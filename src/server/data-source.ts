@@ -2,7 +2,7 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 
-console.log('TypeORM starting form dirname:', __dirname, !!process.env.DB_LOGGING, process.env.DB_LOGGING);
+console.log('TypeORM starting form dirname:', __dirname, 'DB Logging:', !!process.env.DB_LOGGING);
 
 export const AppDataSource = new DataSource({
   type: 'mysql',

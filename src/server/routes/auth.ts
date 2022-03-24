@@ -12,7 +12,7 @@ export class AuthController {
     this.ds = ds;
     this.userRepository = this.ds.getRepository(User);
 
-    this.intializeUsers();
+    if (process.env.DB_NEED_REINIT === 'yes') this.intializeUsers();
     this.router.use(this.checkTokenMiddleware);
     this.router.post(`${this.path}${AUTH_PASSWORD_ENDPOINT}`, this.handlePasswordAuth);
   }
@@ -33,7 +33,9 @@ export class AuthController {
     }
 
     const reqToken = Array.isArray(request.headers.auth) ? request.headers.auth.join('') : request.headers.auth;
-    const user: User | null = await this.userRepository.findOne({ where: { isBlocked: false, token: reqToken } }); //TODO: Добавить userId
+    const reqUserId = Number(Array.isArray(request.headers.userid) ? request.headers.userid.join('') : request.headers.userid);
+
+    const user: User | null = await this.userRepository.findOne({ where: { id: reqUserId, isBlocked: false, token: reqToken } });
     if (user) {
       next();
     } else {
@@ -70,7 +72,8 @@ export class AuthController {
       const newToken = Math.random().toString(36).substring(2);
       user.token = newToken;
       await this.userRepository.save(user);
-      response.send({ token: newToken, userId: 2, username: 'demo2' });
+      const resp: AuthResponse = { token: newToken, userId: user.id };
+      response.send(resp);
       return;
     }
   };
@@ -87,4 +90,9 @@ export class AuthController {
     await this.userRepository.save([user]);
     console.log('Saved a new user with id: ' + user.id);
   }
+}
+
+export interface AuthResponse {
+  token: string;
+  userId: number;
 }

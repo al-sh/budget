@@ -22,7 +22,7 @@ export class AccountsController {
   private create = async (request: express.Request, response: express.Response) => {
     console.log('acc create1', request.body);
 
-    const account = this.ds.manager.create(Account, request.body);
+    const account = this.ds.manager.create(Account, { ...request.body, user: { id: request.headers.userid } });
 
     this.ds.manager
       .save(account)
@@ -51,7 +51,7 @@ export class AccountsController {
 
   private getAll = async (request: express.Request, response: express.Response) => {
     console.log('Loading accounts from the database...');
-    const accounts = await this.ds.manager.find(Account);
+    const accounts = await this.ds.manager.find(Account, { where: { user: { id: Number(request.headers.userid) } } });
     console.log('Loaded accounts: ', accounts);
     response.send(accounts);
   };

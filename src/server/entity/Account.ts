@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from 'typeorm';
 import { Transaction } from './Transaction';
+import { User } from './User';
 
 @Entity()
 export class Account {
@@ -15,4 +16,7 @@ export class Account {
 
   @OneToMany(() => Transaction, (tran) => tran.id)
   public transactions: Transaction;
+
+  @ManyToOne(() => User, (user) => user.id)
+  public user: User;
 }

@@ -1,4 +1,4 @@
-import axios, { AxiosPromise } from 'axios';
+import axios, { AxiosError, AxiosPromise } from 'axios';
 import { useStorage } from './Storage';
 
 interface ApiRequest {
@@ -25,24 +25,12 @@ class ApiService {
 
   public send: <T>(request: ApiRequest) => ApiResponse<T> = async (request) => {
     const { endpoint, method, data, query } = request;
-    // await this.authService.checkToken();
-
     const url = `${this.path}/${endpoint}`;
 
-    // цель доработки - если пришёл код 401, то должен быть редирект на логин useNavigate хук
-    /*const response = axios({
-      //todo: доделать
-      data,
-      headers: { Auth: useStorage().getItem('token') },
-      method,
-      params: query,
-      url,
-    });*/
     return new Promise((resolve, reject) => {
       axios({
-        // тут вернуть новый промис
         data,
-        headers: { Auth: useStorage().getItem('token') },
+        headers: { Auth: useStorage().getItem('token'), UserId: useStorage().getItem('userId') },
         method,
         params: query,
         url,
@@ -52,7 +40,7 @@ class ApiService {
 
           resolve(response);
         })
-        .catch((error) => {
+        .catch((error: AxiosError) => {
           console.log(error.response);
           if (error.response.status === 401) {
             console.log('redirect to login');

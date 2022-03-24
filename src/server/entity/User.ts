@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 /* eslint-disable @typescript-eslint/member-ordering */
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Account } from './Account';
 import { Transaction } from './Transaction';
 
 @Entity()
@@ -28,4 +29,7 @@ export class User {
 
   @OneToMany(() => Transaction, (tran) => tran.id)
   public transactions: Transaction;
+
+  @OneToMany(() => Account, (acc) => acc.id)
+  public accounts: Account;
 }
