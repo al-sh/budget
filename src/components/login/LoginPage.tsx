@@ -19,30 +19,33 @@ export const LoginPage: React.FC = () => {
     passwordInput.current.value = 'demo';
   }, []);
 
-  const handleSubmit = useCallback(async (e) => {
-    e.preventDefault();
-    console.log(nameInput.current.value, passwordInput.current.value);
-    try {
-      const response = await api.send<AuthResponse>({
-        data: {
-          login: nameInput.current.value,
-          password: passwordInput.current.value,
-        },
-        endpoint: AUTH_PASSWORD_ENDPOINT,
-        method: 'POST',
-      });
-      console.log('response: ', response);
-      storage.setItem('token', response.data.token);
-      storage.setItem('userId', String(response.data.userId));
-      navigate('/main');
-    } catch (e) {
-      if (e.response?.status === 403) {
-        notification.error({ message: 'Неправильный логин/пароль' });
-      } else {
-        notification.error({ message: 'Произошла ошибка авторизации. Повторите попытку позже.' });
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      console.log(nameInput.current.value, passwordInput.current.value);
+      try {
+        const response = await api.send<AuthResponse>({
+          data: {
+            login: nameInput.current.value,
+            password: passwordInput.current.value,
+          },
+          endpoint: AUTH_PASSWORD_ENDPOINT,
+          method: 'POST',
+        });
+        console.log('response: ', response);
+        storage.setItem('token', response.data.token);
+        storage.setItem('userId', String(response.data.userId));
+        navigate('/main');
+      } catch (e) {
+        if (e.response?.status === 403) {
+          notification.error({ message: 'Неправильный логин/пароль' });
+        } else {
+          notification.error({ message: 'Произошла ошибка авторизации. Повторите попытку позже.' });
+        }
       }
-    }
-  }, []);
+    },
+    [api, navigate, storage]
+  );
 
   return (
     <>

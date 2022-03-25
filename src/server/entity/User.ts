@@ -27,9 +27,9 @@ export class User {
   @Column()
   public isBlocked: boolean;
 
-  @OneToMany(() => Transaction, (tran) => tran.id)
+  @OneToMany(() => Transaction, (tran) => tran.user)
   public transactions: Transaction;
 
-  @OneToMany(() => Account, (acc) => acc.id)
+  @OneToMany(() => Account, (acc) => acc.user)
   public accounts: Account;
 }

@@ -2,6 +2,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Account } from './Account';
 import { TransactionType } from './TransactionType';
+import { User } from './User';
 
 @Entity()
 export class Transaction {
@@ -19,4 +20,7 @@ export class Transaction {
 
   @ManyToOne(() => Account, (acc) => acc.id)
   public account: Account;
+
+  @ManyToOne(() => User, (user) => user.transactions)
+  public user: User;
 }

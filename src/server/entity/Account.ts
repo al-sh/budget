@@ -17,6 +17,6 @@ export class Account {
   @OneToMany(() => Transaction, (tran) => tran.id)
   public transactions: Transaction;
 
-  @ManyToOne(() => User, (user) => user.id)
+  @ManyToOne(() => User, (user) => user.accounts)
   public user: User;
 }

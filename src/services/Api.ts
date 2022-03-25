@@ -36,14 +36,12 @@ class ApiService {
         url,
       })
         .then((response) => {
-          console.log('status', response.status);
-
           resolve(response);
         })
         .catch((error: AxiosError) => {
           console.log(error.response);
           if (error.response.status === 401) {
-            console.log('redirect to login');
+            console.log('redirected to login');
             window.location.href = `${window.location.origin}/login`;
           }
           reject(error);
