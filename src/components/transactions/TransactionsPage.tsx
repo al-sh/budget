@@ -4,7 +4,7 @@ import { useApi } from '../../services/Api';
 import { Account } from '../../server/entity/Account';
 import { Button, Checkbox, Form, Input } from 'antd';
 
-export const AccountsPage: React.FC = () => {
+export const TransactionsPage: React.FC = () => {
   const api = useApi();
   const queryKey = useMemo(() => ['accounts'], []);
   const { isLoading, isError, data } = useQuery(queryKey, () => api.send<Account[]>({ endpoint: 'accounts', method: 'GET' }));
@@ -46,7 +46,7 @@ export const AccountsPage: React.FC = () => {
 
   return (
     <>
-      <div>Счета</div>
+      <div>Транзакции</div>
       {data.data.map((acc) => (
         <div key={acc.id}>
           <span>Название: {acc.name}</span>
@@ -56,12 +56,12 @@ export const AccountsPage: React.FC = () => {
               handleDelete(acc.id);
             }}
           >
-            Удалить
+            Delete
           </button>
         </div>
       ))}
 
-      <div>Новый счет</div>
+      <div>Новая транзакция</div>
       <div style={{ width: 400 }}>
         <Form
           name="basic"

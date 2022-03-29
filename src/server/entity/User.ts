@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Account } from './Account';
-import { Transaction } from './Transaction';
 
 @Entity()
 export class User {
@@ -26,9 +25,6 @@ export class User {
 
   @Column()
   public isBlocked: boolean;
-
-  @OneToMany(() => Transaction, (tran) => tran.user)
-  public transactions: Transaction;
 
   @OneToMany(() => Account, (acc) => acc.user)
   public accounts: Account;

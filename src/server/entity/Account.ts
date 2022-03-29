@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-inferrable-types */
 /* eslint-disable @typescript-eslint/member-ordering */
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from 'typeorm';
 import { Transaction } from './Transaction';
@@ -13,6 +14,9 @@ export class Account {
 
   @Column()
   public isActive: boolean;
+
+  @Column()
+  public initialValue: number = 0;
 
   @OneToMany(() => Transaction, (tran) => tran.id)
   public transactions: Transaction;

@@ -35,9 +35,9 @@ export const LoginPage: React.FC = () => {
     [api, navigate, storage]
   );
 
-  const onFinishFailed = (errorInfo) => {
+  const onFinishFailed = useCallback((errorInfo) => {
     console.log('Failed:', errorInfo);
-  };
+  }, []);
 
   return (
     <>
@@ -93,7 +93,7 @@ export const LoginPage: React.FC = () => {
             }}
           >
             <Button type="primary" htmlType="submit">
-              Submit
+              Вход
             </Button>
           </Form.Item>
         </Form>
