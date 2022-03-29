@@ -1,34 +1,22 @@
 import { notification } from 'antd';
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AUTH_PASSWORD_ENDPOINT } from '../../constants/urls';
 import { AuthResponse } from '../../server/routes/auth';
 import { useApi } from '../../services/Api';
 import { useStorage } from '../../services/Storage';
+import { Form, Input, Button } from 'antd';
 
 export const LoginPage: React.FC = () => {
   const api = useApi();
   const storage = useStorage();
   const navigate = useNavigate();
 
-  const nameInput = useRef(null);
-  const passwordInput = useRef(null);
-
-  useEffect(() => {
-    nameInput.current.value = 'demo';
-    passwordInput.current.value = 'demo';
-  }, []);
-
-  const handleSubmit = useCallback(
-    async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      console.log(nameInput.current.value, passwordInput.current.value);
+  const handleFinish = useCallback(
+    async (formValues: { login: string; password: string }) => {
       try {
         const response = await api.send<AuthResponse>({
-          data: {
-            login: nameInput.current.value,
-            password: passwordInput.current.value,
-          },
+          data: formValues,
           endpoint: AUTH_PASSWORD_ENDPOINT,
           method: 'POST',
         });
@@ -47,15 +35,68 @@ export const LoginPage: React.FC = () => {
     [api, navigate, storage]
   );
 
+  const onFinishFailed = (errorInfo) => {
+    console.log('Failed:', errorInfo);
+  };
+
   return (
     <>
       <h2>Login</h2>
-      <div>
-        <form onSubmit={handleSubmit}>
-          <input type="text" ref={nameInput} placeholder="Введите логин" />
-          <input type="text" ref={passwordInput} placeholder="Введите пароль" />
-          <button type="submit">Создать</button>
-        </form>
+      <div style={{ width: 500 }}>
+        <Form
+          name="basic"
+          labelCol={{
+            span: 8,
+          }}
+          layout="vertical"
+          wrapperCol={{
+            span: 16,
+          }}
+          initialValues={{
+            login: 'demo',
+            password: 'demo',
+          }}
+          onFinish={handleFinish}
+          onFinishFailed={onFinishFailed}
+          autoComplete="off"
+        >
+          <Form.Item
+            label="Логин"
+            name="login"
+            rules={[
+              {
+                message: 'Введите логин',
+                required: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            label="Пароль"
+            name="password"
+            rules={[
+              {
+                message: 'Введите пароль',
+                required: true,
+              },
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
+
+          <Form.Item
+            wrapperCol={{
+              offset: 8,
+              span: 16,
+            }}
+          >
+            <Button type="primary" htmlType="submit">
+              Submit
+            </Button>
+          </Form.Item>
+        </Form>
       </div>
     </>
   );
