@@ -1,13 +1,12 @@
-import React, { useCallback, useMemo } from 'react';
-import { useQuery, useQueryClient } from 'react-query';
+import React, { useCallback } from 'react';
+import { useQueryClient } from 'react-query';
 import { useApi } from '../../services/Api';
-import { Account } from '../../server/entity/Account';
 import { Button, Checkbox, Form, Input } from 'antd';
+import { accountsQueryKey, useAccounts } from '../../hooks/useAccounts';
 
 export const AccountsPage: React.FC = () => {
   const api = useApi();
-  const queryKey = useMemo(() => ['accounts'], []);
-  const { isLoading, isError, data } = useQuery(queryKey, () => api.send<Account[]>({ endpoint: 'accounts', method: 'GET' }));
+  const { isLoading, isError, data: accounts } = useAccounts();
 
   const queryClient = useQueryClient();
 
@@ -18,9 +17,9 @@ export const AccountsPage: React.FC = () => {
         endpoint: 'accounts',
         method: 'POST',
       });
-      queryClient.invalidateQueries(queryKey);
+      queryClient.invalidateQueries(accountsQueryKey);
     },
-    [api, queryClient, queryKey]
+    [api, queryClient]
   );
 
   const handleDelete = useCallback(
@@ -32,9 +31,9 @@ export const AccountsPage: React.FC = () => {
         endpoint: 'accounts',
         method: 'DELETE',
       });
-      queryClient.invalidateQueries(queryKey);
+      queryClient.invalidateQueries(accountsQueryKey);
     },
-    [api, queryClient, queryKey]
+    [api, queryClient]
   );
 
   const onFinishFailed = useCallback((errorInfo) => {
@@ -47,7 +46,7 @@ export const AccountsPage: React.FC = () => {
   return (
     <>
       <div>Счета</div>
-      {data.data.map((acc) => (
+      {accounts.map((acc) => (
         <div key={acc.id}>
           <span>Название: {acc.name}</span>
           <span style={{ marginLeft: 10 }}>Активен: {acc.isActive ? 'Да' : 'Нет'}</span>

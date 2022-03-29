@@ -26,16 +26,16 @@ ReactDOM.render(
         <div>
           <menu>
             <Link to="/">
-              <div>Main</div>
+              <div>Главная</div>
             </Link>
             <Link to="/login">
-              <div>Login</div>
+              <div>Авторизация</div>
             </Link>
             <Link to="/accounts">
-              <div>Accounts</div>
+              <div>Счета</div>
             </Link>
             <Link to="/transactions">
-              <div>Transactions</div>
+              <div>Транзакции</div>
             </Link>
           </menu>
           <main>

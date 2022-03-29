@@ -37,6 +37,9 @@ export class AuthController {
 
     const user: User | null = await this.userRepository.findOne({ where: { id: reqUserId, isBlocked: false, token: reqToken } });
     if (user) {
+      const reqAccountId = Number(Array.isArray(request.body.accountId) ? request.body.accountId.join('') : request.body.accountId);
+      //TODO проверить reqAccountId на принадлежность текущему пользователю
+
       next();
     } else {
       response.status(401);

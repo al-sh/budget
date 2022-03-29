@@ -21,8 +21,8 @@ export const LoginPage: React.FC = () => {
           method: 'POST',
         });
         console.log('response: ', response);
-        storage.setItem('token', response.data.token);
-        storage.setItem('userId', String(response.data.userId));
+        storage.setItem('token', response.token);
+        storage.setItem('userId', String(response.userId));
         navigate('/main');
       } catch (e) {
         if (e.response?.status === 403) {

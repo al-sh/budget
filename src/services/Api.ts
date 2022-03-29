@@ -23,7 +23,7 @@ class ApiService {
 
   private path = 'http://localhost:3001';
 
-  public send: <T>(request: ApiRequest) => ApiResponse<T> = async (request) => {
+  public send: <T>(request: ApiRequest) => Promise<T> = async (request) => {
     const { endpoint, method, data, query } = request;
     const url = `${this.path}/${endpoint}`;
 
@@ -36,7 +36,7 @@ class ApiService {
         url,
       })
         .then((response) => {
-          resolve(response);
+          resolve(response.data);
         })
         .catch((error: AxiosError) => {
           console.log(error.response);

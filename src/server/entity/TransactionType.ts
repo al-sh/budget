@@ -1,5 +1,7 @@
-import { Entity, PrimaryColumn, Column, OneToMany } from "typeorm";
-import { Transaction } from "./Transaction";
+/* eslint-disable @typescript-eslint/member-ordering */
+/* eslint-disable @typescript-eslint/explicit-member-accessibility */
+import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
+import { Transaction } from './Transaction';
 
 @Entity()
 export class TransactionType {

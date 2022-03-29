@@ -1,7 +1,6 @@
 import * as express from 'express';
 import { DataSource } from 'typeorm';
 import { Account } from '../entity/Account';
-import { User } from '../entity/User';
 
 export class AccountsController {
   constructor(ds: DataSource) {
@@ -52,15 +51,9 @@ export class AccountsController {
 
   private getAll = async (request: express.Request, response: express.Response) => {
     console.log('Loading accounts from the database...');
+
     const accounts = await this.ds.manager.find(Account, { where: { user: { id: Number(request.headers.userid) } } });
 
-    const userRepository = this.ds.getRepository(User);
-    // вывести список всех счетов юзера иначе
-    // TODO: выбрать способ
-    console.log(
-      'user accounts',
-      (await userRepository.findOne({ relations: { accounts: true }, where: { id: Number(request.headers.userid) } })).accounts
-    );
     console.log('Loaded accounts: ', accounts);
     response.send(accounts);
   };

@@ -12,14 +12,11 @@ export class Transaction {
   public description: string;
 
   @Column()
-  public accountId: string;
-
-  @Column()
   public amount: number;
 
-  @ManyToOne(() => TransactionType, (type) => type.id)
+  @ManyToOne(() => TransactionType, (type) => type.transactions)
   public type: TransactionType;
 
-  @ManyToOne(() => Account, (acc) => acc.id)
+  @ManyToOne(() => Account, (acc) => acc.transactions)
   public account: Account;
 }

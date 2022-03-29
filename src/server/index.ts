@@ -7,6 +7,7 @@ import express from 'express';
 import { AppDataSource } from './data-source';
 import { AccountsController } from './routes/accounts';
 import { AuthController } from './routes/auth';
+import { TransactionsController } from './routes/transactions';
 
 console.time('serverInit');
 
@@ -33,6 +34,9 @@ AppDataSource.initialize()
 
     const accountsController = new AccountsController(AppDataSource);
     app.use('/accounts', accountsController.router);
+
+    const transactionsController = new TransactionsController(AppDataSource);
+    app.use('/transactions', transactionsController.router);
 
     app.listen(port, () => {
       console.log(`Example app listening on port ${port}`);
