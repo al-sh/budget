@@ -1,10 +1,11 @@
 import React, { useCallback, useMemo } from 'react';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQueryClient } from 'react-query';
 import { useApi } from '../../services/Api';
 import { Button, Form, Input, InputNumber, Select } from 'antd';
-import { Transaction } from '../../server/entity/Transaction';
 import { useAccounts } from '../../hooks/useAccounts';
 import { useTransactionTypes } from '../../hooks/useTransactionTypes';
+import { useTransactions } from '../../hooks/useTransactions';
+import { TransactionsList } from './TransactionsList';
 
 export const TransactionsPage: React.FC = () => {
   const api = useApi();
@@ -12,7 +13,7 @@ export const TransactionsPage: React.FC = () => {
   const { isLoading: isAccountsLoading, data: accounts } = useAccounts();
   const { isLoading: isTranTypesLoading, data: tranTypes } = useTransactionTypes();
 
-  const { isLoading, isError, data } = useQuery(queryKey, () => api.send<Transaction[]>({ endpoint: 'transactions', method: 'GET' }));
+  const { isLoading, isError, data: transactions } = useTransactions();
 
   const queryClient = useQueryClient();
 
@@ -22,20 +23,6 @@ export const TransactionsPage: React.FC = () => {
         data: formValues,
         endpoint: 'transactions',
         method: 'POST',
-      });
-      queryClient.invalidateQueries(queryKey);
-    },
-    [api, queryClient, queryKey]
-  );
-
-  const handleDelete = useCallback(
-    async (id: number) => {
-      await api.send({
-        data: {
-          id: id,
-        },
-        endpoint: 'transactions',
-        method: 'DELETE',
       });
       queryClient.invalidateQueries(queryKey);
     },
@@ -52,20 +39,7 @@ export const TransactionsPage: React.FC = () => {
   return (
     <>
       <div>Транзакции</div>
-      {data.map((tran) => (
-        <div key={tran.id}>
-          <span>{tran.type.name}</span>
-          <span>Сумма: {tran.amount}</span>
-          <span>Описание: {tran.description}</span>
-          <button
-            onClick={() => {
-              handleDelete(tran.id);
-            }}
-          >
-            Delete
-          </button>
-        </div>
-      ))}
+      <TransactionsList transactions={transactions} />
 
       <div>Новая транзакция</div>
       <div style={{ width: 400 }}>
