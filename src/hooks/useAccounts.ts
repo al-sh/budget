@@ -1,10 +1,49 @@
-import { useQuery } from 'react-query';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { Account } from '../server/entity/Account';
 import { useApi } from '../services/Api';
 
-// eslint-disable-next-line react-hooks/rules-of-hooks
-const api = useApi();
-
 export const accountsQueryKey = ['accounts'];
 
-export const useAccounts = () => useQuery(accountsQueryKey, () => api.send<Account[]>({ endpoint: 'accounts', method: 'GET' }));
+export const useAccounts = () => {
+  const api = useApi();
+
+  const queryClient = useQueryClient();
+
+  const useGetList = () => useQuery(accountsQueryKey, () => api.send<Account[]>({ endpoint: 'accounts', method: 'GET' }));
+
+  const useCreate = () =>
+    useMutation(
+      (formValues: Record<string, unknown>) => {
+        return api.send({
+          data: formValues,
+          endpoint: 'accounts',
+          method: 'POST',
+        });
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries(accountsQueryKey);
+        },
+      }
+    );
+
+  const useDelete = () =>
+    useMutation(
+      (id: number) => {
+        return api.send({
+          data: {
+            id: id,
+          },
+          endpoint: 'accounts',
+          method: 'DELETE',
+        });
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries(accountsQueryKey);
+        },
+      }
+    );
+
+  return { useCreate, useDelete, useGetList };
+};

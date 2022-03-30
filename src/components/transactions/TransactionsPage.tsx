@@ -9,7 +9,7 @@ import { TransactionsList } from './TransactionsList';
 
 export const TransactionsPage: React.FC = () => {
   const api = useApi();
-  const { isLoading: isAccountsLoading, data: accounts } = useAccounts();
+  const { isLoading: isAccountsLoading, data: accounts } = useAccounts().useGetList();
   const { isLoading: isTranTypesLoading, data: tranTypes } = useTransactionTypes();
 
   const { isLoading, isError, data: transactions } = useTransactions();
