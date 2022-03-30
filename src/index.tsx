@@ -4,6 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
+import { ReactQueryDevtools } from 'react-query/devtools';
 import { LoginPage } from './components/login/LoginPage';
 import { AccountsPage } from './components/accounts/AccountsPage';
 import { QueryClient, QueryClientProvider } from 'react-query';
@@ -21,8 +22,8 @@ const queryClient = new QueryClient({
 
 ReactDOM.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
         <div>
           <menu>
             <Link to="/">
@@ -47,8 +48,9 @@ ReactDOM.render(
             </Routes>
           </main>
         </div>
-      </QueryClientProvider>
-    </BrowserRouter>
+      </BrowserRouter>
+      <ReactQueryDevtools initialIsOpen panelProps={{ style: { height: '100vh', maxHeight: 'unset', top: 0, width: '50%' } }} />
+    </QueryClientProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );

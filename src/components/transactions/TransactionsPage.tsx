@@ -1,15 +1,14 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 import { useQueryClient } from 'react-query';
 import { useApi } from '../../services/Api';
 import { Button, Form, Input, InputNumber, Select } from 'antd';
 import { useAccounts } from '../../hooks/useAccounts';
 import { useTransactionTypes } from '../../hooks/useTransactionTypes';
-import { useTransactions } from '../../hooks/useTransactions';
+import { transactionsQueryKey, useTransactions } from '../../hooks/useTransactions';
 import { TransactionsList } from './TransactionsList';
 
 export const TransactionsPage: React.FC = () => {
   const api = useApi();
-  const queryKey = useMemo(() => ['transactions'], []);
   const { isLoading: isAccountsLoading, data: accounts } = useAccounts();
   const { isLoading: isTranTypesLoading, data: tranTypes } = useTransactionTypes();
 
@@ -24,9 +23,9 @@ export const TransactionsPage: React.FC = () => {
         endpoint: 'transactions',
         method: 'POST',
       });
-      queryClient.invalidateQueries(queryKey);
+      queryClient.invalidateQueries(transactionsQueryKey);
     },
-    [api, queryClient, queryKey]
+    [api, queryClient]
   );
 
   const onFinishFailed = useCallback((errorInfo) => {
