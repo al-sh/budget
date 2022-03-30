@@ -28,7 +28,9 @@ export class AccountsController {
       .save(account)
       .then((acc) => {
         console.log('create - ok: ', account, acc);
-        response.send({ account: acc });
+        setTimeout(() => {
+          response.send({ account: acc });
+        }, 1500); //load emulation
       })
       .catch((err) => response.send(err));
   };
@@ -55,7 +57,9 @@ export class AccountsController {
     const accounts = await this.ds.manager.find(Account, { where: { user: { id: Number(request.headers.userid) } } });
 
     console.log('Loaded accounts: ', accounts);
-    response.send(accounts);
+    setTimeout(() => {
+      response.send(accounts);
+    }, 1500);
   };
 
   private async intializeAccounts() {

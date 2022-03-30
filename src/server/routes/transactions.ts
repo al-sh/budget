@@ -35,7 +35,11 @@ export class TransactionsController {
         console.log('create - ok: ', item);
         response.send({ tran: item });
       })
-      .catch((err) => response.send(err));
+      .catch((err) => {
+        response.status(500);
+        console.log('tran create error: ', err?.message);
+        response.send({ message: err?.message });
+      });
   };
 
   private delete = async (request: express.Request, response: express.Response) => {
@@ -70,7 +74,9 @@ export class TransactionsController {
     });
 */
     console.log('Loaded transactions: ', transactions);
-    response.send(transactions);
+    setTimeout(() => {
+      response.send(transactions);
+    }, 1500);
   };
 
   private getTypes = async (request: express.Request, response: express.Response) => {

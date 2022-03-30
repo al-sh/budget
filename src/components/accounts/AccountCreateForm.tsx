@@ -3,7 +3,7 @@ import { useAccounts } from '../../hooks/useAccounts';
 
 export const AccountCreateForm: React.VFC = () => {
   const { useCreate } = useAccounts();
-  const createAccountMutation = useCreate();
+  const createAccountQuery = useCreate();
 
   return (
     <div style={{ width: 400 }}>
@@ -21,7 +21,7 @@ export const AccountCreateForm: React.VFC = () => {
           name: '',
         }}
         onFinish={(formValues) => {
-          createAccountMutation.mutate(formValues);
+          createAccountQuery.mutate(formValues);
         }}
         autoComplete="off"
       >
@@ -48,11 +48,12 @@ export const AccountCreateForm: React.VFC = () => {
             span: 16,
           }}
         >
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" disabled={createAccountQuery.isLoading}>
             Добавить
           </Button>
         </Form.Item>
       </Form>
+      {createAccountQuery.isLoading && <div>Добавление счета...</div>}
     </div>
   );
 };

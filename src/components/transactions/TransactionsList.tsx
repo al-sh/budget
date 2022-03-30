@@ -1,12 +1,14 @@
 import React, { useCallback } from 'react';
 import { useQueryClient } from 'react-query';
-import { transactionsQueryKey } from '../../hooks/useTransactions';
-import { Transaction } from '../../server/entity/Transaction';
+import { transactionsQueryKey, useTransactions } from '../../hooks/useTransactions';
 import { useApi } from '../../services/Api';
 
-export const TransactionsList: React.FC<{ transactions: Transaction[] }> = ({ transactions }) => {
+export const TransactionsList: React.VFC = () => {
   const api = useApi();
   const queryClient = useQueryClient();
+
+  const { useGetList: useGetTransactions } = useTransactions();
+  const { isLoading, isError, data: transactions } = useGetTransactions();
 
   const handleDelete = useCallback(
     async (id: number) => {
@@ -21,6 +23,9 @@ export const TransactionsList: React.FC<{ transactions: Transaction[] }> = ({ tr
     },
     [api, queryClient]
   );
+
+  if (isLoading) return <>Transactions loading...</>;
+  if (isError) return <>Error</>;
 
   return (
     <>
