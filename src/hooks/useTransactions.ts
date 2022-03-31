@@ -27,5 +27,32 @@ export const useTransactions = () => {
       }
     );
 
-  return { useCreate, useGetList };
+  const useDelete = () =>
+    useMutation(
+      (id: number) => {
+        return api.send({
+          data: {
+            id: id,
+          },
+          endpoint: 'transactions',
+          method: 'DELETE',
+        });
+      },
+      {
+        onMutate: async (id) => {
+          // optimistic update
+          const transactions: Transaction[] = queryClient.getQueryData(transactionsQueryKey);
+          queryClient.setQueryData(
+            transactionsQueryKey,
+            transactions.filter((item) => item.id !== id)
+          );
+          return {};
+        },
+        onSuccess: () => {
+          queryClient.invalidateQueries(transactionsQueryKey);
+        },
+      }
+    );
+
+  return { useCreate, useDelete, useGetList };
 };

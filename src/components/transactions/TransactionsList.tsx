@@ -1,28 +1,11 @@
-import React, { useCallback } from 'react';
-import { useQueryClient } from 'react-query';
-import { transactionsQueryKey, useTransactions } from '../../hooks/useTransactions';
-import { useApi } from '../../services/Api';
+import { Button } from 'antd';
+import React from 'react';
+import { useTransactions } from '../../hooks/useTransactions';
 
 export const TransactionsList: React.VFC = () => {
-  const api = useApi();
-  const queryClient = useQueryClient();
-
-  const { useGetList: useGetTransactions } = useTransactions();
+  const { useGetList: useGetTransactions, useDelete } = useTransactions();
+  const useDeleleQuery = useDelete();
   const { isLoading, isError, data: transactions } = useGetTransactions();
-
-  const handleDelete = useCallback(
-    async (id: number) => {
-      await api.send({
-        data: {
-          id: id,
-        },
-        endpoint: 'transactions',
-        method: 'DELETE',
-      });
-      queryClient.invalidateQueries(transactionsQueryKey);
-    },
-    [api, queryClient]
-  );
 
   if (isLoading) return <>Transactions loading...</>;
   if (isError) return <>Error</>;
@@ -34,13 +17,13 @@ export const TransactionsList: React.VFC = () => {
           <span>{tran.type.name}</span>
           <span>Сумма: {tran.amount}</span>
           <span>Описание: {tran.description}</span>
-          <button
+          <Button
             onClick={() => {
-              handleDelete(tran.id);
+              useDeleleQuery.mutate(tran.id);
             }}
           >
-            Delete
-          </button>
+            Удалить
+          </Button>
         </div>
       ))}
     </>

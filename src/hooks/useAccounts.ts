@@ -7,6 +7,8 @@ export const accountsQueryKey = ['accounts'];
 export const useAccounts = () => {
   const api = useApi();
 
+  console.log('useAccounts');
+
   const queryClient = useQueryClient();
 
   const useGetList = () => useQuery(accountsQueryKey, () => api.send<Account[]>({ endpoint: 'accounts', method: 'GET' }));
