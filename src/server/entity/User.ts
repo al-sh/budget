@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Account } from './Account';
+import { Category } from './Category';
 
 @Entity()
 export class User {
@@ -28,4 +29,7 @@ export class User {
 
   @OneToMany(() => Account, (acc) => acc.user)
   public accounts: Account;
+
+  @OneToMany(() => Category, (cat) => cat.user)
+  public categories: Category;
 }

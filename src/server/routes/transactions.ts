@@ -21,11 +21,12 @@ export class TransactionsController {
   private path = '/';
 
   private create = async (request: express.Request, response: express.Response) => {
-    console.log('tran create', request.body);
+    console.log('tran create', request.body); //todo: типизировать body для запросов
 
     const tran = this.ds.manager.create(Transaction, {
       ...request.body,
       account: { id: request.body.accountId },
+      category: { id: request.body.categoryId },
       type: { id: request.body.typeId },
     });
 

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Account } from './Account';
+import { Category } from './Category';
 import { TransactionType } from './TransactionType';
 
 @Entity()
@@ -19,4 +20,7 @@ export class Transaction {
 
   @ManyToOne(() => Account, (acc) => acc.transactions)
   public account: Account;
+
+  @ManyToOne(() => Category, (cat) => cat.transactions)
+  public category: Category;
 }

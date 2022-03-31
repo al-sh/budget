@@ -1,11 +1,13 @@
 import { Form, InputNumber, Input, Select, Button } from 'antd';
 import { useState } from 'react';
 import { useAccounts } from '../../hooks/useAccounts';
+import { useCategories } from '../../hooks/useCategories';
 import { useTransactions } from '../../hooks/useTransactions';
 import { useTransactionTypes } from '../../hooks/useTransactionTypes';
 
 export const TransactionForm: React.VFC = () => {
   const { isLoading: isAccountsLoading, data: accounts } = useAccounts().useGetList();
+  const { isLoading: isCategoriesLoading, data: categories } = useCategories().useGetList();
   const { isLoading: isTranTypesLoading, data: tranTypes } = useTransactionTypes();
   const createTransactionQuery = useTransactions().useCreate();
   const [form] = Form.useForm();
@@ -64,6 +66,16 @@ export const TransactionForm: React.VFC = () => {
             {accounts?.map((acc) => (
               <Select.Option key={acc.id} value={acc.id}>
                 {acc.name}
+              </Select.Option>
+            ))}
+          </Select>
+        </Form.Item>
+
+        <Form.Item label="Категория" name="categoryId" rules={[{ message: 'Выберите категорию', required: true }]}>
+          <Select loading={isCategoriesLoading}>
+            {categories?.map((cat) => (
+              <Select.Option key={cat.id} value={cat.id}>
+                {cat.name}
               </Select.Option>
             ))}
           </Select>

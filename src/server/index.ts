@@ -7,6 +7,7 @@ import express from 'express';
 import { AppDataSource } from './data-source';
 import { AccountsController } from './routes/accounts';
 import { AuthController } from './routes/auth';
+import { CategoriesController } from './routes/categories';
 import { TransactionsController } from './routes/transactions';
 
 console.time('serverInit');
@@ -31,6 +32,9 @@ AppDataSource.initialize()
   .then(async () => {
     const authController = new AuthController(AppDataSource);
     app.use('/', authController.router);
+
+    const categoriesController = new CategoriesController(AppDataSource);
+    app.use('/categories', categoriesController.router);
 
     const accountsController = new AccountsController(AppDataSource);
     app.use('/accounts', accountsController.router);
