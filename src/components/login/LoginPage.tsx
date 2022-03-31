@@ -3,13 +3,13 @@ import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AUTH_PASSWORD_ENDPOINT } from '../../constants/urls';
 import { AuthResponse } from '../../server/routes/auth';
-import { useApi } from '../../services/Api';
-import { useStorage } from '../../services/Storage';
+import { getApi } from '../../services/Api';
+import { getStorage } from '../../services/Storage';
 import { Form, Input, Button } from 'antd';
 
 export const LoginPage: React.FC = () => {
-  const api = useApi();
-  const storage = useStorage();
+  const api = getApi();
+  const storage = getStorage();
   const navigate = useNavigate();
 
   const handleFinish = useCallback(

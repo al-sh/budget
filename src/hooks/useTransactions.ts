@@ -1,11 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { Transaction } from '../server/entity/Transaction';
-import { useApi } from '../services/Api';
+import { getApi } from '../services/Api';
 
 export const transactionsQueryKey = ['transactions'];
 
 export const useTransactions = () => {
-  const api = useApi();
+  const api = getApi();
 
   const queryClient = useQueryClient();
 

@@ -1,9 +1,9 @@
 import { useQuery } from 'react-query';
 import { TransactionType } from '../server/entity/TransactionType';
-import { useApi } from '../services/Api';
+import { getApi } from '../services/Api';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-const api = useApi();
+const api = getApi();
 
 export const transactionTypesQueryKey = ['transactionTypes'];
 

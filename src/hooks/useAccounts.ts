@@ -1,11 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { Account } from '../server/entity/Account';
-import { useApi } from '../services/Api';
+import { getApi } from '../services/Api';
 
 export const accountsQueryKey = ['accounts'];
 
 export const useAccounts = () => {
-  const api = useApi();
+  const api = getApi();
 
   console.log('useAccounts');
 

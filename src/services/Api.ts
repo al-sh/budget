@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosPromise } from 'axios';
-import { useStorage } from './Storage';
+import { getStorage } from './Storage';
 
 interface ApiRequest {
   endpoint: string;
@@ -15,11 +15,14 @@ class ApiService {
 
   public static getInstance(): ApiService {
     if (!ApiService.instance) {
+      console.log('ApiService - create');
       ApiService.instance = new ApiService();
     }
 
     return ApiService.instance;
   }
+
+  private constructor() {}
 
   private path = 'http://localhost:3001';
 
@@ -30,7 +33,7 @@ class ApiService {
     return new Promise((resolve, reject) => {
       axios({
         data,
-        headers: { Auth: useStorage().getItem('token'), UserId: useStorage().getItem('userId') },
+        headers: { Auth: getStorage().getItem('token'), UserId: getStorage().getItem('userId') },
         method,
         params: query,
         url,
@@ -50,4 +53,4 @@ class ApiService {
   };
 }
 
-export const useApi = () => ApiService.getInstance();
+export const getApi = () => ApiService.getInstance();

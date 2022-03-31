@@ -42,6 +42,7 @@ module.exports = {
         interfaces: ['signature', 'constructor', 'field', 'method'],
       },
     ],
+    '@typescript-eslint/no-empty-function': ['error', { allow: ['private-constructors'] }],
     '@typescript-eslint/no-explicit-any': 'warn',
     'react/react-in-jsx-scope': 'off',
     'sort-exports/sort-exports': ['warn', { sortDir: 'asc' }],

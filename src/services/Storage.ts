@@ -24,4 +24,4 @@ class StorageService {
   };
 }
 
-export const useStorage = () => StorageService.getInstance();
+export const getStorage = () => StorageService.getInstance();
