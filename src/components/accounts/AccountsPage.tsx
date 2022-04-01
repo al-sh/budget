@@ -13,3 +13,5 @@ export const AccountsPage: React.VFC = () => {
     </>
   );
 };
+
+export default AccountsPage;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom';
 import 'antd/dist/antd.css';
 import './index.css';
@@ -6,10 +6,8 @@ import { MainPage } from './components/main/MainPage';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import { ReactQueryDevtools } from 'react-query/devtools';
-import { LoginPage } from './components/login/LoginPage';
-import { AccountsPage } from './components/accounts/AccountsPage';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { TransactionsPage } from './components/transactions/TransactionsPage';
+import { Loader } from './components/_shared/Loader';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,6 +18,10 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+const AccountsPage = React.lazy(() => import('./components/accounts/AccountsPage'));
+const LoginPage = React.lazy(() => import('./components/login/LoginPage'));
+const TransactionsPage = React.lazy(() => import('./components/transactions/TransactionsPage'));
 
 ReactDOM.render(
   <React.StrictMode>
@@ -41,12 +43,14 @@ ReactDOM.render(
             </Link>
           </menu>
           <main style={{ width: 600 }}>
-            <Routes>
-              <Route path="/" element={<MainPage />} />
-              <Route path="accounts" element={<AccountsPage />} />
-              <Route path="login" element={<LoginPage />} />
-              <Route path="transactions" element={<TransactionsPage />} />
-            </Routes>
+            <Suspense fallback={<Loader size="large" />}>
+              <Routes>
+                <Route path="/" element={<MainPage />} />
+                <Route path="accounts" element={<AccountsPage />} />
+                <Route path="login" element={<LoginPage />} />
+                <Route path="transactions" element={<TransactionsPage />} />
+              </Routes>
+            </Suspense>
           </main>
         </div>
       </BrowserRouter>

@@ -13,3 +13,5 @@ export const TransactionsPage: React.FC = () => {
     </>
   );
 };
+
+export default TransactionsPage;
