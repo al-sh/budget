@@ -4,7 +4,7 @@ import { useAccounts } from '../../hooks/useAccounts';
 import { useCategories } from '../../hooks/useCategories';
 import { useTransactions } from '../../hooks/useTransactions';
 import { useTransactionTypes } from '../../hooks/useTransactionTypes';
-import { ETRANSACTION_TYPE } from '../../server/entity/TransactionType';
+import { ETRANSACTION_TYPE } from '../../server/types/transactions';
 
 export const TransactionForm: React.VFC = () => {
   const [form] = Form.useForm();

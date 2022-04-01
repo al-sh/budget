@@ -1,0 +1,7 @@
+export enum ETRANSACTION_TYPE {
+  EXPENSE = 1,
+  INCOME = 2,
+  RETURN_EXPENSE = 3,
+  RETURN_INCOME = 4,
+  TRANSFER = 5,
+}

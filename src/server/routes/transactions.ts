@@ -2,7 +2,8 @@ import * as express from 'express';
 import { DataSource, In } from 'typeorm';
 import { Account } from '../entity/Account';
 import { Transaction } from '../entity/Transaction';
-import { ETRANSACTION_TYPE, TransactionType } from '../entity/TransactionType';
+import { TransactionType } from '../entity/TransactionType';
+import { ETRANSACTION_TYPE } from '../types/transactions';
 
 export class TransactionsController {
   constructor(ds: DataSource) {
@@ -101,19 +102,19 @@ export class TransactionsController {
     type1.name = 'Расход';
 
     const type2 = new TransactionType();
-    type2.id = ETRANSACTION_TYPE.EXPENSE;
+    type2.id = ETRANSACTION_TYPE.INCOME;
     type2.name = 'Доход';
 
     const type3 = new TransactionType();
-    type3.id = ETRANSACTION_TYPE.EXPENSE;
+    type3.id = ETRANSACTION_TYPE.RETURN_EXPENSE;
     type3.name = 'Возврат расхода';
 
     const type4 = new TransactionType();
-    type4.id = ETRANSACTION_TYPE.EXPENSE;
+    type4.id = ETRANSACTION_TYPE.RETURN_INCOME;
     type4.name = 'Возврат дохода';
 
     const type5 = new TransactionType();
-    type5.id = ETRANSACTION_TYPE.EXPENSE;
+    type5.id = ETRANSACTION_TYPE.TRANSFER;
     type5.name = 'Перевод между счетами';
 
     await this.ds.manager.save([type1, type2, type3, type4, type5]);

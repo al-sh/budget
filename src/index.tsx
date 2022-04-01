@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import 'antd/dist/antd.css';
 import './index.css';
-import App from './App';
+import { MainPage } from './components/main/MainPage';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import { ReactQueryDevtools } from 'react-query/devtools';
@@ -41,7 +42,7 @@ ReactDOM.render(
           </menu>
           <main style={{ width: 600 }}>
             <Routes>
-              <Route path="/" element={<App />} />
+              <Route path="/" element={<MainPage />} />
               <Route path="accounts" element={<AccountsPage />} />
               <Route path="login" element={<LoginPage />} />
               <Route path="transactions" element={<TransactionsPage />} />
