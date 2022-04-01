@@ -4,13 +4,16 @@ import { useAccounts } from '../../hooks/useAccounts';
 import { useCategories } from '../../hooks/useCategories';
 import { useTransactions } from '../../hooks/useTransactions';
 import { useTransactionTypes } from '../../hooks/useTransactionTypes';
+import { ETRANSACTION_TYPE } from '../../server/entity/TransactionType';
 
 export const TransactionForm: React.VFC = () => {
+  const [form] = Form.useForm();
   const { isLoading: isAccountsLoading, data: accounts } = useAccounts().useGetList();
-  const { isLoading: isCategoriesLoading, data: categories } = useCategories().useGetList();
+  const [typeId, setTypeId] = useState(ETRANSACTION_TYPE.EXPENSE);
+  const { isLoading: isCategoriesLoading, data: categories } = useCategories().useGetList(typeId);
   const { isLoading: isTranTypesLoading, data: tranTypes } = useTransactionTypes();
   const createTransactionQuery = useTransactions().useCreate();
-  const [form] = Form.useForm();
+
   const [isSubmitDisabled, setisSubmitDisabled] = useState(true);
 
   return (
@@ -22,6 +25,7 @@ export const TransactionForm: React.VFC = () => {
           span: 8,
         }}
         onValuesChange={() => {
+          setTypeId(form.getFieldValue('typeId'));
           setisSubmitDisabled(
             createTransactionQuery.isLoading ||
               !form.isFieldsTouched(true) ||
@@ -35,6 +39,7 @@ export const TransactionForm: React.VFC = () => {
         initialValues={{
           isActive: true,
           name: '',
+          typeId: ETRANSACTION_TYPE.EXPENSE,
         }}
         onFinish={(formValues) => createTransactionQuery.mutate(formValues)}
         autoComplete="off"
@@ -51,16 +56,6 @@ export const TransactionForm: React.VFC = () => {
           <Input />
         </Form.Item>
 
-        <Form.Item label="Тип" name="typeId" rules={[{ message: 'Выберите тип', required: true }]}>
-          <Select loading={isTranTypesLoading}>
-            {tranTypes?.map((tran) => (
-              <Select.Option key={tran.id} value={tran.id}>
-                {tran.name}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
-
         <Form.Item label="Счет" name="accountId" rules={[{ message: 'Выберите счет', required: true }]}>
           <Select loading={isAccountsLoading}>
             {accounts?.map((acc) => (
@@ -71,8 +66,18 @@ export const TransactionForm: React.VFC = () => {
           </Select>
         </Form.Item>
 
+        <Form.Item label="Тип" name="typeId" rules={[{ message: 'Выберите тип', required: true }]}>
+          <Select loading={isTranTypesLoading}>
+            {tranTypes?.map((tran) => (
+              <Select.Option key={tran.id} value={tran.id}>
+                {tran.name}
+              </Select.Option>
+            ))}
+          </Select>
+        </Form.Item>
+
         <Form.Item label="Категория" name="categoryId" rules={[{ message: 'Выберите категорию', required: true }]}>
-          <Select loading={isCategoriesLoading}>
+          <Select loading={isCategoriesLoading} disabled={!typeId}>
             {categories?.map((cat) => (
               <Select.Option key={cat.id} value={cat.id}>
                 {cat.name}

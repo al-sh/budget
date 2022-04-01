@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from 'typeorm';
 import { Transaction } from './Transaction';
+import { TransactionType } from './TransactionType';
 import { User } from './User';
 
 @Entity()
@@ -14,6 +15,9 @@ export class Category {
 
   @Column()
   public isActive: boolean;
+
+  @ManyToOne(() => TransactionType, (type) => type.categories)
+  public type: TransactionType;
 
   @OneToMany(() => Category, (category) => category.parentCategory)
   public childrenCategories: Category[];

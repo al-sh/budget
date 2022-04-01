@@ -9,7 +9,14 @@ export const useCategories = () => {
 
   const queryClient = useQueryClient();
 
-  const useGetList = () => useQuery(categoriesQueryKey, () => api.send<Category[]>({ endpoint: 'categories', method: 'GET' }));
+  const useGetList = (typeId: number) =>
+    useQuery(
+      [...categoriesQueryKey, typeId],
+      () => api.send<Category[]>({ query: { typeId: String(typeId) }, endpoint: 'categories', method: 'GET' }),
+      {
+        enabled: !!typeId,
+      }
+    );
 
   const useCreate = () =>
     useMutation(

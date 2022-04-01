@@ -2,11 +2,15 @@ import * as express from 'express';
 import { DataSource, In } from 'typeorm';
 import { Account } from '../entity/Account';
 import { Transaction } from '../entity/Transaction';
-import { TransactionType } from '../entity/TransactionType';
+import { ETRANSACTION_TYPE, TransactionType } from '../entity/TransactionType';
 
 export class TransactionsController {
   constructor(ds: DataSource) {
     this.ds = ds;
+
+    if (process.env.DB_NEED_REINIT) {
+      this.intialize();
+    }
 
     this.router.get(this.path, this.getAll);
     this.router.get(`${this.path}types`, this.getTypes);
@@ -88,4 +92,31 @@ export class TransactionsController {
     console.log('Loaded types: ', types);
     response.send(types);
   };
+
+  private async intialize() {
+    await this.ds.createQueryBuilder().delete().from(TransactionType).execute();
+
+    const type1 = new TransactionType();
+    type1.id = ETRANSACTION_TYPE.EXPENSE;
+    type1.name = 'Расход';
+
+    const type2 = new TransactionType();
+    type2.id = ETRANSACTION_TYPE.EXPENSE;
+    type2.name = 'Доход';
+
+    const type3 = new TransactionType();
+    type3.id = ETRANSACTION_TYPE.EXPENSE;
+    type3.name = 'Возврат расхода';
+
+    const type4 = new TransactionType();
+    type4.id = ETRANSACTION_TYPE.EXPENSE;
+    type4.name = 'Возврат дохода';
+
+    const type5 = new TransactionType();
+    type5.id = ETRANSACTION_TYPE.EXPENSE;
+    type5.name = 'Перевод между счетами';
+
+    await this.ds.manager.save([type1, type2, type3, type4, type5]);
+    console.log('TransactionTypes initialized');
+  }
 }

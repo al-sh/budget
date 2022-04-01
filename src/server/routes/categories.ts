@@ -51,8 +51,10 @@ export class CategoriesController {
 
   private getAll = async (request: express.Request, response: express.Response) => {
     console.log('Loading categories from the database...');
-
-    const categories = await this.ds.manager.find(Category, { where: { user: { id: Number(request.headers.userid) } } });
+    const typeId = parseInt(Array.isArray(request.query.typeId) ? request.query.typeId.join('') : (request.query.typeId as string));
+    const categories = await this.ds.manager.find(Category, {
+      where: { type: typeId ? { id: typeId } : undefined, user: { id: Number(request.headers.userid) } },
+    });
 
     console.log('Loaded categories: ', categories);
     setTimeout(() => {

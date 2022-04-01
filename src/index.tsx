@@ -39,7 +39,7 @@ ReactDOM.render(
               <div>Транзакции</div>
             </Link>
           </menu>
-          <main>
+          <main style={{ width: 600 }}>
             <Routes>
               <Route path="/" element={<App />} />
               <Route path="accounts" element={<AccountsPage />} />
