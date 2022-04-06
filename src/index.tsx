@@ -8,6 +8,8 @@ import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Loader } from './components/_shared/Loader';
+import { Menu } from 'antd';
+import { HomeOutlined, ShoppingOutlined, WalletOutlined } from '@ant-design/icons';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -28,21 +30,32 @@ ReactDOM.render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <div>
-          <menu>
-            <Link to="/">
-              <div>Главная</div>
-            </Link>
-            <Link to="/login">
-              <div>Авторизация</div>
-            </Link>
-            <Link to="/accounts">
-              <div>Счета</div>
-            </Link>
-            <Link to="/transactions">
-              <div>Транзакции</div>
-            </Link>
-          </menu>
-          <main style={{ width: 600 }}>
+          <Menu mode="horizontal">
+            <Menu.Item key="main" icon={<HomeOutlined />}>
+              <Link to="/">
+                <span>Обзор</span>
+              </Link>
+            </Menu.Item>
+
+            <Menu.Item key="accounts" icon={<WalletOutlined />}>
+              <Link to="/accounts">
+                <span>Счета</span>
+              </Link>
+            </Menu.Item>
+
+            <Menu.Item key="transactions" icon={<ShoppingOutlined />}>
+              <Link to="/transactions">
+                <span>Транзакции</span>
+              </Link>
+            </Menu.Item>
+
+            <Menu.Item key="login">
+              <Link to="/login">
+                <span>Авторизация</span>
+              </Link>
+            </Menu.Item>
+          </Menu>
+          <main style={{ padding: 20, width: 600 }}>
             <Suspense fallback={<Loader size="large" />}>
               <Routes>
                 <Route path="/" element={<MainPage />} />
