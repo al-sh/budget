@@ -1,6 +1,7 @@
 import * as express from 'express';
 import { DataSource } from 'typeorm';
 import { Category } from '../entity/Category';
+import { ETRANSACTION_TYPE } from '../types/transactions';
 
 export class CategoriesController {
   constructor(ds: DataSource) {
@@ -51,7 +52,13 @@ export class CategoriesController {
 
   private getAll = async (request: express.Request, response: express.Response) => {
     console.log('Loading categories from the database...');
-    const typeId = parseInt(Array.isArray(request.query.typeId) ? request.query.typeId.join('') : (request.query.typeId as string));
+    let typeId: ETRANSACTION_TYPE = parseInt(
+      Array.isArray(request.query.typeId) ? request.query.typeId.join('') : (request.query.typeId as string)
+    );
+
+    if (typeId === ETRANSACTION_TYPE.RETURN_EXPENSE) typeId = ETRANSACTION_TYPE.EXPENSE;
+    if (typeId === ETRANSACTION_TYPE.RETURN_INCOME) typeId = ETRANSACTION_TYPE.INCOME;
+
     const categories = await this.ds.manager.find(Category, {
       where: { type: typeId ? { id: typeId } : undefined, user: { id: Number(request.headers.userid) } },
     });

@@ -32,6 +32,7 @@ export class TransactionsController {
       ...request.body,
       account: { id: request.body.accountId },
       category: { id: request.body.categoryId },
+      dt: new Date(),
       type: { id: request.body.typeId },
     });
 

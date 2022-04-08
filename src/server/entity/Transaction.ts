@@ -15,6 +15,9 @@ export class Transaction {
   @Column()
   public amount: number;
 
+  @Column()
+  public dt: Date;
+
   @ManyToOne(() => TransactionType, (type) => type.transactions)
   public type: TransactionType;
 

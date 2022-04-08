@@ -26,11 +26,7 @@ export const TransactionForm: React.VFC = () => {
         }}
         onValuesChange={() => {
           setTypeId(form.getFieldValue('typeId'));
-          setisSubmitDisabled(
-            createTransactionQuery.isLoading ||
-              !form.isFieldsTouched(true) ||
-              form.getFieldsError().filter(({ errors }) => errors.length).length > 0
-          );
+          setisSubmitDisabled(createTransactionQuery.isLoading || form.getFieldsError().filter(({ errors }) => errors.length).length > 0);
         }}
         layout="horizontal"
         wrapperCol={{
