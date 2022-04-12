@@ -9,7 +9,9 @@ export class AccountsController {
     // this.intializeAccounts();
 
     this.router.get(this.path, this.getAll);
+    this.router.get(`${this.path}:id`, this.getById);
     this.router.post(this.path, this.create);
+    this.router.put(`${this.path}:id`, this.update);
     this.router.delete(this.path, this.delete);
   }
 
@@ -62,6 +64,19 @@ export class AccountsController {
     }, 1500);
   };
 
+  private getById = async (request: express.Request, response: express.Response) => {
+    const accId = parseInt(request.params.id);
+
+    const account = await this.ds.manager.findOne(Account, {
+      where: { id: accId, user: { id: Number(request.headers.userid) } },
+    });
+
+    console.log('Loaded account: ', account);
+    setTimeout(() => {
+      response.send(account);
+    }, 1000);
+  };
+
   private async intializeAccounts() {
     await this.ds.createQueryBuilder().delete().from(Account).execute();
 
@@ -76,4 +91,15 @@ export class AccountsController {
     await this.ds.manager.save([account, account2]);
     console.log('Saved a new user with id: ' + account.id);
   }
+
+  private update = async (request: express.Request, response: express.Response) => {
+    console.log('acc update', request.body);
+
+    try {
+      const account = await this.ds.manager.update(Account, parseInt(request.params.id), request.body);
+      response.send({ account: account });
+    } catch (err) {
+      response.send(err);
+    }
+  };
 }

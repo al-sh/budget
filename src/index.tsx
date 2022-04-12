@@ -21,6 +21,7 @@ const queryClient = new QueryClient({
   },
 });
 
+const AccountPage = React.lazy(() => import('./components/accounts/AccountPage'));
 const AccountsPage = React.lazy(() => import('./components/accounts/AccountsPage'));
 const LoginPage = React.lazy(() => import('./components/login/LoginPage'));
 const TransactionsPage = React.lazy(() => import('./components/transactions/TransactionsPage'));
@@ -60,6 +61,7 @@ ReactDOM.render(
               <Routes>
                 <Route path="/" element={<MainPage />} />
                 <Route path="accounts" element={<AccountsPage />} />
+                <Route path="accounts/:accountId" element={<AccountPage />} />
                 <Route path="login" element={<LoginPage />} />
                 <Route path="transactions" element={<TransactionsPage />} />
               </Routes>

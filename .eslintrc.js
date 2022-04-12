@@ -44,6 +44,7 @@ module.exports = {
     ],
     '@typescript-eslint/no-empty-function': ['error', { allow: ['private-constructors'] }],
     '@typescript-eslint/no-explicit-any': 'warn',
+    'react/prop-types': 'off',
     'react/react-in-jsx-scope': 'off',
     'sort-exports/sort-exports': ['warn', { sortDir: 'asc' }],
     'sort-keys': ['warn', 'asc', { caseSensitive: true, natural: false }],

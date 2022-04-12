@@ -11,6 +11,9 @@ export const useAccounts = () => {
 
   const useGetList = () => useQuery(accountsQueryKey, () => api.send<Account[]>({ endpoint: 'accounts', method: 'GET' }));
 
+  const useGetOne = (id: number) =>
+    useQuery([accountsQueryKey, id], () => api.send<Account>({ endpoint: `accounts/${id}`, method: 'GET' }), { enabled: !!id });
+
   const useCreate = () =>
     useMutation(
       (formValues: Record<string, unknown>) => {
@@ -18,6 +21,22 @@ export const useAccounts = () => {
           data: formValues,
           endpoint: 'accounts',
           method: 'POST',
+        });
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries(accountsQueryKey);
+        },
+      }
+    );
+
+  const useItem = (method: 'POST' | 'PUT' | 'DELETE', id?: number) =>
+    useMutation(
+      (formValues: Record<string, unknown>) => {
+        return api.send({
+          data: formValues,
+          endpoint: id ? `accounts/${id}` : 'accounts',
+          method: method,
         });
       },
       {
@@ -45,5 +64,5 @@ export const useAccounts = () => {
       }
     );
 
-  return { useCreate, useDelete, useGetList };
+  return { useCreate, useDelete, useGetList, useGetOne, useItem };
 };

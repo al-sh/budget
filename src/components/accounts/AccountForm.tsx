@@ -1,12 +1,17 @@
 import { Form, Input, Checkbox, Button } from 'antd';
 import { useAccounts } from '../../hooks/useAccounts';
+import { Account } from '../../server/entity/Account';
 
-export const AccountCreateForm: React.VFC = () => {
-  const { useCreate } = useAccounts();
-  const createAccountQuery = useCreate();
+export const AccountForm: React.VFC<{ account?: Account }> = ({ account }) => {
+  console.log('AccountForm account', account);
+  const { useItem } = useAccounts();
+  const isUpdate = !!account;
+  const query = useItem(isUpdate ? 'PUT' : 'POST', isUpdate ? account.id : undefined);
 
   return (
     <div style={{ width: 400 }}>
+      {account ? <div>Редактирование счета {account?.name}</div> : <div>Новый счет</div>}
+
       <Form
         name="basic"
         labelCol={{
@@ -17,11 +22,11 @@ export const AccountCreateForm: React.VFC = () => {
           span: 16,
         }}
         initialValues={{
-          isActive: true,
-          name: '',
+          isActive: account?.id ? account.isActive : true,
+          name: account?.id ? account.name : '',
         }}
         onFinish={(formValues) => {
-          createAccountQuery.mutate(formValues);
+          query.mutate(formValues);
         }}
         autoComplete="off"
       >
@@ -48,12 +53,12 @@ export const AccountCreateForm: React.VFC = () => {
             span: 16,
           }}
         >
-          <Button type="primary" htmlType="submit" disabled={createAccountQuery.isLoading}>
-            Добавить
+          <Button type="primary" htmlType="submit" disabled={query.isLoading}>
+            Сохранить
           </Button>
         </Form.Item>
       </Form>
-      {createAccountQuery.isLoading && <div>Добавление счета...</div>}
+      {query.isLoading && <div>Сохранение данных...</div>}
     </div>
   );
 };
