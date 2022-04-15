@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { Account } from '../server/entity/Account';
 import { getApi } from '../services/Api';
 
-export const accountsQueryKey = ['accounts'];
+export const accountsQueryKey = 'accounts';
 
 export const useAccounts = () => {
   const api = getApi();
@@ -30,7 +30,7 @@ export const useAccounts = () => {
       }
     );
 
-  const useItem = (method: 'POST' | 'PUT' | 'DELETE', id?: number) =>
+  const useItem = (method: 'POST' | 'PUT' | 'DELETE', id?: number, onSuccess?: () => void) =>
     useMutation(
       (formValues: Record<string, unknown>) => {
         return api.send({
@@ -40,8 +40,12 @@ export const useAccounts = () => {
         });
       },
       {
-        onSuccess: () => {
+        onSuccess: async () => {
+          console.log('useItem onSuccess', method);
+          await queryClient.cancelQueries(accountsQueryKey);
+          queryClient.invalidateQueries([accountsQueryKey, id]);
           queryClient.invalidateQueries(accountsQueryKey);
+          onSuccess && onSuccess();
         },
       }
     );

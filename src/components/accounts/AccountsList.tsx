@@ -3,11 +3,11 @@ import { useAccounts } from '../../hooks/useAccounts';
 
 export const AccountsList: React.VFC = () => {
   const { useGetList, useDelete } = useAccounts();
-  const { isLoading, isError, data: accounts } = useGetList();
+  const { isFetching, isError, data: accounts } = useGetList();
   const deleteAccountMutation = useDelete();
   const navigate = useNavigate();
 
-  if (isLoading) return <>Loading...</>;
+  if (isFetching) return <>Fetching...</>;
   if (isError) return <>Error</>;
 
   return (

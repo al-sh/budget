@@ -13,7 +13,7 @@ export class Account {
   public name: string;
 
   @Column()
-  public isActive: boolean;
+  public isActive: boolean = true;
 
   @Column()
   public initialValue: number = 0;

@@ -1,16 +1,15 @@
-import { Form, Input, Checkbox, Button } from 'antd';
+import { Form, Input, Button, InputNumber } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import { useAccounts } from '../../hooks/useAccounts';
-import { Account } from '../../server/entity/Account';
 
-export const AccountForm: React.VFC<{ account?: Account }> = ({ account }) => {
-  console.log('AccountForm account', account);
+export const AccountNewForm: React.VFC<{ onFinish: () => void }> = ({ onFinish }) => {
   const { useItem } = useAccounts();
-  const isUpdate = !!account;
-  const query = useItem(isUpdate ? 'PUT' : 'POST', isUpdate ? account.id : undefined);
+  const query = useItem('POST');
+  const navigate = useNavigate();
 
   return (
     <div style={{ width: 400 }}>
-      {account ? <div>Редактирование счета {account?.name}</div> : <div>Новый счет</div>}
+      <div>Новый счет</div>
 
       <Form
         name="basic"
@@ -22,11 +21,14 @@ export const AccountForm: React.VFC<{ account?: Account }> = ({ account }) => {
           span: 16,
         }}
         initialValues={{
-          isActive: account?.id ? account.isActive : true,
-          name: account?.id ? account.name : '',
+          initialValue: 0,
+          name: '',
         }}
         onFinish={(formValues) => {
           query.mutate(formValues);
+          console.log('query.isSuccess');
+          navigate('/accounts');
+          onFinish();
         }}
         autoComplete="off"
       >
@@ -43,9 +45,15 @@ export const AccountForm: React.VFC<{ account?: Account }> = ({ account }) => {
           <Input />
         </Form.Item>
 
-        <Form.Item name="isActive" valuePropName="checked">
-          <Checkbox>Активен</Checkbox>
-        </Form.Item>
+        {
+          <Form.Item label="Остаток" name="initialValue">
+            <InputNumber
+              style={{
+                width: 300,
+              }}
+            />
+          </Form.Item>
+        }
 
         <Form.Item
           wrapperCol={{

@@ -1,12 +1,10 @@
 import { Button } from 'antd';
 import React, { useState } from 'react';
-import { AccountForm } from './AccountForm';
+import { AccountNewForm } from './AccountNewForm';
 import { AccountsList } from './AccountsList';
 
 export const AccountsPage: React.VFC = () => {
   const [isAddAccount, setIsAddAccount] = useState(false);
-
-  console.log('selectedAccountId', isAddAccount);
 
   return (
     <>
@@ -19,7 +17,13 @@ export const AccountsPage: React.VFC = () => {
       >
         Добавить
       </Button>
-      {isAddAccount && <AccountForm />}
+      {isAddAccount && (
+        <AccountNewForm
+          onFinish={() => {
+            setIsAddAccount(false);
+          }}
+        />
+      )}
     </>
   );
 };
