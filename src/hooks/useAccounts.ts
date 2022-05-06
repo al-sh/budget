@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { Account } from '../server/entity/Account';
+import { AccountWithRest } from '../server/types/accounts';
 import { getApi } from '../services/Api';
 
 export const accountsQueryKey = 'accounts';
@@ -12,7 +13,7 @@ export const useAccounts = () => {
   const useGetList = () => useQuery(accountsQueryKey, () => api.send<Account[]>({ endpoint: 'accounts', method: 'GET' }));
 
   const useGetOne = (id: number) =>
-    useQuery([accountsQueryKey, id], () => api.send<Account>({ endpoint: `accounts/${id}`, method: 'GET' }), { enabled: !!id });
+    useQuery([accountsQueryKey, id], () => api.send<AccountWithRest>({ endpoint: `accounts/${id}`, method: 'GET' }), { enabled: !!id });
 
   const useCreate = () =>
     useMutation(

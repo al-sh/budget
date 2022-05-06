@@ -1,6 +1,8 @@
 import * as express from 'express';
 import { DataSource } from 'typeorm';
 import { Account } from '../entity/Account';
+import { Transaction } from '../entity/Transaction';
+import { ETRANSACTION_TYPE } from '../types/transactions';
 
 export class AccountsController {
   constructor(ds: DataSource) {
@@ -72,8 +74,21 @@ export class AccountsController {
     });
 
     console.log('Loaded account: ', account);
+
+    const transactions = await this.ds.manager.find(Transaction, { relations: ['account', 'type'], where: { account: { id: accId } } });
+    const rest = transactions.reduce((prev, current) => {
+      console.log(current);
+      if (current.type.id === ETRANSACTION_TYPE.INCOME || current.type.id === ETRANSACTION_TYPE.RETURN_EXPENSE) {
+        return prev + current.amount;
+      }
+
+      return prev - current.amount;
+    }, account.initialValue);
+
+    console.log('tran cnt:', transactions.length, 'SUM1:', rest);
+
     setTimeout(() => {
-      response.send(account);
+      response.send({ ...account, rest: rest });
     }, 1000);
   };
 

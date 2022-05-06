@@ -1,9 +1,10 @@
 import { Form, Input, Checkbox, Button } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useAccounts } from '../../hooks/useAccounts';
-import { Account } from '../../server/entity/Account';
+import { AccountWithRest } from '../../server/types/accounts';
+import { formatMoney } from '../../utils/format';
 
-export const EditAccountForm: React.VFC<{ account: Account }> = ({ account }) => {
+export const EditAccountForm: React.VFC<{ account: AccountWithRest }> = ({ account }) => {
   const { useItem } = useAccounts();
   const query = useItem('PUT', account.id);
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ export const EditAccountForm: React.VFC<{ account: Account }> = ({ account }) =>
           span: 16,
         }}
         initialValues={{
-          initialValue: 0,
+          initialValue: account.initialValue,
           isActive: account?.id ? account.isActive : true,
           name: account?.id ? account.name : '',
         }}
@@ -45,9 +46,24 @@ export const EditAccountForm: React.VFC<{ account: Account }> = ({ account }) =>
           <Input />
         </Form.Item>
 
+        <Form.Item
+          label="Начальный остаток"
+          name="initialValue"
+          rules={[
+            {
+              message: 'Укажите начальный остаток',
+              required: true,
+            },
+          ]}
+        >
+          <Input />
+        </Form.Item>
+
         <Form.Item name="isActive" valuePropName="checked">
           <Checkbox>Активен</Checkbox>
         </Form.Item>
+
+        <span style={{ marginLeft: 10 }}>Остаток: {formatMoney(account.rest)}</span>
 
         <Form.Item
           wrapperCol={{
