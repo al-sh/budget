@@ -24,7 +24,7 @@ class ApiService {
 
   private constructor() {}
 
-  private path = 'http://localhost:3001';
+  private path = process.env.REACT_APP_API_PATH;
 
   public send: <T>(request: ApiRequest) => Promise<T> = async (request) => {
     const { endpoint, method, data, query } = request;
