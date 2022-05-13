@@ -42,7 +42,7 @@ AppDataSource.initialize()
     const transactionsController = new TransactionsController(AppDataSource);
     app.use('/transactions', transactionsController.router);
 
-    app.listen(port, () => {
+    app.listen(port, '0.0.0.0', () => {
       console.log(`Example app listening on port ${port}`);
     });
     console.timeEnd('serverInit');
