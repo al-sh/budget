@@ -35,6 +35,18 @@ export class AuthController {
     const reqToken = Array.isArray(request.headers.auth) ? request.headers.auth.join('') : request.headers.auth;
     const reqUserId = Number(Array.isArray(request.headers.userid) ? request.headers.userid.join('') : request.headers.userid);
 
+    if (!reqUserId) {
+      response.status(401);
+      response.send({ message: 'Not auth E1' });
+      return;
+    }
+
+    if (!reqToken) {
+      response.status(401);
+      response.send({ message: 'Not auth E2' });
+      return;
+    }
+
     const user: User | null = await this.userRepository.findOne({ where: { id: reqUserId, isBlocked: false, token: reqToken } });
     if (user) {
       const reqAccountId = Number(Array.isArray(request.body.accountId) ? request.body.accountId.join('') : request.body.accountId);
