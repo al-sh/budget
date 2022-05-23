@@ -8,7 +8,7 @@ export const AccountNewForm: React.VFC<{ onFinish: () => void }> = ({ onFinish }
   const navigate = useNavigate();
 
   return (
-    <div style={{ width: 400 }}>
+    <div>
       <div>Новый счет</div>
 
       <Form

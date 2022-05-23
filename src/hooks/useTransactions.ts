@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { Transaction } from '../server/entity/Transaction';
 import { getApi } from '../services/Api';
+import { API_ENDPOINTS } from '../constants/urls';
 
 export const transactionsQueryKey = ['transactions'];
 
@@ -11,12 +12,15 @@ export const useTransactions = () => {
 
   const useGetList = () => useQuery(transactionsQueryKey, () => api.send<Transaction[]>({ endpoint: 'transactions', method: 'GET' }));
 
+  const useGetOne = (id: number) =>
+    useQuery([transactionsQueryKey, id], () => api.send<Transaction>({ endpoint: `transactions/${id}`, method: 'GET' }), { enabled: !!id });
+
   const useCreate = () =>
     useMutation(
       (formValues: Record<string, unknown>) => {
         return api.send({
           data: formValues,
-          endpoint: 'transactions',
+          endpoint: API_ENDPOINTS.TRANSACTIONS,
           method: 'POST',
         });
       },
@@ -34,7 +38,7 @@ export const useTransactions = () => {
           data: {
             id: id,
           },
-          endpoint: 'transactions',
+          endpoint: API_ENDPOINTS.TRANSACTIONS,
           method: 'DELETE',
         });
       },
@@ -54,5 +58,5 @@ export const useTransactions = () => {
       }
     );
 
-  return { useCreate, useDelete, useGetList };
+  return { useCreate, useDelete, useGetOne, useGetList };
 };

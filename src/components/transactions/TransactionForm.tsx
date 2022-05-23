@@ -1,23 +1,26 @@
 import { Form, InputNumber, Input, Select, Button } from 'antd';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAccounts } from '../../hooks/useAccounts';
 import { useCategories } from '../../hooks/useCategories';
 import { useTransactions } from '../../hooks/useTransactions';
 import { useTransactionTypes } from '../../hooks/useTransactionTypes';
+import { Transaction } from '../../server/entity/Transaction';
 import { ETRANSACTION_TYPE } from '../../server/types/transactions';
 
-export const TransactionForm: React.VFC = () => {
+export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ transaction }) => {
   const [form] = Form.useForm();
   const { isLoading: isAccountsLoading, data: accounts } = useAccounts().useGetList();
   const [typeId, setTypeId] = useState(ETRANSACTION_TYPE.EXPENSE);
   const { isLoading: isCategoriesLoading, data: categories } = useCategories().useGetList(typeId);
   const { isLoading: isTranTypesLoading, data: tranTypes } = useTransactionTypes();
   const createTransactionQuery = useTransactions().useCreate();
+  const navigate = useNavigate();
 
   const [isSubmitDisabled, setisSubmitDisabled] = useState(true);
 
   return (
-    <div style={{ width: 400 }}>
+    <div>
       <Form
         name="transactionForm"
         form={form}
@@ -29,21 +32,27 @@ export const TransactionForm: React.VFC = () => {
           setisSubmitDisabled(createTransactionQuery.isLoading || form.getFieldsError().filter(({ errors }) => errors.length).length > 0);
         }}
         layout="horizontal"
+        labelAlign="left"
         wrapperCol={{
           span: 16,
         }}
         initialValues={{
-          isActive: true,
-          name: '',
-          typeId: ETRANSACTION_TYPE.EXPENSE,
+          accountId: transaction?.account?.id || '',
+          amount: transaction?.amount || 1,
+          categoryId: transaction?.category?.id || '',
+          description: transaction?.description || '',
+          typeId: transaction?.type?.id || ETRANSACTION_TYPE.EXPENSE,
         }}
-        onFinish={(formValues) => createTransactionQuery.mutate(formValues)}
+        onFinish={(formValues) => {
+          createTransactionQuery.mutate(formValues);
+          navigate('/transactions');
+        }}
         autoComplete="off"
       >
         <Form.Item label="Сумма" name="amount" rules={[{ message: 'Укажите сумму', required: true }]}>
           <InputNumber
             style={{
-              width: 300,
+              width: '100%',
             }}
           />
         </Form.Item>
@@ -64,21 +73,23 @@ export const TransactionForm: React.VFC = () => {
 
         <Form.Item label="Тип" name="typeId" rules={[{ message: 'Выберите тип', required: true }]}>
           <Select loading={isTranTypesLoading}>
-            {tranTypes?.map((tran) => (
-              <Select.Option key={tran.id} value={tran.id}>
-                {tran.name}
-              </Select.Option>
-            ))}
+            {tranTypes?.length &&
+              tranTypes?.map((tran) => (
+                <Select.Option key={tran.id} value={tran.id}>
+                  {tran.name}
+                </Select.Option>
+              ))}
           </Select>
         </Form.Item>
 
         <Form.Item label="Категория" name="categoryId" rules={[{ message: 'Выберите категорию', required: true }]}>
           <Select loading={isCategoriesLoading} disabled={!typeId}>
-            {categories?.map((cat) => (
-              <Select.Option key={cat.id} value={cat.id}>
-                {cat.name}
-              </Select.Option>
-            ))}
+            {categories?.length &&
+              categories?.map((cat) => (
+                <Select.Option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </Select.Option>
+              ))}
           </Select>
         </Form.Item>
 
@@ -89,7 +100,7 @@ export const TransactionForm: React.VFC = () => {
           }}
         >
           <Button type="primary" htmlType="submit" disabled={isSubmitDisabled}>
-            Добавить
+            Сохранить
           </Button>
         </Form.Item>
       </Form>

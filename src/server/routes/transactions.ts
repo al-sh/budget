@@ -15,7 +15,9 @@ export class TransactionsController {
 
     this.router.get(this.path, this.getAll);
     this.router.get(`${this.path}types`, this.getTypes);
+    this.router.get(`${this.path}:id`, this.getById);
     this.router.post(this.path, this.create);
+    this.router.put(this.path, this.update);
     this.router.delete(this.path, this.delete);
   }
 
@@ -70,7 +72,10 @@ export class TransactionsController {
 
     const accounts = await this.ds.manager.find(Account, { where: { user: { id: Number(request.headers.userid) } } });
     const accountIds = accounts.map((acc) => acc.id);
-    const transactions = await this.ds.manager.find(Transaction, { relations: ['account', 'type'], where: { account: In(accountIds) } });
+    const transactions = await this.ds.manager.find(Transaction, {
+      relations: ['account', 'category', 'type'],
+      where: { account: In(accountIds) },
+    });
 
     /*
     пример поиска юзера со связанными сущностям
@@ -84,6 +89,27 @@ export class TransactionsController {
     setTimeout(() => {
       response.send(transactions);
     }, 1500);
+  };
+
+  private getById = async (request: express.Request, response: express.Response) => {
+    const tranId = parseInt(request.params.id);
+
+    try {
+      const tran = await this.ds.manager.findOne(Transaction, { relations: ['account', 'category'], where: { id: tranId } });
+
+      /** todo: добавить проверку на принадлежность юзеру
+      if (!(tran.account.user.id === Number(request.headers.userid))) {
+        response.status(401);
+        response.send('Not auth E3');
+      }
+       */
+
+      response.send(tran);
+    } catch (err) {
+      response.status(500);
+      console.log(err);
+      response.send(err);
+    }
   };
 
   private getTypes = async (request: express.Request, response: express.Response) => {
@@ -121,4 +147,15 @@ export class TransactionsController {
     await this.ds.manager.save([type1, type2, type3, type4, type5]);
     console.log('TransactionTypes initialized');
   }
+
+  private update = async (request: express.Request, response: express.Response) => {
+    console.log('tran update', request.body);
+
+    try {
+      const tran = await this.ds.manager.update(Transaction, parseInt(request.params.id), request.body);
+      response.send({ tran: tran });
+    } catch (err) {
+      response.send(err);
+    }
+  };
 }

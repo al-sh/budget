@@ -10,7 +10,7 @@ export const EditAccountForm: React.VFC<{ account: AccountWithRest }> = ({ accou
   const navigate = useNavigate();
 
   return (
-    <div style={{ width: 400 }}>
+    <div>
       <div>Редактирование счета</div>
 
       <Form

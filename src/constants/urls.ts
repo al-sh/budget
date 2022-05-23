@@ -1,1 +1,4 @@
-export const AUTH_PASSWORD_ENDPOINT = 'auth/password';
+export const API_ENDPOINTS = {
+  AUTH: { PASSWORD: 'auth/password' },
+  TRANSACTIONS: 'transactions',
+};

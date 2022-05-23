@@ -1,11 +1,10 @@
-import { Button } from 'antd';
 import React from 'react';
 import { useTransactions } from '../../hooks/useTransactions';
 import { Loader } from '../_shared/Loader';
+import { TransactionItem } from './TransactionItem';
 
 export const TransactionsList: React.VFC = () => {
-  const { useGetList: useGetTransactions, useDelete } = useTransactions();
-  const useDeleleQuery = useDelete();
+  const { useGetList: useGetTransactions } = useTransactions();
   const { isLoading, isError, data: transactions } = useGetTransactions();
 
   if (isLoading)
@@ -19,18 +18,7 @@ export const TransactionsList: React.VFC = () => {
   return (
     <>
       {transactions.map((tran) => (
-        <div key={tran.id}>
-          <span>{tran.type.name}</span>
-          <span>Сумма: {tran.amount}</span>
-          <span>Описание: {tran.description}</span>
-          <Button
-            onClick={() => {
-              useDeleleQuery.mutate(tran.id);
-            }}
-          >
-            Удалить
-          </Button>
-        </div>
+        <TransactionItem key={tran.id} tran={tran} />
       ))}
     </>
   );

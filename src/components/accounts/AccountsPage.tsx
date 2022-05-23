@@ -8,7 +8,6 @@ export const AccountsPage: React.VFC = () => {
 
   return (
     <>
-      <div>Счета</div>
       <AccountsList />
       <Button
         onClick={() => {

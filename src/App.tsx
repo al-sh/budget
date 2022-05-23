@@ -26,6 +26,7 @@ const queryClient = new QueryClient({
 const AccountPage = React.lazy(() => import('./components/accounts/AccountPage'));
 const AccountsPage = React.lazy(() => import('./components/accounts/AccountsPage'));
 const LoginPage = React.lazy(() => import('./components/login/LoginPage'));
+const TransactionPage = React.lazy(() => import('./components/transactions/TransactionPage'));
 const TransactionsPage = React.lazy(() => import('./components/transactions/TransactionsPage'));
 
 export const App = () => {
@@ -39,14 +40,15 @@ export const App = () => {
           <AppWrapper>
             <CSSReset />
             <MainMenu />
-            <main style={{ padding: 20, width: 600 }}>
+            <main style={{ padding: '1em' }}>
               <Suspense fallback={<Loader size="large" />}>
                 <Routes>
-                  <Route path="/" element={<MainPage />} />
+                  <Route path="home" element={<MainPage />} />
                   <Route path="accounts" element={<AccountsPage />} />
                   <Route path="accounts/:accountId" element={<AccountPage />} />
                   <Route path="login" element={<LoginPage />} />
                   <Route path="transactions" element={<TransactionsPage />} />
+                  <Route path="transactions/:transactionId" element={<TransactionPage />} />
                 </Routes>
               </Suspense>
             </main>

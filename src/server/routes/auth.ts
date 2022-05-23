@@ -2,7 +2,7 @@ import * as express from 'express';
 import * as crypto from 'crypto';
 import { DataSource, Repository } from 'typeorm';
 import { User } from '../entity/User';
-import { AUTH_PASSWORD_ENDPOINT } from '../../constants/urls';
+import { API_ENDPOINTS } from '../../constants/urls';
 
 const getPasswordHash = (password: string) =>
   crypto.pbkdf2Sync(password, 'testSalt', Number(process.env.CRYPTO_ITERATIONS), 32, 'sha256').toString('hex');
@@ -14,7 +14,7 @@ export class AuthController {
 
     if (process.env.DB_NEED_REINIT === 'yes') this.intializeUsers();
     this.router.use(this.checkTokenMiddleware);
-    this.router.post(`${this.path}${AUTH_PASSWORD_ENDPOINT}`, this.handlePasswordAuth);
+    this.router.post(`${this.path}${API_ENDPOINTS.AUTH.PASSWORD}`, this.handlePasswordAuth);
   }
 
   public router = express.Router();
@@ -27,7 +27,7 @@ export class AuthController {
 
   private checkTokenMiddleware = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
     console.log('req:', request.path);
-    if (request.method === 'OPTIONS' || request.path === `/${AUTH_PASSWORD_ENDPOINT}`) {
+    if (request.method === 'OPTIONS' || request.path === `/${API_ENDPOINTS.AUTH.PASSWORD}`) {
       next();
       return;
     }

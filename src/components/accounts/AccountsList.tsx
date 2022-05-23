@@ -19,7 +19,7 @@ export const AccountsList: React.VFC = () => {
               navigate(`/accounts/${acc.id}`);
             }}
           >
-            Название: {acc.name}
+            {acc.name}
           </span>
           <span style={{ marginLeft: 10 }}>Активен: {acc.isActive ? 'Да' : 'Нет'}</span>
           <button

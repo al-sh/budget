@@ -1,7 +1,7 @@
 import { notification } from 'antd';
 import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AUTH_PASSWORD_ENDPOINT } from '../../constants/urls';
+import { API_ENDPOINTS } from '../../constants/urls';
 import { AuthResponse } from '../../server/routes/auth';
 import { getApi } from '../../services/Api';
 import { getStorage } from '../../services/Storage';
@@ -17,7 +17,7 @@ export const LoginPage: React.FC = () => {
       try {
         const response = await api.send<AuthResponse>({
           data: formValues,
-          endpoint: AUTH_PASSWORD_ENDPOINT,
+          endpoint: API_ENDPOINTS.AUTH.PASSWORD,
           method: 'POST',
         });
         console.log('response: ', response);
