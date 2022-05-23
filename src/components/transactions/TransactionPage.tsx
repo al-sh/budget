@@ -1,10 +1,9 @@
-import { DeleteOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTransactions } from '../../hooks/useTransactions';
 import { Loader } from '../_shared/Loader';
 import { TransactionForm } from './TransactionForm';
+import { FormHeader } from '../_shared/forms/FormHeader';
 
 export const TransactionsPage: React.FC = () => {
   const { transactionId } = useParams();
@@ -17,20 +16,13 @@ export const TransactionsPage: React.FC = () => {
     <>
       {isFetching && <Loader />}
       {transactionId !== 'new' && (
-        <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5em' }}>
-          <span>Редактирование транзакции</span>
-          <span>
-            <Button
-              onClick={() => {
-                useDeleleQuery.mutate(parseInt(transactionId));
-                navigate('/transactions');
-              }}
-              type="primary"
-              htmlType="submit"
-              icon={<DeleteOutlined />}
-            ></Button>
-          </span>
-        </div>
+        <FormHeader
+          text="Редактирование транзакции"
+          onDeleteButtonClick={() => {
+            useDeleleQuery.mutate(parseInt(transactionId));
+            navigate('/transactions');
+          }}
+        />
       )}
       {transactionId === 'new' && <div>Новая транзакция</div>}
       {!isFetching && <TransactionForm transaction={transaction} />}

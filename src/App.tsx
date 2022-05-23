@@ -9,9 +9,9 @@ import { Loader } from './components/_shared/Loader';
 import { AppWrapper, CSSReset } from './components/_shared/main-layout/wrappers';
 import { MainMenu } from './components/_shared/main-layout/MainMenu';
 import { ThemeProvider } from 'styled-components';
-import { dark } from './components/_shared/main-layout/themes/dark';
+import { dark } from './components/_shared/themes/dark';
 import { getStorage } from './services/Storage';
-import { light } from './components/_shared/main-layout/themes/light';
+import { light } from './components/_shared/themes/light';
 
 const queryClient = new QueryClient({
   defaultOptions: {

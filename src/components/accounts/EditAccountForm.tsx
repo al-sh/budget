@@ -3,15 +3,26 @@ import { useNavigate } from 'react-router-dom';
 import { useAccounts } from '../../hooks/useAccounts';
 import { AccountWithRest } from '../../server/types/accounts';
 import { formatMoney } from '../../utils/format';
+import { FormHeader } from '../_shared/forms/FormHeader';
 
 export const EditAccountForm: React.VFC<{ account: AccountWithRest }> = ({ account }) => {
   const { useItem } = useAccounts();
   const query = useItem('PUT', account.id);
   const navigate = useNavigate();
+  const { useDelete } = useAccounts();
+  const deleteAccountMutation = useDelete();
 
   return (
     <div>
-      <div>Редактирование счета</div>
+      <FormHeader
+        text="Редактирование счета"
+        onDeleteButtonClick={() => {
+          if (confirm('Удалить счет?')) {
+            deleteAccountMutation.mutate(account.id);
+            navigate('/accounts');
+          }
+        }}
+      />
 
       <Form
         name="basic"

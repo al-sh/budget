@@ -1,34 +1,32 @@
 import { useNavigate } from 'react-router-dom';
 import { useAccounts } from '../../hooks/useAccounts';
+import { Loader } from '../_shared/Loader';
+import styled from 'styled-components';
+
+const AccountName = styled.span<{ active: boolean }>`
+  color: ${({ theme, active }) => (active ? theme.text.primary : theme.text.inactive)};
+`;
 
 export const AccountsList: React.VFC = () => {
-  const { useGetList, useDelete } = useAccounts();
+  const { useGetList } = useAccounts();
   const { isFetching, isError, data: accounts } = useGetList();
-  const deleteAccountMutation = useDelete();
   const navigate = useNavigate();
 
-  if (isFetching) return <>Fetching...</>;
+  if (isFetching) return <Loader />;
   if (isError) return <>Error</>;
 
   return (
     <>
       {accounts.map((acc) => (
         <div key={acc.id}>
-          <span
+          <AccountName
             onClick={() => {
               navigate(`/accounts/${acc.id}`);
             }}
+            active={acc.isActive}
           >
             {acc.name}
-          </span>
-          <span style={{ marginLeft: 10 }}>Активен: {acc.isActive ? 'Да' : 'Нет'}</span>
-          <button
-            onClick={() => {
-              deleteAccountMutation.mutate(acc.id);
-            }}
-          >
-            Удалить
-          </button>
+          </AccountName>
         </div>
       ))}
     </>

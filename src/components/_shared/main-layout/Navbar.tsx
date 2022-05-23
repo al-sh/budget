@@ -29,10 +29,10 @@ export const Navbar = {
     padding: 0 1rem;
     cursor: pointer;
 
-    color: ${(props) => (props.active ? props.theme.text.active : props.theme.text.primary)};
+    color: ${({ theme, active }) => (active ? theme.text.active : theme.text.primary)};
 
     :hover {
-      color: ${(props) => props.theme.text.hover};
+      color: ${({ theme }) => theme.text.hover};
     }
   `,
   Icon: styled.div`
