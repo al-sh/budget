@@ -73,12 +73,17 @@ export class AccountsController {
       where: { id: accId, user: { id: Number(request.headers.userid) } },
     });
 
-    console.log('Loaded account: ', account);
+    if (!account) {
+      console.error('accounts getById request.params.id', request.params.id, ' - not found');
+      response.status(500);
+      response.send('account not found');
+      return;
+    }
 
     const transactions = await this.ds.manager.find(Transaction, { relations: ['account', 'type'], where: { account: { id: accId } } });
     const rest = transactions.reduce((prev, current) => {
       console.log(current);
-      if (current.type.id === ETRANSACTION_TYPE.INCOME || current.type.id === ETRANSACTION_TYPE.RETURN_EXPENSE) {
+      if (current.type?.id === ETRANSACTION_TYPE.INCOME || current.type?.id === ETRANSACTION_TYPE.RETURN_EXPENSE) {
         return prev + current.amount;
       }
 

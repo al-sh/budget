@@ -8,26 +8,26 @@ import { User } from './User';
 @Entity()
 export class Category {
   @PrimaryGeneratedColumn()
-  public id: number;
+  public id!: number;
 
   @Column()
-  public name: string;
+  public name?: string;
 
   @Column()
-  public isActive: boolean;
+  public isActive: boolean = true;
 
   @ManyToOne(() => TransactionType, (type) => type.categories)
-  public type: TransactionType;
+  public type!: TransactionType;
 
   @OneToMany(() => Category, (category) => category.parentCategory)
-  public childrenCategories: Category[];
+  public childrenCategories?: Category[];
 
   @ManyToOne(() => Category, (category) => category.childrenCategories)
-  public parentCategory: Category;
+  public parentCategory?: Category;
 
   @OneToMany(() => Transaction, (tran) => tran.account)
-  public transactions: Transaction;
+  public transactions?: Transaction;
 
   @ManyToOne(() => User, (user) => user.accounts)
-  public user: User;
+  public user?: User;
 }

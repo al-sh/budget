@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { Category } from '../server/entity/Category';
 import { getApi } from '../services/Api';
+import { API_ENDPOINTS } from '../constants/urls';
+import { ETRANSACTION_TYPE } from '../server/types/transactions';
 
 export const categoriesQueryKey = ['categories'];
 
@@ -9,12 +11,37 @@ export const useCategories = () => {
 
   const queryClient = useQueryClient();
 
-  const useGetList = (typeId: number) =>
+  const useGetList = (typeId?: ETRANSACTION_TYPE) =>
     useQuery(
       [...categoriesQueryKey, typeId],
-      () => api.send<Category[]>({ query: { typeId: String(typeId) }, endpoint: 'categories', method: 'GET' }),
-      {
+      () => api.send<Category[]>({ endpoint: API_ENDPOINTS.CATEGORIES, method: 'GET', query: { typeId: String(typeId) } })
+      /*{
         enabled: !!typeId,
+      }*/
+    );
+
+  const useGetOne = (id: number) =>
+    useQuery([categoriesQueryKey, id], () => api.send<Category>({ endpoint: `${API_ENDPOINTS.CATEGORIES}/${id}`, method: 'GET' }), {
+      enabled: !!id,
+    });
+
+  const useItem = (method: 'POST' | 'PUT' | 'DELETE', id?: number, onSuccess?: () => void) =>
+    useMutation(
+      (formValues: Record<string, unknown>) => {
+        return api.send({
+          data: formValues,
+          endpoint: id ? `${API_ENDPOINTS.CATEGORIES}/${id}` : API_ENDPOINTS.CATEGORIES,
+          method: method,
+        });
+      },
+      {
+        onSuccess: async () => {
+          console.log('useItem onSuccess', method);
+          await queryClient.cancelQueries(categoriesQueryKey);
+          queryClient.invalidateQueries([categoriesQueryKey, id]);
+          queryClient.invalidateQueries(categoriesQueryKey);
+          onSuccess && onSuccess();
+        },
       }
     );
 
@@ -34,23 +61,5 @@ export const useCategories = () => {
       }
     );
 
-  const useDelete = () =>
-    useMutation(
-      (id: number) => {
-        return api.send({
-          data: {
-            id: id,
-          },
-          endpoint: 'categories',
-          method: 'DELETE',
-        });
-      },
-      {
-        onSuccess: () => {
-          queryClient.invalidateQueries(categoriesQueryKey);
-        },
-      }
-    );
-
-  return { useCreate, useDelete, useGetList };
+  return { useCreate, useGetList, useGetOne, useItem };
 };

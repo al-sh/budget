@@ -7,16 +7,16 @@ import { Category } from './Category';
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
-  public id: number;
+  public id!: number;
 
   @Column()
-  public name: string;
+  public name?: string;
 
   @Column()
-  public login: string;
+  public login?: string;
 
   @Column()
-  public passwordHash: string;
+  public passwordHash?: string;
 
   @Column()
   public token: string = '';
@@ -25,11 +25,11 @@ export class User {
   public loginAttemts: number = 0;
 
   @Column()
-  public isBlocked: boolean;
+  public isBlocked: boolean = false;
 
   @OneToMany(() => Account, (acc) => acc.user)
-  public accounts: Account;
+  public accounts?: Account;
 
   @OneToMany(() => Category, (cat) => cat.user)
-  public categories: Category;
+  public categories?: Category;
 }

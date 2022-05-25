@@ -15,18 +15,25 @@ export const useTransactions = () => {
   const useGetOne = (id: number) =>
     useQuery([transactionsQueryKey, id], () => api.send<Transaction>({ endpoint: `transactions/${id}`, method: 'GET' }), { enabled: !!id });
 
-  const useCreate = () =>
+  const useItem = (method: 'POST' | 'PUT' | 'DELETE', params?: { id?: number; onSuccess?: () => void }) =>
     useMutation(
       (formValues: Record<string, unknown>) => {
         return api.send({
           data: formValues,
-          endpoint: API_ENDPOINTS.TRANSACTIONS,
-          method: 'POST',
+          endpoint: params?.id ? `${API_ENDPOINTS.TRANSACTIONS}/${params.id}` : API_ENDPOINTS.TRANSACTIONS,
+          method: method,
         });
       },
       {
-        onSuccess: () => {
+        onSuccess: async () => {
+          console.log('useItem onSuccess', method);
+          await queryClient.cancelQueries(transactionsQueryKey);
+          if (method === 'PUT' && params?.id) {
+            queryClient.invalidateQueries([transactionsQueryKey, params.id]);
+          }
+
           queryClient.invalidateQueries(transactionsQueryKey);
+          params?.onSuccess && params?.onSuccess();
         },
       }
     );
@@ -52,11 +59,11 @@ export const useTransactions = () => {
           );
           return {};
         },
-        onSuccess: () => {
+        onSuccess: async () => {
           queryClient.invalidateQueries(transactionsQueryKey);
         },
       }
     );
 
-  return { useCreate, useDelete, useGetOne, useGetList };
+  return { useDelete, useGetList, useGetOne, useItem };
 };

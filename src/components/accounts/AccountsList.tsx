@@ -2,9 +2,24 @@ import { useNavigate } from 'react-router-dom';
 import { useAccounts } from '../../hooks/useAccounts';
 import { Loader } from '../_shared/Loader';
 import styled from 'styled-components';
+import { UI_ROUTES } from '../../constants/urls';
+
+const AccountListWrapper = styled.div`
+  margin-bottom: 1em;
+`;
 
 const AccountName = styled.span<{ active: boolean }>`
   color: ${({ theme, active }) => (active ? theme.text.primary : theme.text.inactive)};
+`;
+
+const AccountRest = styled.span``;
+
+const AccountWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  border-bottom: 1px solid black;
+  font-size: 1.5em;
 `;
 
 export const AccountsList: React.VFC = () => {
@@ -16,19 +31,18 @@ export const AccountsList: React.VFC = () => {
   if (isError) return <>Error</>;
 
   return (
-    <>
+    <AccountListWrapper>
       {accounts.map((acc) => (
-        <div key={acc.id}>
-          <AccountName
-            onClick={() => {
-              navigate(`/accounts/${acc.id}`);
-            }}
-            active={acc.isActive}
-          >
-            {acc.name}
-          </AccountName>
-        </div>
+        <AccountWrapper
+          key={acc.id}
+          onClick={() => {
+            navigate(`${UI_ROUTES.ACCOUNTS}/${acc.id}`);
+          }}
+        >
+          <AccountName active={acc.isActive}>img {acc.name}</AccountName>
+          <AccountRest>100 500 RUB</AccountRest>
+        </AccountWrapper>
       ))}
-    </>
+    </AccountListWrapper>
   );
 };

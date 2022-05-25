@@ -3,6 +3,7 @@ import { HomeOutlined, PlusCircleOutlined, SettingOutlined, ShoppingOutlined, Wa
 import { Link, useLocation } from 'react-router-dom';
 import { Navbar } from './Navbar';
 import styled from 'styled-components';
+import { UI_ROUTES } from '../../../constants/urls';
 
 const MenuItem: React.FC<{ icon: React.ReactElement; title: string; to: string }> = ({ to, title, icon }) => {
   const location = useLocation();
@@ -28,10 +29,10 @@ export const MainMenu = () => {
   return (
     <Navbar.Wrapper>
       <Navbar.Items>
-        <MenuItem to="/home" title="Обзор" icon={<HomeOutlined />} />
-        <MenuItem to="/accounts" title="Счета" icon={<WalletOutlined />} />
+        <MenuItem to={UI_ROUTES.HOME} title="Обзор" icon={<HomeOutlined />} />
+        <MenuItem to={UI_ROUTES.ACCOUNTS} title="Счета" icon={<WalletOutlined />} />
         <MenuItem
-          to="/transactions/new"
+          to={`${UI_ROUTES.TRANSACTIONS}/new`}
           title=""
           icon={
             <BigSvgWrapper>
@@ -39,8 +40,8 @@ export const MainMenu = () => {
             </BigSvgWrapper>
           }
         />
-        <MenuItem to="/transactions" title="Транзакции" icon={<ShoppingOutlined />} />
-        <MenuItem to="/login" title="Меню" icon={<SettingOutlined />} />
+        <MenuItem to={UI_ROUTES.TRANSACTIONS} title="Транзакции" icon={<ShoppingOutlined />} />
+        <MenuItem to={UI_ROUTES.SETTINGS.ROOT} title="Настройки" icon={<SettingOutlined />} />
       </Navbar.Items>
     </Navbar.Wrapper>
   );

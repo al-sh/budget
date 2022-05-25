@@ -1,7 +1,7 @@
 import { notification } from 'antd';
 import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API_ENDPOINTS } from '../../constants/urls';
+import { API_ENDPOINTS, UI_ROUTES } from '../../constants/urls';
 import { AuthResponse } from '../../server/routes/auth';
 import { getApi } from '../../services/Api';
 import { getStorage } from '../../services/Storage';
@@ -23,7 +23,7 @@ export const LoginPage: React.FC = () => {
         console.log('response: ', response);
         storage.setItem('token', response.token);
         storage.setItem('userId', String(response.userId));
-        navigate('/main');
+        navigate(UI_ROUTES.HOME);
       } catch (e) {
         if (e.response?.status === 403) {
           notification.error({ message: 'Неправильный логин/пароль' });

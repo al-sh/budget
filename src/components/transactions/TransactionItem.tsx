@@ -8,6 +8,7 @@ import { ETRANSACTION_TYPE } from '../../server/types/transactions';
 import format from 'date-fns/format';
 import isValid from 'date-fns/isValid';
 import { parseISO } from 'date-fns';
+import { UI_ROUTES } from '../../constants/urls';
 
 const TypeIcon: React.VFC<{ type: TransactionType }> = ({ type }) => {
   return (
@@ -46,7 +47,7 @@ export const TransactionItem: React.VFC<{ tran: Transaction }> = ({ tran }) => {
   return (
     <TransactionWrapper
       onClick={() => {
-        navigate(`/transactions/${tran.id}`);
+        navigate(`${UI_ROUTES.TRANSACTIONS}/${tran.id}`);
       }}
     >
       <span>

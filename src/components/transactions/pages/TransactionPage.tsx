@@ -1,9 +1,10 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useTransactions } from '../../hooks/useTransactions';
-import { Loader } from '../_shared/Loader';
-import { TransactionForm } from './TransactionForm';
-import { FormHeader } from '../_shared/forms/FormHeader';
+import { TransactionForm } from '../TransactionForm';
+import { Loader } from '../../_shared/Loader';
+import { FormHeader } from '../../_shared/forms/FormHeader';
+import { useTransactions } from '../../../hooks/useTransactions';
+import { UI_ROUTES } from '../../../constants/urls';
 
 export const TransactionsPage: React.FC = () => {
   const { transactionId } = useParams();
@@ -20,7 +21,7 @@ export const TransactionsPage: React.FC = () => {
           text="Редактирование транзакции"
           onDeleteButtonClick={() => {
             useDeleleQuery.mutate(parseInt(transactionId));
-            navigate('/transactions');
+            navigate(UI_ROUTES.TRANSACTIONS);
           }}
         />
       )}

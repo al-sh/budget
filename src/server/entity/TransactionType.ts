@@ -8,17 +8,17 @@ import { Transaction } from './Transaction';
 @Entity()
 export class TransactionType {
   @PrimaryColumn()
-  id: ETRANSACTION_TYPE;
+  id!: ETRANSACTION_TYPE;
 
   @Column()
-  name: string;
+  name?: string;
 
   @Column()
-  imageUrl: string;
+  imageUrl?: string;
 
   @OneToMany(() => Transaction, (tran) => tran.type)
-  transactions: Transaction[];
+  transactions?: Transaction[];
 
   @OneToMany(() => Category, (cat) => cat.type)
-  categories: Category[];
+  categories?: Category[];
 }

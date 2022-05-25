@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { API_ENDPOINTS } from '../constants/urls';
 import { Account } from '../server/entity/Account';
 import { AccountWithRest } from '../server/types/accounts';
 import { getApi } from '../services/Api';
@@ -20,7 +21,7 @@ export const useAccounts = () => {
       (formValues: Record<string, unknown>) => {
         return api.send({
           data: formValues,
-          endpoint: 'accounts',
+          endpoint: API_ENDPOINTS.ACCOUNTS,
           method: 'POST',
         });
       },
@@ -31,12 +32,12 @@ export const useAccounts = () => {
       }
     );
 
-  const useItem = (method: 'POST' | 'PUT' | 'DELETE', id?: number, onSuccess?: () => void) =>
+  const useItem = (method: 'POST' | 'PUT' | 'DELETE', params?: { id?: number; onSuccess?: () => void }) =>
     useMutation(
       (formValues: Record<string, unknown>) => {
         return api.send({
           data: formValues,
-          endpoint: id ? `accounts/${id}` : 'accounts',
+          endpoint: params?.id ? `accounts/${params.id}` : 'accounts',
           method: method,
         });
       },
@@ -44,30 +45,15 @@ export const useAccounts = () => {
         onSuccess: async () => {
           console.log('useItem onSuccess', method);
           await queryClient.cancelQueries(accountsQueryKey);
-          queryClient.invalidateQueries([accountsQueryKey, id]);
+          if (method === 'PUT' && params?.id) {
+            queryClient.invalidateQueries([accountsQueryKey, params.id]);
+          }
+
           queryClient.invalidateQueries(accountsQueryKey);
-          onSuccess && onSuccess();
+          params?.onSuccess && params?.onSuccess();
         },
       }
     );
 
-  const useDelete = () =>
-    useMutation(
-      (id: number) => {
-        return api.send({
-          data: {
-            id: id,
-          },
-          endpoint: 'accounts',
-          method: 'DELETE',
-        });
-      },
-      {
-        onSuccess: () => {
-          queryClient.invalidateQueries(accountsQueryKey);
-        },
-      }
-    );
-
-  return { useCreate, useDelete, useGetList, useGetOne, useItem };
+  return { useCreate, useGetList, useGetOne, useItem };
 };

@@ -8,7 +8,9 @@ export class CategoriesController {
     this.ds = ds;
 
     this.router.get(this.path, this.getAll);
+    this.router.get(`${this.path}:id`, this.getById);
     this.router.post(this.path, this.create);
+    this.router.put(`${this.path}:id`, this.update);
     this.router.delete(this.path, this.delete);
   }
 
@@ -21,7 +23,13 @@ export class CategoriesController {
   private create = async (request: express.Request, response: express.Response) => {
     console.log('cat create', request.body);
 
-    const category = this.ds.manager.create(Category, { ...request.body, user: { id: request.headers.userid } });
+    const category = this.ds.manager.create(Category, {
+      ...request.body,
+      type: { id: request.body.typeId },
+      user: {
+        id: request.headers.userid,
+      },
+    });
 
     this.ds.manager
       .save(category)
@@ -51,7 +59,6 @@ export class CategoriesController {
   };
 
   private getAll = async (request: express.Request, response: express.Response) => {
-    console.log('Loading categories from the database...');
     let typeId: ETRANSACTION_TYPE = parseInt(
       Array.isArray(request.query.typeId) ? request.query.typeId.join('') : (request.query.typeId as string)
     );
@@ -60,12 +67,41 @@ export class CategoriesController {
     if (typeId === ETRANSACTION_TYPE.RETURN_INCOME) typeId = ETRANSACTION_TYPE.INCOME;
 
     const categories = await this.ds.manager.find(Category, {
+      relations: ['type'],
       where: { type: typeId ? { id: typeId } : undefined, user: { id: Number(request.headers.userid) } },
     });
 
-    console.log('Loaded categories: ', categories);
     setTimeout(() => {
       response.send(categories);
     }, 1500);
+  };
+
+  private getById = async (request: express.Request, response: express.Response) => {
+    const id = parseInt(request.params.id);
+
+    const category = await this.ds.manager.findOne(Category, {
+      where: { id: id, user: { id: Number(request.headers.userid) } },
+    });
+
+    if (!category) {
+      console.error('categories getById request.params.id', request.params.id, ' - not found');
+      response.status(500);
+      response.send('category not found');
+    }
+
+    setTimeout(() => {
+      response.send(category);
+    }, 1000);
+  };
+
+  private update = async (request: express.Request, response: express.Response) => {
+    console.log('cat update', request.body);
+
+    try {
+      const tran = await this.ds.manager.update(Category, parseInt(request.params.id), request.body);
+      response.send({ tran: tran });
+    } catch (err) {
+      response.send(err);
+    }
   };
 }

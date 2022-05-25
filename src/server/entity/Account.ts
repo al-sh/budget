@@ -7,10 +7,10 @@ import { User } from './User';
 @Entity()
 export class Account {
   @PrimaryGeneratedColumn()
-  public id: number;
+  public id!: number;
 
   @Column()
-  public name: string;
+  public name?: string;
 
   @Column()
   public isActive: boolean = true;
@@ -19,8 +19,8 @@ export class Account {
   public initialValue: number = 0;
 
   @OneToMany(() => Transaction, (tran) => tran.account)
-  public transactions: Transaction;
+  public transactions?: Transaction;
 
   @ManyToOne(() => User, (user) => user.accounts)
-  public user: User;
+  public user?: User;
 }

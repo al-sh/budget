@@ -1,20 +1,24 @@
-import { Form, InputNumber, Input, Select, Button } from 'antd';
+import { Form, InputNumber, Input, Button } from 'antd';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAccounts } from '../../hooks/useAccounts';
-import { useCategories } from '../../hooks/useCategories';
+import { UI_ROUTES } from '../../constants/urls';
 import { useTransactions } from '../../hooks/useTransactions';
-import { useTransactionTypes } from '../../hooks/useTransactionTypes';
 import { Transaction } from '../../server/entity/Transaction';
 import { ETRANSACTION_TYPE } from '../../server/types/transactions';
+import { AccountsSelect } from '../_shared/selects/AccountsSelect';
+import { CategoriesSelect } from '../_shared/selects/CategoriesSelect';
+import { TransactionTypeSelect } from '../_shared/selects/TransactionTypeSelect';
 
 export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ transaction }) => {
   const [form] = Form.useForm();
-  const { isLoading: isAccountsLoading, data: accounts } = useAccounts().useGetList();
+
   const [typeId, setTypeId] = useState(ETRANSACTION_TYPE.EXPENSE);
-  const { isLoading: isCategoriesLoading, data: categories } = useCategories().useGetList(typeId);
-  const { isLoading: isTranTypesLoading, data: tranTypes } = useTransactionTypes();
-  const createTransactionQuery = useTransactions().useCreate();
+
+  const createTransactionQuery = useTransactions().useItem('POST', {
+    onSuccess: () => {
+      navigate(UI_ROUTES.TRANSACTIONS);
+    },
+  });
   const navigate = useNavigate();
 
   const [isSubmitDisabled, setisSubmitDisabled] = useState(true);
@@ -45,7 +49,6 @@ export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ tran
         }}
         onFinish={(formValues) => {
           createTransactionQuery.mutate(formValues);
-          navigate('/transactions');
         }}
         autoComplete="off"
       >
@@ -62,35 +65,15 @@ export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ tran
         </Form.Item>
 
         <Form.Item label="Счет" name="accountId" rules={[{ message: 'Выберите счет', required: true }]}>
-          <Select loading={isAccountsLoading}>
-            {accounts?.map((acc) => (
-              <Select.Option key={acc.id} value={acc.id}>
-                {acc.name}
-              </Select.Option>
-            ))}
-          </Select>
+          <AccountsSelect />
         </Form.Item>
 
         <Form.Item label="Тип" name="typeId" rules={[{ message: 'Выберите тип', required: true }]}>
-          <Select loading={isTranTypesLoading}>
-            {tranTypes?.length &&
-              tranTypes?.map((tran) => (
-                <Select.Option key={tran.id} value={tran.id}>
-                  {tran.name}
-                </Select.Option>
-              ))}
-          </Select>
+          <TransactionTypeSelect />
         </Form.Item>
 
         <Form.Item label="Категория" name="categoryId" rules={[{ message: 'Выберите категорию', required: true }]}>
-          <Select loading={isCategoriesLoading} disabled={!typeId}>
-            {categories?.length &&
-              categories?.map((cat) => (
-                <Select.Option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </Select.Option>
-              ))}
-          </Select>
+          <CategoriesSelect typeId={typeId} />
         </Form.Item>
 
         <Form.Item

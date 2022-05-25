@@ -1,16 +1,17 @@
-import { Form, Input, Button, InputNumber } from 'antd';
+import { Form, Input, Button } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { useAccounts } from '../../hooks/useAccounts';
-import { UI_ROUTES } from '../../constants/urls';
+import { UI_ROUTES } from '../../../constants/urls';
+import { useCategories } from '../../../hooks/useCategories';
+import { TransactionTypeSelect } from '../../_shared/selects/TransactionTypeSelect';
 
-export const AccountNewForm: React.VFC<{ onFinish: () => void }> = ({ onFinish }) => {
-  const { useItem } = useAccounts();
+export const CategoryNewForm: React.VFC<{ onFinish: () => void }> = ({ onFinish }) => {
+  const { useCreate } = useCategories();
+  const query = useCreate();
   const navigate = useNavigate();
-  const query = useItem('POST');
 
   return (
     <div>
-      <div>Новый счет</div>
+      <div>Новая категория</div>
 
       <Form
         name="basic"
@@ -27,8 +28,8 @@ export const AccountNewForm: React.VFC<{ onFinish: () => void }> = ({ onFinish }
         }}
         onFinish={(formValues) => {
           query.mutate(formValues);
-          console.log('query.isSuccess');
-          navigate(UI_ROUTES.ACCOUNTS);
+          console.log('query.isSuccess', formValues);
+          navigate(UI_ROUTES.SETTINGS.CATEGORIES);
           onFinish();
         }}
         autoComplete="off"
@@ -38,7 +39,7 @@ export const AccountNewForm: React.VFC<{ onFinish: () => void }> = ({ onFinish }
           name="name"
           rules={[
             {
-              message: 'Введите название счета',
+              message: 'Введите название категории',
               required: true,
             },
           ]}
@@ -46,15 +47,18 @@ export const AccountNewForm: React.VFC<{ onFinish: () => void }> = ({ onFinish }
           <Input />
         </Form.Item>
 
-        {
-          <Form.Item label="Остаток" name="initialValue">
-            <InputNumber
-              style={{
-                width: 300,
-              }}
-            />
-          </Form.Item>
-        }
+        <Form.Item
+          label="Тип"
+          name="typeId"
+          rules={[
+            {
+              message: 'Укажите тип категории',
+              required: true,
+            },
+          ]}
+        >
+          <TransactionTypeSelect />
+        </Form.Item>
 
         <Form.Item
           wrapperCol={{

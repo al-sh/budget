@@ -1,5 +1,6 @@
 import { Form, Input, Checkbox, Button } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import { UI_ROUTES } from '../../constants/urls';
 import { useAccounts } from '../../hooks/useAccounts';
 import { AccountWithRest } from '../../server/types/accounts';
 import { formatMoney } from '../../utils/format';
@@ -7,10 +8,18 @@ import { FormHeader } from '../_shared/forms/FormHeader';
 
 export const EditAccountForm: React.VFC<{ account: AccountWithRest }> = ({ account }) => {
   const { useItem } = useAccounts();
-  const query = useItem('PUT', account.id);
   const navigate = useNavigate();
-  const { useDelete } = useAccounts();
-  const deleteAccountMutation = useDelete();
+  const query = useItem('PUT', {
+    id: account.id,
+    onSuccess: () => {
+      navigate(UI_ROUTES.ACCOUNTS);
+    },
+  });
+  const deleteAccountMutation = useItem('DELETE', {
+    onSuccess: () => {
+      navigate(UI_ROUTES.ACCOUNTS);
+    },
+  });
 
   return (
     <div>
@@ -18,8 +27,7 @@ export const EditAccountForm: React.VFC<{ account: AccountWithRest }> = ({ accou
         text="Редактирование счета"
         onDeleteButtonClick={() => {
           if (confirm('Удалить счет?')) {
-            deleteAccountMutation.mutate(account.id);
-            navigate('/accounts');
+            deleteAccountMutation.mutate({ id: account.id });
           }
         }}
       />
@@ -40,7 +48,7 @@ export const EditAccountForm: React.VFC<{ account: AccountWithRest }> = ({ accou
         }}
         onFinish={(formValues) => {
           query.mutate(formValues);
-          navigate('/accounts');
+          navigate(UI_ROUTES.ACCOUNTS);
         }}
         autoComplete="off"
       >

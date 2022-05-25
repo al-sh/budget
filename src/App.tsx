@@ -12,6 +12,7 @@ import { ThemeProvider } from 'styled-components';
 import { dark } from './components/_shared/themes/dark';
 import { getStorage } from './services/Storage';
 import { light } from './components/_shared/themes/light';
+import { UI_ROUTES } from './constants/urls';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,11 +24,16 @@ const queryClient = new QueryClient({
   },
 });
 
-const AccountPage = React.lazy(() => import('./components/accounts/AccountPage'));
-const AccountsPage = React.lazy(() => import('./components/accounts/AccountsPage'));
-const LoginPage = React.lazy(() => import('./components/login/LoginPage'));
-const TransactionPage = React.lazy(() => import('./components/transactions/TransactionPage'));
-const TransactionsPage = React.lazy(() => import('./components/transactions/TransactionsPage'));
+const AccountPage = React.lazy(() => import('./components/accounts/pages/AccountPage'));
+const AccountsPage = React.lazy(() => import('./components/accounts/pages/AccountsPage'));
+
+const SettingsPage = React.lazy(() => import('./components/settings/SettingsPage'));
+const LoginPage = React.lazy(() => import('./components/settings/LoginPage'));
+const CategoriesPage = React.lazy(() => import('./components/settings/categories/pages/CategoriesPage'));
+const CategoryDetailsPage = React.lazy(() => import('./components/settings/categories/pages/CategoryDetailsPage'));
+
+const TransactionPage = React.lazy(() => import('./components/transactions/pages/TransactionPage'));
+const TransactionsPage = React.lazy(() => import('./components/transactions/pages/TransactionsPage'));
 
 export const App = () => {
   const storage = getStorage();
@@ -43,12 +49,15 @@ export const App = () => {
             <main style={{ padding: '1em' }}>
               <Suspense fallback={<Loader size="large" />}>
                 <Routes>
-                  <Route path="home" element={<MainPage />} />
-                  <Route path="accounts" element={<AccountsPage />} />
-                  <Route path="accounts/:accountId" element={<AccountPage />} />
-                  <Route path="login" element={<LoginPage />} />
-                  <Route path="transactions" element={<TransactionsPage />} />
-                  <Route path="transactions/:transactionId" element={<TransactionPage />} />
+                  <Route path={UI_ROUTES.HOME} element={<MainPage />} />
+                  <Route path={UI_ROUTES.ACCOUNTS} element={<AccountsPage />} />
+                  <Route path={`${UI_ROUTES.ACCOUNTS}/:accountId`} element={<AccountPage />} />
+                  <Route path={UI_ROUTES.SETTINGS.ROOT} element={<SettingsPage />} />
+                  <Route path={UI_ROUTES.SETTINGS.CATEGORIES} element={<CategoriesPage />} />
+                  <Route path={`${UI_ROUTES.SETTINGS.CATEGORIES}/:categoryId`} element={<CategoryDetailsPage />} />
+                  <Route path={UI_ROUTES.SETTINGS.LOGIN} element={<LoginPage />} />
+                  <Route path={UI_ROUTES.TRANSACTIONS} element={<TransactionsPage />} />
+                  <Route path={`${UI_ROUTES.TRANSACTIONS}/:transactionId`} element={<TransactionPage />} />
                 </Routes>
               </Suspense>
             </main>

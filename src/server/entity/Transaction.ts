@@ -7,23 +7,23 @@ import { TransactionType } from './TransactionType';
 @Entity()
 export class Transaction {
   @PrimaryGeneratedColumn()
-  public id: number;
+  public id!: number;
 
   @Column()
-  public description: string;
+  public description?: string;
 
   @Column()
-  public amount: number;
+  public amount!: number;
 
   @Column()
-  public dt: Date;
+  public dt?: Date;
 
   @ManyToOne(() => TransactionType, (type) => type.transactions)
-  public type: TransactionType;
+  public type?: TransactionType;
 
   @ManyToOne(() => Account, (acc) => acc.transactions)
-  public account: Account;
+  public account?: Account;
 
   @ManyToOne(() => Category, (cat) => cat.transactions)
-  public category: Category;
+  public category?: Category;
 }
