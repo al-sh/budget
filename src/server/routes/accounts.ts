@@ -23,6 +23,17 @@ export class AccountsController {
 
   private path = '/';
 
+  private calculateRest = (transactions: Transaction[], initialValue: number) => {
+    return transactions.reduce((prev, current) => {
+      console.log(current);
+      if (current.type?.id === ETRANSACTION_TYPE.INCOME || current.type?.id === ETRANSACTION_TYPE.RETURN_EXPENSE) {
+        return prev + current.amount;
+      }
+
+      return prev - current.amount;
+    }, initialValue);
+  };
+
   private create = async (request: express.Request, response: express.Response) => {
     console.log('acc create1', request.body);
 
@@ -58,11 +69,23 @@ export class AccountsController {
   private getAll = async (request: express.Request, response: express.Response) => {
     console.log('Loading accounts from the database...');
 
-    const accounts = await this.ds.manager.find(Account, { where: { user: { id: Number(request.headers.userid) } } });
+    const accounts = await this.ds.manager.find(Account, {
+      relations: { transactions: { type: true } },
+      where: { user: { id: Number(request.headers.userid) } },
+    });
 
     console.log('Loaded accounts: ', accounts);
+
+    const accountsWithRest = accounts.map((account) => {
+      return {
+        id: account.id,
+        isActive: account.isActive,
+        name: account.name,
+        rest: this.calculateRest(account.transactions ? account.transactions : [], account.initialValue),
+      };
+    });
     setTimeout(() => {
-      response.send(accounts);
+      response.send(accountsWithRest);
     }, 1500);
   };
 
@@ -81,14 +104,7 @@ export class AccountsController {
     }
 
     const transactions = await this.ds.manager.find(Transaction, { relations: ['account', 'type'], where: { account: { id: accId } } });
-    const rest = transactions.reduce((prev, current) => {
-      console.log(current);
-      if (current.type?.id === ETRANSACTION_TYPE.INCOME || current.type?.id === ETRANSACTION_TYPE.RETURN_EXPENSE) {
-        return prev + current.amount;
-      }
-
-      return prev - current.amount;
-    }, account.initialValue);
+    const rest = this.calculateRest(transactions, account.initialValue);
 
     console.log('tran cnt:', transactions.length, 'SUM1:', rest);
 

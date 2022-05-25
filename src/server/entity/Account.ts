@@ -19,7 +19,7 @@ export class Account {
   public initialValue: number = 0;
 
   @OneToMany(() => Transaction, (tran) => tran.account)
-  public transactions?: Transaction;
+  public transactions?: Transaction[];
 
   @ManyToOne(() => User, (user) => user.accounts)
   public user?: User;

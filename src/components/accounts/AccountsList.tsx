@@ -40,7 +40,7 @@ export const AccountsList: React.VFC = () => {
           }}
         >
           <AccountName active={acc.isActive}>img {acc.name}</AccountName>
-          <AccountRest>100 500 RUB</AccountRest>
+          <AccountRest>{acc.rest} RUB</AccountRest>
         </AccountWrapper>
       ))}
     </AccountListWrapper>
