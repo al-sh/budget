@@ -24,6 +24,9 @@ export class Transaction {
   @ManyToOne(() => Account, (acc) => acc.transactions)
   public account?: Account;
 
+  @ManyToOne(() => Account, (acc) => acc.incomingTransactions)
+  public toAccount?: Account;
+
   @ManyToOne(() => Category, (cat) => cat.transactions)
   public category?: Category;
 }

@@ -64,11 +64,13 @@ export const App = () => {
           </AppWrapper>
         </ThemeProvider>
       </BrowserRouter>
-      <ReactQueryDevtools
-        initialIsOpen
-        position="bottom-right"
-        panelProps={{ style: { height: '100vh', maxHeight: 'unset', top: 0, width: '50%' } }}
-      />
+      <div>
+        <ReactQueryDevtools
+          initialIsOpen
+          position="bottom-right"
+          panelProps={{ style: { height: '100vh', maxHeight: 'unset', top: 0, width: '50%' } }}
+        />
+      </div>
     </QueryClientProvider>
   );
 };

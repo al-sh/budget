@@ -1,6 +1,7 @@
 import * as express from 'express';
 import { DataSource, In } from 'typeorm';
 import { Account } from '../entity/Account';
+import { Category } from '../entity/Category';
 import { Transaction } from '../entity/Transaction';
 import { TransactionType } from '../entity/TransactionType';
 import { ETRANSACTION_TYPE } from '../types/transactions';
@@ -17,7 +18,7 @@ export class TransactionsController {
     this.router.get(`${this.path}types`, this.getTypes);
     this.router.get(`${this.path}:id`, this.getById);
     this.router.post(this.path, this.create);
-    this.router.put(this.path, this.update);
+    this.router.put(`${this.path}:id`, this.update);
     this.router.delete(this.path, this.delete);
   }
 
@@ -30,13 +31,9 @@ export class TransactionsController {
   private create = async (request: express.Request, response: express.Response) => {
     console.log('tran create', request.body); //todo: типизировать body для запросов
 
-    const tran = this.ds.manager.create(Transaction, {
-      ...request.body,
-      account: { id: request.body.accountId },
-      category: { id: request.body.categoryId },
-      dt: new Date(),
-      type: { id: request.body.typeId },
-    });
+    const tranToCreate = this.transformTranFromRequest(request);
+
+    const tran = this.ds.manager.create(Transaction, tranToCreate);
 
     this.ds.manager
       .save(tran)
@@ -85,7 +82,7 @@ export class TransactionsController {
       where: { id: Number(request.headers.userid) },
     });
 */
-    console.log('Loaded transactions: ', transactions);
+    // console.log('Loaded transactions: ', transactions);
     setTimeout(() => {
       response.send(transactions);
     }, 1500);
@@ -95,7 +92,10 @@ export class TransactionsController {
     const tranId = parseInt(request.params.id);
 
     try {
-      const tran = await this.ds.manager.findOne(Transaction, { relations: ['account', 'category'], where: { id: tranId } });
+      const tran = await this.ds.manager.findOne(Transaction, {
+        relations: ['account', 'toAccount', 'category', 'type'],
+        where: { id: tranId },
+      });
 
       /** todo: добавить проверку на принадлежность юзеру
       if (!(tran.account.user.id === Number(request.headers.userid))) {
@@ -148,11 +148,31 @@ export class TransactionsController {
     console.log('TransactionTypes initialized');
   }
 
+  private transformTranFromRequest(request: express.Request): Omit<Transaction, 'id'> {
+    const tran: Omit<Transaction, 'id'> = {
+      account: { id: request.body.accountId } as Account,
+      amount: request.body.amount,
+      description: request.body.description,
+      dt: new Date(),
+      type: { id: request.body.typeId },
+    };
+
+    if (request.body.typeId !== ETRANSACTION_TYPE.TRANSFER) {
+      tran.category = { id: request.body.categoryId } as Category;
+    } else {
+      tran.toAccount = { id: request.body.toAccountId } as Account;
+    }
+
+    return tran;
+  }
+
   private update = async (request: express.Request, response: express.Response) => {
     console.log('tran update', request.body);
 
+    const tranToUpdate = this.transformTranFromRequest(request);
+
     try {
-      const tran = await this.ds.manager.update(Transaction, parseInt(request.params.id), request.body);
+      const tran = await this.ds.manager.update(Transaction, parseInt(request.params.id), tranToUpdate);
       response.send({ tran: tran });
     } catch (err) {
       response.send(err);

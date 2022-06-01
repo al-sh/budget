@@ -21,6 +21,9 @@ export class Account {
   @OneToMany(() => Transaction, (tran) => tran.account)
   public transactions?: Transaction[];
 
+  @OneToMany(() => Transaction, (tran) => tran.toAccount)
+  public incomingTransactions?: Transaction[];
+
   @ManyToOne(() => User, (user) => user.accounts)
   public user?: User;
 }

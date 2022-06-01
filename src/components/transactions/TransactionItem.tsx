@@ -58,7 +58,9 @@ export const TransactionItem: React.VFC<{ tran: Transaction }> = ({ tran }) => {
 
           <span>{formatDate(tran.dt)}</span>
 
-          <span style={{ color: 'gray', marginLeft: '0.5em' }}>{tran?.category?.name}</span>
+          <span style={{ color: 'gray', marginLeft: '0.5em' }}>
+            {tran.type?.id !== ETRANSACTION_TYPE.TRANSFER ? tran?.category?.name : tran.type?.name}
+          </span>
         </div>
 
         <span>{tran.description}</span>
@@ -66,7 +68,7 @@ export const TransactionItem: React.VFC<{ tran: Transaction }> = ({ tran }) => {
 
       <span>
         <div style={{ whiteSpace: 'nowrap' }}>{tran.amount} RUB</div>
-        <div style={{ color: 'gray', textAlign: 'right' }}>{tran?.account?.name}</div>
+        <div style={{ color: 'gray', textAlign: 'right' }}>{tran.account?.name}</div>
       </span>
     </TransactionWrapper>
   );

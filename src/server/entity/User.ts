@@ -28,8 +28,8 @@ export class User {
   public isBlocked: boolean = false;
 
   @OneToMany(() => Account, (acc) => acc.user)
-  public accounts?: Account;
+  public accounts?: Account[];
 
   @OneToMany(() => Category, (cat) => cat.user)
-  public categories?: Category;
+  public categories?: Category[];
 }

@@ -23,15 +23,22 @@ export class AccountsController {
 
   private path = '/';
 
-  private calculateRest = (transactions: Transaction[], initialValue: number) => {
-    return transactions.reduce((prev, current) => {
+  private calculateRest = (transactions: Transaction[], account: Account) => {
+    const rest = transactions.reduce((prev, current) => {
       console.log(current);
       if (current.type?.id === ETRANSACTION_TYPE.INCOME || current.type?.id === ETRANSACTION_TYPE.RETURN_EXPENSE) {
         return prev + current.amount;
       }
 
+      if (current.type?.id === ETRANSACTION_TYPE.TRANSFER && current?.toAccount?.id === account.id) {
+        return prev + current.amount;
+      }
+
       return prev - current.amount;
-    }, initialValue);
+    }, account.initialValue);
+
+    console.log('calculateRest', rest, 'trans:', transactions);
+    return rest;
   };
 
   private create = async (request: express.Request, response: express.Response) => {
@@ -70,18 +77,27 @@ export class AccountsController {
     console.log('Loading accounts from the database...');
 
     const accounts = await this.ds.manager.find(Account, {
-      relations: { transactions: { type: true } },
+      relations: { incomingTransactions: { toAccount: true, type: true }, transactions: { type: true } },
       where: { user: { id: Number(request.headers.userid) } },
     });
 
     console.log('Loaded accounts: ', accounts);
 
     const accountsWithRest = accounts.map((account) => {
+      let transactions: Transaction[] = [];
+      if (account.incomingTransactions?.length) {
+        transactions = [...transactions, ...account.incomingTransactions];
+      }
+
+      if (account.transactions?.length) {
+        transactions = [...transactions, ...account.transactions];
+      }
+
       return {
         id: account.id,
         isActive: account.isActive,
         name: account.name,
-        rest: this.calculateRest(account.transactions ? account.transactions : [], account.initialValue),
+        rest: this.calculateRest(transactions, account),
       };
     });
     setTimeout(() => {
@@ -104,7 +120,11 @@ export class AccountsController {
     }
 
     const transactions = await this.ds.manager.find(Transaction, { relations: ['account', 'type'], where: { account: { id: accId } } });
-    const rest = this.calculateRest(transactions, account.initialValue);
+    const incomingTransactions = await this.ds.manager.find(Transaction, {
+      relations: ['account', 'type', 'toAccount'],
+      where: { toAccount: { id: accId } },
+    });
+    const rest = this.calculateRest([...transactions, ...incomingTransactions], account);
 
     console.log('tran cnt:', transactions.length, 'SUM1:', rest);
 

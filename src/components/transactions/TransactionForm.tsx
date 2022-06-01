@@ -12,13 +12,15 @@ import { TransactionTypeSelect } from '../_shared/selects/TransactionTypeSelect'
 export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ transaction }) => {
   const [form] = Form.useForm();
 
-  const [typeId, setTypeId] = useState(ETRANSACTION_TYPE.EXPENSE);
+  const [typeId, setTypeId] = useState(transaction?.type?.id ? transaction.type?.id : ETRANSACTION_TYPE.EXPENSE);
 
-  const createTransactionQuery = useTransactions().useItem('POST', {
+  const query = useTransactions().useItem(transaction ? 'PUT' : 'POST', {
+    id: transaction ? transaction.id : undefined,
     onSuccess: () => {
       navigate(UI_ROUTES.TRANSACTIONS);
     },
   });
+
   const navigate = useNavigate();
 
   const [isSubmitDisabled, setisSubmitDisabled] = useState(true);
@@ -33,7 +35,7 @@ export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ tran
         }}
         onValuesChange={() => {
           setTypeId(form.getFieldValue('typeId'));
-          setisSubmitDisabled(createTransactionQuery.isLoading || form.getFieldsError().filter(({ errors }) => errors.length).length > 0);
+          setisSubmitDisabled(query.isLoading || form.getFieldsError().filter(({ errors }) => errors.length).length > 0);
         }}
         layout="horizontal"
         labelAlign="left"
@@ -45,10 +47,11 @@ export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ tran
           amount: transaction?.amount || 1,
           categoryId: transaction?.category?.id || '',
           description: transaction?.description || '',
+          toAccountId: transaction?.toAccount?.id || '',
           typeId: transaction?.type?.id || ETRANSACTION_TYPE.EXPENSE,
         }}
         onFinish={(formValues) => {
-          createTransactionQuery.mutate(formValues);
+          query.mutate(formValues);
         }}
         autoComplete="off"
       >
@@ -72,9 +75,17 @@ export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ tran
           <TransactionTypeSelect />
         </Form.Item>
 
-        <Form.Item label="Категория" name="categoryId" rules={[{ message: 'Выберите категорию', required: true }]}>
-          <CategoriesSelect typeId={typeId} />
-        </Form.Item>
+        {typeId === ETRANSACTION_TYPE.TRANSFER && (
+          <Form.Item label="Счет пополнения" name="toAccountId" rules={[{ message: 'Выберите счет пополнения', required: true }]}>
+            <AccountsSelect />
+          </Form.Item>
+        )}
+
+        {typeId !== ETRANSACTION_TYPE.TRANSFER && (
+          <Form.Item label="Категория" name="categoryId" rules={[{ message: 'Выберите категорию', required: true }]}>
+            <CategoriesSelect typeId={typeId} />
+          </Form.Item>
+        )}
 
         <Form.Item
           wrapperCol={{

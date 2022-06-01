@@ -2,7 +2,9 @@ import styled, { createGlobalStyle } from 'styled-components';
 
 export const AppWrapper = styled.div`
   max-width: 360px;
-  overflow: hidden;
+  padding-bottom: 50px;
+  overflow-x: hidden;
+  overflow-y: scroll;
   display: flex;
   height: 100vh;
   flex-direction: column;
