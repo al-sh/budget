@@ -1,4 +1,5 @@
-import { Form, InputNumber, Input, Button } from 'antd';
+import { Form, InputNumber, Input, Button, DatePicker } from 'antd';
+import moment from 'moment';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UI_ROUTES } from '../../constants/urls';
@@ -47,6 +48,7 @@ export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ tran
           amount: transaction?.amount || 1,
           categoryId: transaction?.category?.id || '',
           description: transaction?.description || '',
+          dt: moment(transaction?.dt) || new Date(),
           toAccountId: transaction?.toAccount?.id || '',
           typeId: transaction?.type?.id || ETRANSACTION_TYPE.EXPENSE,
         }}
@@ -61,6 +63,10 @@ export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ tran
               width: '100%',
             }}
           />
+        </Form.Item>
+
+        <Form.Item label="Дата" name="dt" rules={[{ message: 'Укажите дату', required: true }]}>
+          <DatePicker format="YYYY-MM-DD HH:mm" showTime placeholder="Выберите дату" />
         </Form.Item>
 
         <Form.Item label="Описание" name="description">

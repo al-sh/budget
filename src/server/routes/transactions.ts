@@ -5,6 +5,7 @@ import { Category } from '../entity/Category';
 import { Transaction } from '../entity/Transaction';
 import { TransactionType } from '../entity/TransactionType';
 import { ETRANSACTION_TYPE } from '../types/transactions';
+import { PAGE_SIZE } from '../../constants/misc';
 
 export class TransactionsController {
   constructor(ds: DataSource) {
@@ -65,13 +66,20 @@ export class TransactionsController {
   };
 
   private getAll = async (request: express.Request, response: express.Response) => {
-    console.log('Loading transactions from the database...');
+    const pageNumber = Number.isFinite(parseInt(request.query.page as string)) ? parseInt(request.query.page as string) : 0;
+
+    console.log('Loading transactions from the database', request.query, pageNumber * PAGE_SIZE);
 
     const accounts = await this.ds.manager.find(Account, { where: { user: { id: Number(request.headers.userid) } } });
     const accountIds = accounts.map((acc) => acc.id);
     const transactions = await this.ds.manager.find(Transaction, {
       relations: ['account', 'category', 'type'],
       where: { account: In(accountIds) },
+      order: {
+        dt: 'DESC',
+      },
+      skip: 0 + pageNumber * PAGE_SIZE,
+      take: PAGE_SIZE,
     });
 
     /*
@@ -153,7 +161,7 @@ export class TransactionsController {
       account: { id: request.body.accountId } as Account,
       amount: request.body.amount,
       description: request.body.description,
-      dt: new Date(),
+      dt: request.body.dt,
       type: { id: request.body.typeId },
     };
 

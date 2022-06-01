@@ -38,7 +38,7 @@ const formatDate = (dt: Date) => {
     console.log('invalid date: ', newDt);
     return '';
   }
-  return format(newDt, 'hh:mm dd.MM.yyyy');
+  return format(newDt, 'HH:mm dd.MM.yyyy');
 };
 
 export const TransactionItem: React.VFC<{ tran: Transaction }> = ({ tran }) => {

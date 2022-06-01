@@ -10,10 +10,19 @@ export const useTransactions = () => {
 
   const queryClient = useQueryClient();
 
-  const useGetList = () => useQuery(transactionsQueryKey, () => api.send<Transaction[]>({ endpoint: 'transactions', method: 'GET' }));
+  const useGetList = (page?: number) =>
+    useQuery([transactionsQueryKey, page], () =>
+      api.send<Transaction[]>({
+        endpoint: 'transactions',
+        method: 'GET',
+        query: { page: String(page) },
+      })
+    );
 
   const useGetOne = (id: number) =>
-    useQuery([transactionsQueryKey, id], () => api.send<Transaction>({ endpoint: `transactions/${id}`, method: 'GET' }), { enabled: !!id });
+    useQuery([transactionsQueryKey, 'details', id], () => api.send<Transaction>({ endpoint: `transactions/${id}`, method: 'GET' }), {
+      enabled: !!id,
+    });
 
   const useItem = (method: 'POST' | 'PUT' | 'DELETE', params?: { id?: number; onSuccess?: () => void }) =>
     useMutation(
@@ -29,7 +38,7 @@ export const useTransactions = () => {
           console.log('useItem onSuccess', method);
           await queryClient.cancelQueries(transactionsQueryKey);
           if (method === 'PUT' && params?.id) {
-            queryClient.invalidateQueries([transactionsQueryKey, params.id]);
+            queryClient.invalidateQueries([transactionsQueryKey, 'details', params.id]);
           }
 
           queryClient.invalidateQueries(transactionsQueryKey);
