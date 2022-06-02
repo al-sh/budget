@@ -57,7 +57,7 @@ export const CategoryNewForm: React.VFC<{ onFinish: () => void }> = ({ onFinish 
             },
           ]}
         >
-          <TransactionTypeSelect />
+          <TransactionTypeSelect hideReturns />
         </Form.Item>
 
         <Form.Item

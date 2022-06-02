@@ -3,6 +3,8 @@ import { useAccounts } from '../../hooks/useAccounts';
 import { Loader } from '../_shared/Loader';
 import styled from 'styled-components';
 import { UI_ROUTES } from '../../constants/urls';
+import { Button } from 'antd';
+import { useState } from 'react';
 
 const AccountListWrapper = styled.div`
   margin-bottom: 1em;
@@ -22,12 +24,13 @@ const AccountWrapper = styled.div`
   font-size: 1.5em;
 `;
 
-export const AccountsList: React.VFC = () => {
-  const { useGetList } = useAccounts();
-  const { isFetching, isError, data: accounts } = useGetList();
+export const AccountsList: React.VFC<{ fromMainPage?: boolean }> = ({ fromMainPage }) => {
+  const { useGetAccountsList } = useAccounts();
+  const [showHidden, setShowHidden] = useState(false);
+  const { isLoading, isError, data: accounts } = useGetAccountsList(showHidden);
   const navigate = useNavigate();
 
-  if (isFetching) return <Loader />;
+  if (isLoading) return <Loader />;
   if (isError) return <>Error</>;
 
   return (
@@ -43,6 +46,15 @@ export const AccountsList: React.VFC = () => {
           <AccountRest>{acc.rest} RUB</AccountRest>
         </AccountWrapper>
       ))}
+      {!fromMainPage && !showHidden && (
+        <Button
+          onClick={() => {
+            setShowHidden(true);
+          }}
+        >
+          Показать скрытые
+        </Button>
+      )}
     </AccountListWrapper>
   );
 };

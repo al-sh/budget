@@ -4,10 +4,11 @@ import { useTransactionTypes } from '../../../hooks/useTransactionTypes';
 interface Props {
   onChange?: (newValue: number) => void;
   value?: number;
+  hideReturns?: boolean;
 }
 
-export const TransactionTypeSelect: React.VFC<Props> = ({ onChange, value }) => {
-  const { isLoading: isTranTypesLoading, data: tranTypes } = useTransactionTypes();
+export const TransactionTypeSelect: React.VFC<Props> = ({ onChange, value, hideReturns }) => {
+  const { isLoading: isTranTypesLoading, data: tranTypes } = useTransactionTypes(hideReturns);
   return (
     <Select loading={isTranTypesLoading} onChange={onChange} value={value}>
       {tranTypes?.length &&

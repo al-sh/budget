@@ -7,7 +7,7 @@ interface Props {
 }
 
 export const AccountsSelect: React.VFC<Props> = ({ value, onChange }) => {
-  const { isLoading: isAccountsLoading, data: accounts } = useAccounts().useGetList();
+  const { isLoading: isAccountsLoading, data: accounts } = useAccounts().useGetAccountsList(false);
 
   return (
     <Select loading={isAccountsLoading} value={value} onChange={onChange}>

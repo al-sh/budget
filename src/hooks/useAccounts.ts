@@ -10,10 +10,19 @@ export const useAccounts = () => {
 
   const queryClient = useQueryClient();
 
-  const useGetList = () => useQuery(accountsQueryKey, () => api.send<AccountWithRest[]>({ endpoint: 'accounts', method: 'GET' }));
+  const useGetAccountsList = (showHidden?: boolean) =>
+    useQuery([accountsQueryKey, showHidden], () =>
+      api.send<AccountWithRest[]>({
+        endpoint: 'accounts',
+        method: 'GET',
+        query: { showHidden: showHidden ? '1' : '0' },
+      })
+    );
 
   const useGetOne = (id: number) =>
-    useQuery([accountsQueryKey, id], () => api.send<AccountWithRest>({ endpoint: `accounts/${id}`, method: 'GET' }), { enabled: !!id });
+    useQuery([accountsQueryKey, 'details', id], () => api.send<AccountWithRest>({ endpoint: `accounts/${id}`, method: 'GET' }), {
+      enabled: !!id,
+    });
 
   const useCreate = () =>
     useMutation(
@@ -45,7 +54,7 @@ export const useAccounts = () => {
           console.log('useItem onSuccess', method);
           await queryClient.cancelQueries(accountsQueryKey);
           if (method === 'PUT' && params?.id) {
-            queryClient.invalidateQueries([accountsQueryKey, params.id]);
+            queryClient.invalidateQueries([accountsQueryKey, 'details', params.id]);
           }
 
           queryClient.invalidateQueries(accountsQueryKey);
@@ -54,5 +63,5 @@ export const useAccounts = () => {
       }
     );
 
-  return { useCreate, useGetList, useGetOne, useItem };
+  return { useCreate, useGetAccountsList, useGetOne, useItem };
 };

@@ -6,5 +6,7 @@ const api = getApi();
 
 export const transactionTypesQueryKey = ['transactionTypes'];
 
-export const useTransactionTypes = () =>
-  useQuery(transactionTypesQueryKey, () => api.send<TransactionType[]>({ endpoint: 'transactions/types', method: 'GET' }));
+export const useTransactionTypes = (hideReturns?: boolean) =>
+  useQuery([transactionTypesQueryKey, hideReturns], () =>
+    api.send<TransactionType[]>({ endpoint: 'transactions/types', method: 'GET', query: { hideReturns: hideReturns ? '1' : '0' } })
+  );

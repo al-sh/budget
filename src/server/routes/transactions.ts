@@ -122,8 +122,11 @@ export class TransactionsController {
 
   private getTypes = async (request: express.Request, response: express.Response) => {
     console.log('Loading transaction types from the database...');
-
-    const types = await this.ds.manager.find(TransactionType);
+    const hideReturns = request.query.hideReturns === '1';
+    const types = await this.ds.manager.find(
+      TransactionType,
+      hideReturns ? { where: { id: In([ETRANSACTION_TYPE.EXPENSE, ETRANSACTION_TYPE.INCOME]) } } : undefined
+    );
 
     console.log('Loaded types: ', types);
     response.send(types);

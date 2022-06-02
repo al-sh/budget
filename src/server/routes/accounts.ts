@@ -1,5 +1,5 @@
 import * as express from 'express';
-import { DataSource } from 'typeorm';
+import { DataSource, FindOptionsWhere } from 'typeorm';
 import { Account } from '../entity/Account';
 import { Transaction } from '../entity/Transaction';
 import { ETRANSACTION_TYPE } from '../types/transactions';
@@ -75,10 +75,17 @@ export class AccountsController {
 
   private getAll = async (request: express.Request, response: express.Response) => {
     console.log('Loading accounts from the database...');
+    const showHidden = request.query.showHidden === '1';
+    console.log(request.query.showHidden, showHidden);
+
+    const whereClause: FindOptionsWhere<Account> = { user: { id: Number(request.headers.userid) } };
+    if (!showHidden) {
+      whereClause.isActive = true;
+    }
 
     const accounts = await this.ds.manager.find(Account, {
       relations: { incomingTransactions: { toAccount: true, type: true }, transactions: { type: true } },
-      where: { user: { id: Number(request.headers.userid) } },
+      where: whereClause,
     });
 
     console.log('Loaded accounts: ', accounts);
