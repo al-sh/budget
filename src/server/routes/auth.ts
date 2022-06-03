@@ -4,15 +4,11 @@ import { DataSource, Repository } from 'typeorm';
 import { User } from '../entity/User';
 import { API_ENDPOINTS } from '../../constants/urls';
 
-const getPasswordHash = (password: string) =>
-  crypto.pbkdf2Sync(password, 'testSalt', Number(process.env.CRYPTO_ITERATIONS), 32, 'sha256').toString('hex');
-
 export class AuthController {
   constructor(ds: DataSource) {
     this.ds = ds;
     this.userRepository = this.ds.getRepository(User);
 
-    if (process.env.DB_NEED_REINIT === 'yes') this.intializeUsers();
     this.router.use(this.checkTokenMiddleware);
     this.router.post(`${this.path}${API_ENDPOINTS.AUTH.PASSWORD}`, this.handlePasswordAuth);
   }
@@ -92,22 +88,12 @@ export class AuthController {
       return;
     }
   };
-
-  private async intializeUsers() {
-    await this.ds.createQueryBuilder().delete().from(User).execute();
-
-    const user = new User();
-    user.name = 'Demo User';
-    user.login = 'demo';
-    user.isBlocked = false;
-    user.passwordHash = getPasswordHash('demo');
-
-    await this.userRepository.save([user]);
-    console.log('Saved a new user with id: ' + user.id);
-  }
 }
 
 export interface AuthResponse {
   token: string;
   userId: number;
 }
+
+export const getPasswordHash = (password: string) =>
+  crypto.pbkdf2Sync(password, 'testSalt', Number(process.env.CRYPTO_ITERATIONS), 32, 'sha256').toString('hex');

@@ -8,8 +8,6 @@ export class AccountsController {
   constructor(ds: DataSource) {
     this.ds = ds;
 
-    // this.intializeAccounts();
-
     this.router.get(this.path, this.getAll);
     this.router.get(`${this.path}:id`, this.getById);
     this.router.post(this.path, this.create);
@@ -134,21 +132,6 @@ export class AccountsController {
       response.send({ ...account, rest: rest });
     }, 1000);
   };
-
-  private async intializeAccounts() {
-    await this.ds.createQueryBuilder().delete().from(Account).execute();
-
-    const account = new Account();
-    account.name = 'Tinkoff';
-    account.isActive = true;
-
-    const account2 = new Account();
-    account2.name = 'Test';
-    account2.isActive = false;
-
-    await this.ds.manager.save([account, account2]);
-    console.log('Saved a new user with id: ' + account.id);
-  }
 
   private update = async (request: express.Request, response: express.Response) => {
     console.log('acc update', request.body);

@@ -14,7 +14,7 @@ export class TransactionType {
   name?: string;
 
   @Column()
-  imageUrl?: string;
+  imageUrl?: string = '';
 
   @OneToMany(() => Transaction, (tran) => tran.type)
   transactions?: Transaction[];

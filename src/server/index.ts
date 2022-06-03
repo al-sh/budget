@@ -5,6 +5,7 @@ console.log('env loaded');
 import express from 'express';
 
 import { AppDataSource } from './data-source';
+import { dbInitializer } from './dbInitialisation';
 import { AccountsController } from './routes/accounts';
 import { AuthController } from './routes/auth';
 import { CategoriesController } from './routes/categories';
@@ -30,6 +31,8 @@ app.get('/', (req, res) => {
 
 AppDataSource.initialize()
   .then(async () => {
+    dbInitializer(AppDataSource);
+
     const authController = new AuthController(AppDataSource);
     app.use('/', authController.router);
 

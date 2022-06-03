@@ -1,5 +1,6 @@
 import axios, { AxiosError, AxiosPromise } from 'axios';
 import { getStorage } from './Storage';
+import { UI_ROUTES } from '../constants/urls';
 
 interface ApiRequest {
   endpoint: string;
@@ -45,7 +46,7 @@ class ApiService {
           console.log(error.response);
           if (error.response && error.response?.status === 401) {
             console.log('redirected to login');
-            window.location.href = `${window.location.origin}/login`;
+            window.location.href = `${window.location.origin}${UI_ROUTES.SETTINGS.LOGIN}`;
           }
           reject(error);
         });
