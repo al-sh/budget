@@ -14,7 +14,7 @@ export class AccountsController {
     this.router.get(`${this.path}:id`, this.getById);
     this.router.post(this.path, this.create);
     this.router.put(`${this.path}:id`, this.update);
-    this.router.delete(this.path, this.delete);
+    this.router.delete(`${this.path}:id`, this.delete);
   }
 
   public router = express.Router();
@@ -59,18 +59,13 @@ export class AccountsController {
 
   private delete = async (request: express.Request, response: express.Response) => {
     console.log('acc delete', request.body);
-
-    await this.ds
-      .createQueryBuilder()
-      .delete()
-      .from(Account)
-      .where('id = :id', { id: request.body.id })
-      .execute()
-      .then((acc) => {
-        console.log('delete - ok');
-        response.send({ account: acc });
-      })
-      .catch((err) => response.send(err));
+    if (!parseInt(request.params.id)) {
+      response.status(500);
+      response.send(`acc delete error. request.params.id: ${request.params.id}`);
+      return;
+    }
+    const account = await this.ds.manager.update(Account, parseInt(request.params.id), { isActive: false });
+    response.send({ account: account });
   };
 
   private getAll = async (request: express.Request, response: express.Response) => {

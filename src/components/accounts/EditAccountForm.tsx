@@ -16,6 +16,7 @@ export const EditAccountForm: React.VFC<{ account: AccountWithRest }> = ({ accou
     },
   });
   const deleteAccountMutation = useItem('DELETE', {
+    id: account.id,
     onSuccess: () => {
       navigate(UI_ROUTES.ACCOUNTS);
     },
