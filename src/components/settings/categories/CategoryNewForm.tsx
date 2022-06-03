@@ -1,13 +1,19 @@
 import { Form, Input, Button } from 'antd';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UI_ROUTES } from '../../../constants/urls';
 import { useCategories } from '../../../hooks/useCategories';
+import { ETRANSACTION_TYPE } from '../../../server/types/transactions';
+import { CategoriesSelect } from '../../_shared/selects/CategoriesSelect';
 import { TransactionTypeSelect } from '../../_shared/selects/TransactionTypeSelect';
 
 export const CategoryNewForm: React.VFC<{ onFinish: () => void }> = ({ onFinish }) => {
   const { useCreate } = useCategories();
   const query = useCreate();
   const navigate = useNavigate();
+
+  const [form] = Form.useForm();
+  const [typeId, setTypeId] = useState(ETRANSACTION_TYPE.EXPENSE);
 
   return (
     <div>
@@ -18,6 +24,7 @@ export const CategoryNewForm: React.VFC<{ onFinish: () => void }> = ({ onFinish 
         labelCol={{
           span: 8,
         }}
+        form={form}
         layout="vertical"
         wrapperCol={{
           span: 16,
@@ -25,6 +32,10 @@ export const CategoryNewForm: React.VFC<{ onFinish: () => void }> = ({ onFinish 
         initialValues={{
           initialValue: 0,
           name: '',
+          typeId: ETRANSACTION_TYPE.EXPENSE,
+        }}
+        onValuesChange={() => {
+          setTypeId(form.getFieldValue('typeId'));
         }}
         onFinish={(formValues) => {
           query.mutate(formValues);
@@ -58,6 +69,10 @@ export const CategoryNewForm: React.VFC<{ onFinish: () => void }> = ({ onFinish 
           ]}
         >
           <TransactionTypeSelect hideReturns />
+        </Form.Item>
+
+        <Form.Item label="Родительская категория" name={['parentCategory', 'id']}>
+          <CategoriesSelect typeId={typeId} />
         </Form.Item>
 
         <Form.Item

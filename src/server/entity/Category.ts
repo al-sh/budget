@@ -14,7 +14,7 @@ export class Category {
   public name?: string;
 
   @Column()
-  public isActive: boolean = true;
+  public isActive?: boolean = true;
 
   @ManyToOne(() => TransactionType, (type) => type.categories)
   public type!: TransactionType;

@@ -19,13 +19,13 @@ export class User {
   public passwordHash?: string;
 
   @Column()
-  public token: string = '';
+  public token?: string = '';
 
   @Column()
-  public loginAttemts: number = 0;
+  public loginAttemts?: number = 0;
 
   @Column()
-  public isBlocked: boolean = false;
+  public isBlocked?: boolean = false;
 
   @OneToMany(() => Account, (acc) => acc.user)
   public accounts?: Account[];

@@ -12,7 +12,7 @@ export const CategoriesSelect: React.VFC<Props> = ({ typeId, onChange, value }) 
   const { isLoading, data: categories } = useCategories().useGetList(typeId);
 
   return (
-    <Select loading={isLoading} disabled={!typeId} onChange={onChange} value={value}>
+    <Select allowClear loading={isLoading} disabled={!typeId} onChange={onChange} value={value}>
       {categories?.length &&
         categories?.map((cat) => (
           <Select.Option key={cat.id} value={cat.id}>

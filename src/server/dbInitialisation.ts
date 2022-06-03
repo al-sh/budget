@@ -33,6 +33,7 @@ export const dbInitializer = async (ds: DataSource) => {
 
     const account = new Account();
     account.name = 'Tinkoff';
+    account.initialValue = 5000;
     account.isActive = true;
     account.user = newDemoUser;
 

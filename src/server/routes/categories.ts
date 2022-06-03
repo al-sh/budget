@@ -23,13 +23,20 @@ export class CategoriesController {
   private create = async (request: express.Request, response: express.Response) => {
     console.log('cat create', request.body);
 
-    const category = this.ds.manager.create(Category, {
-      ...request.body,
-      type: { id: request.body.typeId },
+    const categoryToCreate: Omit<Category, 'id'> = {
+      name: request.body.name as string,
+      type: { id: parseInt(String(request.body.typeId)) },
       user: {
-        id: request.headers.userid,
+        id: parseInt(String(request.headers.userid)),
       },
-    });
+    };
+
+    const parentCategoryId = parseInt(String(request.body.parentCategoryId));
+    if (Number.isFinite(parentCategoryId)) {
+      categoryToCreate.parentCategory = { parentCategory: { id: parseInt(String(request.body.parentCategoryId)) } } as Category;
+    }
+
+    const category = this.ds.manager.create(Category, categoryToCreate);
 
     this.ds.manager
       .save(category)
@@ -67,7 +74,7 @@ export class CategoriesController {
     if (typeId === ETRANSACTION_TYPE.RETURN_INCOME) typeId = ETRANSACTION_TYPE.INCOME;
 
     const categories = await this.ds.manager.find(Category, {
-      relations: ['type'],
+      relations: ['type', 'childrenCategories', 'parentCategory'],
       where: { type: typeId ? { id: typeId } : undefined, user: { id: Number(request.headers.userid) } },
     });
 

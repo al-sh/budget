@@ -74,7 +74,10 @@ export class AuthController {
     if (!(user.passwordHash === enteredPwdHash)) {
       response.status(403);
       response.send({ message: 'Incorrect username or password.' });
-      user.loginAttemts = user.loginAttemts + 1;
+      if (!user?.loginAttemts) {
+        user.loginAttemts = 0;
+      }
+      user.loginAttemts = user?.loginAttemts + 1;
       if (user.loginAttemts >= 3) user.isBlocked = true;
       await this.userRepository.save(user);
       return;
