@@ -44,6 +44,7 @@ export const EditCategoryForm: React.VFC<{ category: Category }> = ({ category }
         initialValues={{
           isActive: category?.id ? category.isActive : true,
           name: category?.id ? category.name : '',
+          parentCategory: category?.parentCategory,
           typeId: initialTypeId,
         }}
         onValuesChange={() => {

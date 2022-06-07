@@ -35,6 +35,8 @@ export class Category {
 
 export interface ICategoryTreeItem {
   title?: string;
+  key: string | number;
   value: number;
+  isActive?: boolean;
   children?: ICategoryTreeItem[];
 }

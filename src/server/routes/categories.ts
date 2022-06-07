@@ -134,7 +134,7 @@ export class CategoriesController {
   };
 
   private getTreeItem = (category: Category, categories: Category[]) => {
-    const item: ICategoryTreeItem = { title: category.name, value: category.id };
+    const item: ICategoryTreeItem = { title: category.name, key: category.id, value: category.id, isActive: category.isActive };
     const children = categories.filter((item) => item.parentCategory?.id === category?.id);
     if (children?.length) {
       item.children = children.map((child) => this.getTreeItem(child, categories));
