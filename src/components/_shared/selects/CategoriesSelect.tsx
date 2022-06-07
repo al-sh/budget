@@ -1,4 +1,4 @@
-import { Select } from 'antd';
+import { TreeSelect } from 'antd';
 import { useCategories } from '../../../hooks/useCategories';
 import { ETRANSACTION_TYPE } from '../../../server/types/transactions';
 
@@ -9,16 +9,20 @@ interface Props {
 }
 
 export const CategoriesSelect: React.VFC<Props> = ({ typeId, onChange, value }) => {
-  const { isLoading, data: categories } = useCategories().useGetList(typeId);
+  const { isLoading, data: categoriesTree } = useCategories().useGetTree(typeId);
 
   return (
-    <Select allowClear loading={isLoading} disabled={!typeId} onChange={onChange} value={value}>
-      {categories?.length &&
-        categories?.map((cat) => (
-          <Select.Option key={cat.id} value={cat.id}>
-            {cat.name}
-          </Select.Option>
-        ))}
-    </Select>
+    <TreeSelect
+      treeData={categoriesTree}
+      allowClear
+      loading={isLoading}
+      disabled={!typeId}
+      onChange={onChange}
+      value={value}
+      dropdownStyle={{
+        overflow: 'auto',
+      }}
+      treeDefaultExpandAll
+    />
   );
 };

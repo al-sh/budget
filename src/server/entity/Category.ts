@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 /* eslint-disable @typescript-eslint/member-ordering */
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, Tree, TreeChildren, TreeParent } from 'typeorm';
 import { Transaction } from './Transaction';
 import { TransactionType } from './TransactionType';
 import { User } from './User';
 
 @Entity()
+@Tree('materialized-path')
 export class Category {
   @PrimaryGeneratedColumn()
   public id!: number;
@@ -19,10 +20,10 @@ export class Category {
   @ManyToOne(() => TransactionType, (type) => type.categories)
   public type!: TransactionType;
 
-  @OneToMany(() => Category, (category) => category.parentCategory)
+  @TreeChildren()
   public childrenCategories?: Category[];
 
-  @ManyToOne(() => Category, (category) => category.childrenCategories)
+  @TreeParent()
   public parentCategory?: Category;
 
   @OneToMany(() => Transaction, (tran) => tran.account)
@@ -30,4 +31,10 @@ export class Category {
 
   @ManyToOne(() => User, (user) => user.accounts)
   public user?: User;
+}
+
+export interface ICategoryTreeItem {
+  title?: string;
+  value: number;
+  children?: ICategoryTreeItem[];
 }

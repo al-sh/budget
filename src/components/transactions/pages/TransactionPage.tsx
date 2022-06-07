@@ -20,8 +20,10 @@ export const TransactionsPage: React.FC = () => {
         <FormHeader
           text="Редактирование транзакции"
           onDeleteButtonClick={() => {
-            useDeleleQuery.mutate(parseInt(transactionId));
-            navigate(UI_ROUTES.TRANSACTIONS);
+            if (confirm('Удалить транзакцию?')) {
+              useDeleleQuery.mutate(parseInt(transactionId));
+              navigate(UI_ROUTES.TRANSACTIONS);
+            }
           }}
         />
       )}

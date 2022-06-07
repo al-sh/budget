@@ -1,10 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { Category } from '../server/entity/Category';
+import { Category, ICategoryTreeItem } from '../server/entity/Category';
 import { getApi } from '../services/Api';
 import { API_ENDPOINTS } from '../constants/urls';
 import { ETRANSACTION_TYPE } from '../server/types/transactions';
 
-export const categoriesQueryKey = ['categories'];
+export const categoriesQueryKey = 'categories';
 
 export const useCategories = () => {
   const api = getApi();
@@ -13,15 +13,24 @@ export const useCategories = () => {
 
   const useGetList = (typeId?: ETRANSACTION_TYPE) =>
     useQuery(
-      [...categoriesQueryKey, typeId],
-      () => api.send<Category[]>({ endpoint: API_ENDPOINTS.CATEGORIES, method: 'GET', query: { typeId: String(typeId) } })
+      [categoriesQueryKey, typeId],
+      () => api.send<Category[]>({ endpoint: API_ENDPOINTS.CATEGORIES.ALL, method: 'GET', query: { typeId: String(typeId) } })
+      /*{
+        enabled: !!typeId,
+      }*/
+    );
+
+  const useGetTree = (typeId?: ETRANSACTION_TYPE) =>
+    useQuery(
+      [categoriesQueryKey, 'tree', typeId],
+      () => api.send<ICategoryTreeItem[]>({ endpoint: API_ENDPOINTS.CATEGORIES.TREE, method: 'GET', query: { typeId: String(typeId) } })
       /*{
         enabled: !!typeId,
       }*/
     );
 
   const useGetOne = (id: number) =>
-    useQuery([categoriesQueryKey, id], () => api.send<Category>({ endpoint: `${API_ENDPOINTS.CATEGORIES}/${id}`, method: 'GET' }), {
+    useQuery([categoriesQueryKey, id], () => api.send<Category>({ endpoint: `${API_ENDPOINTS.CATEGORIES.ALL}/${id}`, method: 'GET' }), {
       enabled: !!id,
     });
 
@@ -30,7 +39,7 @@ export const useCategories = () => {
       (formValues: Record<string, unknown>) => {
         return api.send({
           data: formValues,
-          endpoint: id ? `${API_ENDPOINTS.CATEGORIES}/${id}` : API_ENDPOINTS.CATEGORIES,
+          endpoint: id ? `${API_ENDPOINTS.CATEGORIES.ALL}/${id}` : API_ENDPOINTS.CATEGORIES.ALL,
           method: method,
         });
       },
@@ -61,5 +70,5 @@ export const useCategories = () => {
       }
     );
 
-  return { useCreate, useGetList, useGetOne, useItem };
+  return { useCreate, useGetList, useGetTree, useGetOne, useItem };
 };

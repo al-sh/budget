@@ -32,17 +32,19 @@ export const CategoriesList: React.VFC = () => {
 
   return (
     <CategoriesListWrapper>
-      {categories.map((cat) => (
-        <CategoryWrapper
-          key={cat.id}
-          onClick={() => {
-            navigate(`${UI_ROUTES.SETTINGS.CATEGORIES}/${cat.id}`);
-          }}
-        >
-          <CategoryName active={cat.isActive}>img {cat.name}</CategoryName>
-          <CategoryType>{cat.type?.name}</CategoryType>
-        </CategoryWrapper>
-      ))}
+      {categories.length &&
+        categories.map((cat) => (
+          <CategoryWrapper
+            key={cat.id}
+            onClick={() => {
+              navigate(`${UI_ROUTES.SETTINGS.CATEGORIES}/${cat.id}`);
+            }}
+          >
+            <CategoryName active={cat.isActive}>img {cat.name}</CategoryName>
+            {cat.parentCategory && `(${cat.parentCategory.name}`}
+            <CategoryType>{cat.type?.name}</CategoryType>
+          </CategoryWrapper>
+        ))}
     </CategoriesListWrapper>
   );
 };

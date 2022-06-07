@@ -2,7 +2,10 @@
 export const API_ENDPOINTS = {
   ACCOUNTS: 'accounts',
   AUTH: { PASSWORD: 'auth/password' },
-  CATEGORIES: 'categories',
+  CATEGORIES: {
+    ALL: 'categories',
+    TREE: 'categories/tree',
+  },
   TRANSACTIONS: 'transactions',
 };
 
