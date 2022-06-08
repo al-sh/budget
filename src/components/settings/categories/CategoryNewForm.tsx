@@ -72,7 +72,7 @@ export const CategoryNewForm: React.VFC<{ onFinish: () => void }> = ({ onFinish 
         </Form.Item>
 
         <Form.Item label="Родительская категория" name={['parentCategory', 'id']}>
-          <CategoriesSelect typeId={typeId} />
+          <CategoriesSelect typeId={typeId} allowClear />
         </Form.Item>
 
         <Form.Item

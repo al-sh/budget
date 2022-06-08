@@ -1,7 +1,12 @@
 import * as express from 'express';
-import { DataSource } from 'typeorm';
+import { DataSource, FindOptionsWhere } from 'typeorm';
 import { Category, ICategoryTreeItem } from '../entity/Category';
 import { ETRANSACTION_TYPE } from '../types/transactions';
+
+interface IGetAllQuery {
+  showHidden?: boolean;
+  typeId?: string;
+}
 
 export class CategoriesController {
   constructor(ds: DataSource) {
@@ -12,7 +17,7 @@ export class CategoriesController {
     this.router.get(`${this.path}:id`, this.getById);
     this.router.post(this.path, this.create);
     this.router.put(`${this.path}:id`, this.update);
-    this.router.delete(this.path, this.delete);
+    this.router.delete(`${this.path}:id`, this.delete);
   }
 
   public router = express.Router();
@@ -53,20 +58,24 @@ export class CategoriesController {
   private delete = async (request: express.Request, response: express.Response) => {
     console.log('category delete', request.body);
 
-    await this.ds
-      .createQueryBuilder()
-      .delete()
-      .from(Category)
-      .where('id = :id', { id: request.body.id })
-      .execute()
-      .then((cat) => {
-        console.log('delete - ok');
-        response.send({ category: cat });
-      })
-      .catch((err) => response.send(err));
+    const categoryId = parseInt(request.params.id);
+
+    if (!categoryId) {
+      response.status(500);
+      response.send(`category delete error. request.params.id: ${request.params.id}`);
+      return;
+    }
+
+    try {
+      const category = await this.ds.manager.update(Category, categoryId, { isActive: false });
+      response.send({ category: category });
+    } catch (err) {
+      console.error('category delete error: ', err);
+      response.send(err);
+    }
   };
 
-  private getAll = async (request: express.Request, response: express.Response) => {
+  private getAll = async (request: express.Request, response: express.Response<Category[]>) => {
     let typeId: ETRANSACTION_TYPE = parseInt(
       Array.isArray(request.query.typeId) ? request.query.typeId.join('') : (request.query.typeId as string)
     );
@@ -74,9 +83,19 @@ export class CategoriesController {
     if (typeId === ETRANSACTION_TYPE.RETURN_EXPENSE) typeId = ETRANSACTION_TYPE.EXPENSE;
     if (typeId === ETRANSACTION_TYPE.RETURN_INCOME) typeId = ETRANSACTION_TYPE.INCOME;
 
+    const whereClause: FindOptionsWhere<Category> = {
+      type: typeId ? { id: typeId } : undefined,
+      user: { id: Number(request.headers.userid) },
+    };
+
+    const showHidden = request.query.showHidden === '1';
+    if (!showHidden) {
+      whereClause.isActive = true;
+    }
+
     const categories = await this.ds.manager.find(Category, {
       relations: ['type', 'childrenCategories', 'parentCategory'],
-      where: { type: typeId ? { id: typeId } : undefined, user: { id: Number(request.headers.userid) }, isActive: true },
+      where: whereClause,
       order: {
         type: { name: 'ASC' },
         name: 'ASC',
@@ -115,9 +134,19 @@ export class CategoriesController {
     if (typeId === ETRANSACTION_TYPE.RETURN_EXPENSE) typeId = ETRANSACTION_TYPE.EXPENSE;
     if (typeId === ETRANSACTION_TYPE.RETURN_INCOME) typeId = ETRANSACTION_TYPE.INCOME;
 
+    const whereClause: FindOptionsWhere<Category> = {
+      type: typeId ? { id: typeId } : undefined,
+      user: { id: Number(request.headers.userid) },
+    };
+
+    const showHidden = request.query.showHidden === '1';
+    if (!showHidden) {
+      whereClause.isActive = true;
+    }
+
     const categories = await this.ds.manager.find(Category, {
       relations: ['type', 'parentCategory'],
-      where: { type: typeId ? { id: typeId } : undefined, user: { id: Number(request.headers.userid) }, isActive: true },
+      where: whereClause,
       order: {
         type: { name: 'ASC' },
         name: 'ASC',
@@ -143,25 +172,6 @@ export class CategoriesController {
     return item;
   };
 
-  private transformCategoryFromRequest(request: express.Request, categoryId?: number): Partial<Category> {
-    const category: Partial<Category> = {
-      name: request.body.name as string,
-      type: { id: parseInt(String(request.body.typeId)) },
-    };
-
-    if (Number.isFinite(categoryId)) {
-      category.id = categoryId;
-    }
-
-    const parentCategoryId = parseInt(String(request.body.parentCategory?.id));
-
-    if (Number.isFinite(parentCategoryId)) {
-      category.parentCategory = { id: parentCategoryId } as Category;
-    }
-
-    return category;
-  }
-
   private update = async (request: express.Request, response: express.Response) => {
     console.log('cat update request.body:', request.body);
 
@@ -173,7 +183,23 @@ export class CategoriesController {
       return;
     }
 
-    const categoryToUpdate = this.transformCategoryFromRequest(request);
+    const categoryToUpdate: Partial<Category> = {
+      name: request.body.name as string,
+      isActive: request.body.isActive,
+      type: { id: parseInt(String(request.body.typeId)) },
+    };
+
+    if (Number.isFinite(categoryId)) {
+      categoryToUpdate.id = categoryId;
+    }
+
+    const parentCategoryId = parseInt(String(request.body.parentCategory?.id));
+
+    if (Number.isFinite(parentCategoryId)) {
+      categoryToUpdate.parentCategory = { id: parentCategoryId } as Category;
+    } else {
+      categoryToUpdate.parentCategory = { id: undefined } as unknown as Category;
+    }
 
     try {
       const updatedCategory = await this.ds.manager.update(Category, categoryId, categoryToUpdate);

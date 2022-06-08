@@ -12,7 +12,7 @@ import { TransactionTypeSelect } from '../../_shared/selects/TransactionTypeSele
 export const EditCategoryForm: React.VFC<{ category: Category }> = ({ category }) => {
   const { useItem } = useCategories();
   const query = useItem('PUT', category.id);
-  const deleteCategoryMutation = useItem('DELETE');
+  const deleteCategoryMutation = useItem('DELETE', category.id);
   const navigate = useNavigate();
 
   const [form] = Form.useForm();
@@ -24,7 +24,7 @@ export const EditCategoryForm: React.VFC<{ category: Category }> = ({ category }
       <FormHeader
         text="Редактирование категории"
         onDeleteButtonClick={() => {
-          if (confirm('Удалить категорию?')) {
+          if (confirm('Удалить категорию? Категория перейдёт в неактивные и её можно будет восстановить.')) {
             deleteCategoryMutation.mutate({ id: category.id });
             navigate(UI_ROUTES.SETTINGS.CATEGORIES);
           }
@@ -83,7 +83,7 @@ export const EditCategoryForm: React.VFC<{ category: Category }> = ({ category }
         </Form.Item>
 
         <Form.Item label="Родительская категория" name={['parentCategory', 'id']}>
-          <CategoriesSelect typeId={typeId} />
+          <CategoriesSelect typeId={typeId} allowClear />
         </Form.Item>
 
         <Form.Item name="isActive" valuePropName="checked">

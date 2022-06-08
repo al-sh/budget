@@ -20,15 +20,25 @@ export const useCategories = () => {
       }*/
     );
 
-  const useGetTree = (typeId?: ETRANSACTION_TYPE) =>
-    useQuery(
-      [categoriesQueryKey, 'tree', typeId],
-      () => api.send<ICategoryTreeItem[]>({ endpoint: API_ENDPOINTS.CATEGORIES.TREE, method: 'GET', query: { typeId: String(typeId) } })
+  const useGetTree = (params: { showHidden?: boolean; typeId?: ETRANSACTION_TYPE }) => {
+    const { typeId, showHidden } = params;
+
+    return useQuery(
+      [categoriesQueryKey, 'tree', typeId, showHidden],
+      () =>
+        api.send<ICategoryTreeItem[]>({
+          endpoint: API_ENDPOINTS.CATEGORIES.TREE,
+          method: 'GET',
+          query: {
+            showHidden: showHidden ? '1' : '0',
+            typeId: String(typeId),
+          },
+        })
       /*{
         enabled: !!typeId,
       }*/
     );
-
+  };
   const useGetOne = (id: number) =>
     useQuery([categoriesQueryKey, id], () => api.send<Category>({ endpoint: `${API_ENDPOINTS.CATEGORIES.ALL}/${id}`, method: 'GET' }), {
       enabled: !!id,

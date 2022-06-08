@@ -2,6 +2,7 @@ import * as express from 'express';
 import { DataSource, FindOptionsWhere } from 'typeorm';
 import { Account } from '../entity/Account';
 import { Transaction } from '../entity/Transaction';
+import { AccountWithRest } from '../types/accounts';
 import { ETRANSACTION_TYPE } from '../types/transactions';
 
 export class AccountsController {
@@ -66,10 +67,9 @@ export class AccountsController {
     response.send({ account: account });
   };
 
-  private getAll = async (request: express.Request, response: express.Response) => {
+  private getAll = async (request: express.Request, response: express.Response<AccountWithRest[]>) => {
     console.log('Loading accounts from the database...');
     const showHidden = request.query.showHidden === '1';
-    console.log(request.query.showHidden, showHidden);
 
     const whereClause: FindOptionsWhere<Account> = { user: { id: Number(request.headers.userid) } };
     if (!showHidden) {
