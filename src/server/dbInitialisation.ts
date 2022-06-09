@@ -32,17 +32,27 @@ export const dbInitializer = async (ds: DataSource) => {
     console.log('Saved a new user with id: ' + newDemoUser.id);
 
     const account = new Account();
-    account.name = 'Tinkoff';
-    account.initialValue = 5000;
-    account.isActive = true;
+    account.name = 'Сберкарта';
+    account.initialValue = 2000;
     account.user = newDemoUser;
 
     const account2 = new Account();
-    account2.name = 'Test';
-    account2.isActive = false;
+    account2.name = 'Tinkoff Black';
+    account2.initialValue = 12000;
     account2.user = newDemoUser;
 
-    await transactionalEntityManager.save([account, account2]);
+    const account3 = new Account();
+    account3.name = 'Клюква';
+    account3.initialValue = 1000;
+    account3.isActive = false;
+    account3.user = newDemoUser;
+
+    const account4 = new Account();
+    account4.name = 'Вклад Прибыльный';
+    account4.initialValue = 50000;
+    account4.user = newDemoUser;
+
+    await transactionalEntityManager.save([account, account2, account3, account4]);
 
     const type1 = new TransactionType();
     type1.id = ETRANSACTION_TYPE.EXPENSE;
@@ -69,15 +79,25 @@ export const dbInitializer = async (ds: DataSource) => {
 
     const category1 = new Category();
     category1.type = { id: ETRANSACTION_TYPE.INCOME };
-    category1.name = 'Тест доход';
+    category1.name = 'Зарплата';
     category1.user = newDemoUser;
 
     const category2 = new Category();
-    category2.type = { id: ETRANSACTION_TYPE.EXPENSE };
-    category2.name = 'Тест расход';
+    category2.type = { id: ETRANSACTION_TYPE.INCOME };
+    category2.name = 'Премия';
     category2.user = newDemoUser;
 
-    await transactionalEntityManager.save([category1, category2]);
+    const category3 = new Category();
+    category3.type = { id: ETRANSACTION_TYPE.EXPENSE };
+    category3.name = 'Продукты';
+    category3.user = newDemoUser;
+
+    const category4 = new Category();
+    category4.type = { id: ETRANSACTION_TYPE.EXPENSE };
+    category4.name = 'Квартира';
+    category4.user = newDemoUser;
+
+    await transactionalEntityManager.save([category1, category2, category3, category4]);
     console.log('Categories initialized');
   });
 };

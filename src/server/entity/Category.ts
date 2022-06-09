@@ -20,7 +20,7 @@ export class Category {
   @ManyToOne(() => TransactionType, (type) => type.categories)
   public type!: TransactionType;
 
-  @TreeChildren()
+  @TreeChildren({ cascade: true })
   public childrenCategories?: Category[];
 
   @TreeParent()
