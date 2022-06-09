@@ -35,7 +35,7 @@ export const CategoryNewForm: React.VFC<{ onFinish: () => void }> = ({ onFinish 
           typeId: ETRANSACTION_TYPE.EXPENSE,
         }}
         onValuesChange={() => {
-          setTypeId(form.getFieldValue('typeId'));
+          setTypeId(form.getFieldValue(['type', 'id']));
         }}
         onFinish={(formValues) => {
           query.mutate(formValues);
@@ -60,7 +60,7 @@ export const CategoryNewForm: React.VFC<{ onFinish: () => void }> = ({ onFinish 
 
         <Form.Item
           label="Тип"
-          name="typeId"
+          name={['type', 'id']}
           rules={[
             {
               message: 'Укажите тип категории',

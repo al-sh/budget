@@ -1,5 +1,5 @@
 import * as express from 'express';
-import { DataSource, FindOptionsWhere } from 'typeorm';
+import { DataSource, FindOptionsWhere, UpdateResult } from 'typeorm';
 import { Category, ICategoryTreeItem } from '../entity/Category';
 import { ETRANSACTION_TYPE } from '../types/transactions';
 
@@ -7,6 +7,19 @@ interface IGetAllQuery {
   showHidden?: boolean;
   typeId?: string;
 }
+
+interface IBaseItemRequest {
+  id: string;
+}
+
+interface IError {
+  message: string;
+  additional?: unknown;
+}
+
+type TBaseResponse<T> = T | IError;
+
+type TBaseUpdate = TBaseResponse<UpdateResult>;
 
 export class CategoriesController {
   constructor(ds: DataSource) {
@@ -26,12 +39,12 @@ export class CategoriesController {
 
   private path = '/';
 
-  private create = async (request: express.Request, response: express.Response) => {
+  private create = async (request: express.Request<null, null, Category>, response: express.Response) => {
     console.log('cat create', request.body);
 
     const categoryToCreate: Omit<Category, 'id'> = {
       name: request.body.name as string,
-      type: { id: parseInt(String(request.body.typeId)) },
+      type: { id: parseInt(String(request.body.type?.id)) },
       user: {
         id: parseInt(String(request.headers.userid)),
       },
@@ -55,27 +68,27 @@ export class CategoriesController {
       .catch((err) => response.send(err));
   };
 
-  private delete = async (request: express.Request, response: express.Response) => {
+  private delete = async (request: express.Request<IBaseItemRequest>, response: express.Response<TBaseUpdate>) => {
     console.log('category delete', request.body);
 
     const categoryId = parseInt(request.params.id);
 
     if (!categoryId) {
       response.status(500);
-      response.send(`category delete error. request.params.id: ${request.params.id}`);
+      response.send({ message: `category delete error. request.params.id: ${request.params.id}` });
       return;
     }
 
     try {
-      const category = await this.ds.manager.update(Category, categoryId, { isActive: false });
-      response.send({ category: category });
+      const res = await this.ds.manager.update(Category, categoryId, { isActive: false });
+      response.send(res);
     } catch (err) {
       console.error('category delete error: ', err);
-      response.send(err);
+      response.send({ message: `category delete error. request.params.id: ${request.params.id}`, additional: err });
     }
   };
 
-  private getAll = async (request: express.Request, response: express.Response<Category[]>) => {
+  private getAll = async (request: express.Request<unknown, unknown, IGetAllQuery>, response: express.Response<Category[]>) => {
     let typeId: ETRANSACTION_TYPE = parseInt(
       Array.isArray(request.query.typeId) ? request.query.typeId.join('') : (request.query.typeId as string)
     );
@@ -107,7 +120,7 @@ export class CategoriesController {
     }, 1500);
   };
 
-  private getById = async (request: express.Request, response: express.Response) => {
+  private getById = async (request: express.Request<IBaseItemRequest>, response: express.Response) => {
     const id = parseInt(request.params.id);
 
     const category = await this.ds.manager.findOne(Category, {
@@ -126,7 +139,10 @@ export class CategoriesController {
     }, 1000);
   };
 
-  private getTree = async (request: express.Request, response: express.Response<ICategoryTreeItem[]>) => {
+  private getTree = async (
+    request: express.Request<null, null, null, { showHidden: string; typeId: string }>,
+    response: express.Response<ICategoryTreeItem[]>
+  ) => {
     let typeId: ETRANSACTION_TYPE = parseInt(
       Array.isArray(request.query.typeId) ? request.query.typeId.join('') : (request.query.typeId as string)
     );
@@ -172,7 +188,7 @@ export class CategoriesController {
     return item;
   };
 
-  private update = async (request: express.Request, response: express.Response) => {
+  private update = async (request: express.Request<IBaseItemRequest, null, Partial<Category>>, response: express.Response<TBaseUpdate>) => {
     console.log('cat update request.body:', request.body);
 
     const categoryId = parseInt(String(request.params.id));
@@ -183,10 +199,10 @@ export class CategoriesController {
       return;
     }
 
+    // редактирование типа удалено, т.к. лишено всякой логики и может создать в дальнейшем ошибки
     const categoryToUpdate: Partial<Category> = {
       name: request.body.name as string,
       isActive: request.body.isActive,
-      type: { id: parseInt(String(request.body.typeId)) },
     };
 
     if (Number.isFinite(categoryId)) {
@@ -203,10 +219,10 @@ export class CategoriesController {
 
     try {
       const updatedCategory = await this.ds.manager.update(Category, categoryId, categoryToUpdate);
-      response.send({ category: updatedCategory });
+      response.send(updatedCategory);
     } catch (err) {
       console.error(err);
-      response.send(err);
+      response.send({ message: 'category update error', additional: err });
     }
   };
 }

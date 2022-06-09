@@ -45,10 +45,10 @@ export const EditCategoryForm: React.VFC<{ category: Category }> = ({ category }
           isActive: category?.id ? category.isActive : true,
           name: category?.id ? category.name : '',
           parentCategory: category?.parentCategory,
-          typeId: initialTypeId,
+          type: { id: initialTypeId },
         }}
         onValuesChange={() => {
-          setTypeId(form.getFieldValue('typeId'));
+          setTypeId(form.getFieldValue(['type', 'id']));
         }}
         onFinish={(formValues) => {
           query.mutate(formValues);
@@ -71,7 +71,7 @@ export const EditCategoryForm: React.VFC<{ category: Category }> = ({ category }
 
         <Form.Item
           label="Тип"
-          name="typeId"
+          name={['type', 'id']}
           rules={[
             {
               message: 'Укажите тип категории',
@@ -79,7 +79,7 @@ export const EditCategoryForm: React.VFC<{ category: Category }> = ({ category }
             },
           ]}
         >
-          <TransactionTypeSelect hideReturns />
+          <TransactionTypeSelect hideReturns disabled />
         </Form.Item>
 
         <Form.Item label="Родительская категория" name={['parentCategory', 'id']}>

@@ -7,17 +7,18 @@ interface Props {
   typeId: ETRANSACTION_TYPE;
   value?: number;
   allowClear?: boolean;
+  disabled?: boolean;
 }
 
-export const CategoriesSelect: React.VFC<Props> = ({ typeId, onChange, value, allowClear }) => {
-  const { isLoading, data: categoriesTree } = useCategories().useGetTree(typeId);
+export const CategoriesSelect: React.VFC<Props> = ({ typeId, onChange, value, allowClear, disabled }) => {
+  const { isLoading, data: categoriesTree } = useCategories().useGetTree({ typeId: typeId });
 
   return (
     <TreeSelect
       treeData={categoriesTree}
       allowClear={allowClear}
       loading={isLoading}
-      disabled={!typeId}
+      disabled={disabled || !typeId}
       onChange={onChange}
       value={value}
       dropdownStyle={{
