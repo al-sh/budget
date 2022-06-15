@@ -3,6 +3,7 @@ import { Category, ICategoryTreeItem } from '../server/entity/Category';
 import { getApi } from '../services/Api';
 import { API_ENDPOINTS } from '../constants/urls';
 import { ETRANSACTION_TYPE } from '../server/types/transactions';
+import { GetAllCategoriesQuery, GetCategoriesTree } from '../server/routes/categories';
 
 export const categoriesQueryKey = 'categories';
 
@@ -14,7 +15,12 @@ export const useCategories = () => {
   const useGetList = (typeId?: ETRANSACTION_TYPE) =>
     useQuery(
       [categoriesQueryKey, typeId],
-      () => api.send<Category[]>({ endpoint: API_ENDPOINTS.CATEGORIES.ALL, method: 'GET', query: { typeId: String(typeId) } })
+      () =>
+        api.send<Category[], null, GetAllCategoriesQuery>({
+          endpoint: API_ENDPOINTS.CATEGORIES.ALL,
+          method: 'GET',
+          query: { typeId: String(typeId) },
+        })
       /*{
         enabled: !!typeId,
       }*/
@@ -26,7 +32,7 @@ export const useCategories = () => {
     return useQuery(
       [categoriesQueryKey, 'tree', typeId, showHidden],
       () =>
-        api.send<ICategoryTreeItem[]>({
+        api.send<ICategoryTreeItem[], null, GetCategoriesTree['params']>({
           endpoint: API_ENDPOINTS.CATEGORIES.TREE,
           method: 'GET',
           query: {

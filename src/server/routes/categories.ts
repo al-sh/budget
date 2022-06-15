@@ -1,25 +1,30 @@
+/* eslint-disable sort-exports/sort-exports */
 import * as express from 'express';
-import { DataSource, FindOptionsWhere, UpdateResult } from 'typeorm';
+import { DataSource, FindOptionsWhere } from 'typeorm';
 import { Category, ICategoryTreeItem } from '../entity/Category';
+import { BaseItemRequest, BaseUpdate } from '../types/api';
 import { ETRANSACTION_TYPE } from '../types/transactions';
 
-interface IGetAllQuery {
-  showHidden?: boolean;
+export interface GetAllCategoriesRequest extends express.Request {
+  query: {
+    showHidden?: string;
+    typeId?: string;
+  };
+}
+
+type GetCategoriesTreeParams = {
+  showHidden: string;
+  typeId: string;
+};
+
+export interface GetCategoriesTree extends express.Request {
+  params: GetCategoriesTreeParams;
+}
+
+export interface GetAllCategoriesQuery {
+  showHidden?: string;
   typeId?: string;
 }
-
-interface IBaseItemRequest {
-  id: string;
-}
-
-interface IError {
-  message: string;
-  additional?: unknown;
-}
-
-type TBaseResponse<T> = T | IError;
-
-type TBaseUpdate = TBaseResponse<UpdateResult>;
 
 export class CategoriesController {
   constructor(ds: DataSource) {
@@ -68,7 +73,7 @@ export class CategoriesController {
       .catch((err) => response.send(err));
   };
 
-  private delete = async (request: express.Request<IBaseItemRequest>, response: express.Response<TBaseUpdate>) => {
+  private delete = async (request: express.Request<BaseItemRequest>, response: express.Response<BaseUpdate>) => {
     console.log('category delete', request.body);
 
     const categoryId = parseInt(request.params.id);
@@ -88,7 +93,7 @@ export class CategoriesController {
     }
   };
 
-  private getAll = async (request: express.Request<unknown, unknown, IGetAllQuery>, response: express.Response<Category[]>) => {
+  private getAll = async (request: GetAllCategoriesRequest, response: express.Response<Category[]>) => {
     let typeId: ETRANSACTION_TYPE = parseInt(
       Array.isArray(request.query.typeId) ? request.query.typeId.join('') : (request.query.typeId as string)
     );
@@ -120,7 +125,7 @@ export class CategoriesController {
     }, 1500);
   };
 
-  private getById = async (request: express.Request<IBaseItemRequest>, response: express.Response) => {
+  private getById = async (request: express.Request<BaseItemRequest>, response: express.Response) => {
     const id = parseInt(request.params.id);
 
     const category = await this.ds.manager.findOne(Category, {
@@ -139,10 +144,7 @@ export class CategoriesController {
     }, 1000);
   };
 
-  private getTree = async (
-    request: express.Request<null, null, null, { showHidden: string; typeId: string }>,
-    response: express.Response<ICategoryTreeItem[]>
-  ) => {
+  private getTree = async (request: GetCategoriesTree, response: express.Response<ICategoryTreeItem[]>) => {
     let typeId: ETRANSACTION_TYPE = parseInt(
       Array.isArray(request.query.typeId) ? request.query.typeId.join('') : (request.query.typeId as string)
     );
@@ -188,7 +190,7 @@ export class CategoriesController {
     return item;
   };
 
-  private update = async (request: express.Request<IBaseItemRequest, null, Partial<Category>>, response: express.Response<TBaseUpdate>) => {
+  private update = async (request: express.Request<BaseItemRequest, null, Partial<Category>>, response: express.Response<BaseUpdate>) => {
     console.log('cat update request.body:', request.body);
 
     const categoryId = parseInt(String(request.params.id));

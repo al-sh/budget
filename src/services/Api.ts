@@ -2,11 +2,11 @@ import axios, { AxiosError, AxiosPromise } from 'axios';
 import { getStorage } from './Storage';
 import { UI_ROUTES } from '../constants/urls';
 
-interface ApiRequest {
+interface ApiRequest<ReqBody, ReqQuery> {
   endpoint: string;
   method: 'GET' | 'POST' | 'PUT' | 'DELETE';
-  data?: Record<string, unknown>;
-  query?: { [key: string]: string };
+  data?: ReqBody;
+  query?: ReqQuery;
 }
 
 export type ApiResponse<T = Record<string, unknown>> = AxiosPromise<T>;
@@ -27,7 +27,7 @@ class ApiService {
 
   private path = process.env.REACT_APP_API_PATH;
 
-  public send: <T>(request: ApiRequest) => Promise<T> = async (request) => {
+  public send: <Result, RequestBody, RequestQuery>(request: ApiRequest<RequestBody, RequestQuery>) => Promise<Result> = async (request) => {
     const { endpoint, method, data, query } = request;
     const url = `${this.path}/${endpoint}`;
 

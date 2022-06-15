@@ -21,7 +21,7 @@ const AccountWrapper = styled.div`
   flex-direction: row;
   justify-content: space-between;
   border-bottom: 1px solid black;
-  font-size: 1.5em;
+  font-size: 1.2em;
 `;
 
 export const AccountsList: React.VFC<{ fromMainPage?: boolean }> = ({ fromMainPage }) => {
