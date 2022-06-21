@@ -13,7 +13,7 @@
     "eslint-plugin-sort-exports": "0.6.0",
     "nodemon": "2.0.15",
     "serve": "13.0.2",
-    "ts-node": "10.4.0"
+    "ts-node": "^10.4.0"
   },
   "dependencies": {
     "@ant-design/icons": "4.7.0",

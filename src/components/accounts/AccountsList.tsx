@@ -35,7 +35,7 @@ export const AccountsList: React.VFC<{ fromMainPage?: boolean }> = ({ fromMainPa
 
   return (
     <AccountListWrapper>
-      {accounts.map((acc) => (
+      {accounts?.map((acc) => (
         <AccountWrapper
           key={acc.id}
           onClick={() => {
