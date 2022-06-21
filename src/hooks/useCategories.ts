@@ -46,14 +46,18 @@ export const useCategories = () => {
     );
   };
   const useGetOne = (id: number) =>
-    useQuery([categoriesQueryKey, id], () => api.send<Category>({ endpoint: `${API_ENDPOINTS.CATEGORIES.ALL}/${id}`, method: 'GET' }), {
-      enabled: !!id,
-    });
+    useQuery(
+      [categoriesQueryKey, id],
+      () => api.send<Category, null, null>({ endpoint: `${API_ENDPOINTS.CATEGORIES.ALL}/${id}`, method: 'GET' }),
+      {
+        enabled: !!id,
+      }
+    );
 
   const useItem = (method: 'POST' | 'PUT' | 'DELETE', id?: number, onSuccess?: () => void) =>
     useMutation(
-      (formValues: Record<string, unknown>) => {
-        return api.send({
+      (formValues: Category) => {
+        return api.send<null, Category, null>({
           data: formValues,
           endpoint: id ? `${API_ENDPOINTS.CATEGORIES.ALL}/${id}` : API_ENDPOINTS.CATEGORIES.ALL,
           method: method,
@@ -72,8 +76,8 @@ export const useCategories = () => {
 
   const useCreate = () =>
     useMutation(
-      (formValues: Record<string, unknown>) => {
-        return api.send({
+      (formValues: Category) => {
+        return api.send<null, Category, null>({
           data: formValues,
           endpoint: 'categories',
           method: 'POST',
