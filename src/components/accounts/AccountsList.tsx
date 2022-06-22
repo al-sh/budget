@@ -1,10 +1,11 @@
-import { useNavigate } from 'react-router-dom';
-import { useAccounts } from '../../hooks/useAccounts';
-import { Loader } from '../_shared/Loader';
-import styled from 'styled-components';
-import { UI_ROUTES } from '../../constants/urls';
 import { Button } from 'antd';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
+import { UI_ROUTES } from '../../constants/urls';
+import { useAccounts } from '../../hooks/useAccounts';
+import { Loader } from '../_shared/Loader';
+import { AccountIcon } from './icons/AccountIcon';
 
 const AccountListWrapper = styled.div`
   margin-bottom: 1em;
@@ -42,7 +43,10 @@ export const AccountsList: React.VFC<{ fromMainPage?: boolean }> = ({ fromMainPa
             navigate(`${UI_ROUTES.ACCOUNTS}/${acc.id}`);
           }}
         >
-          <AccountName active={acc.isActive}>img {acc.name}</AccountName>
+          <AccountName active={acc.isActive}>
+            <AccountIcon icon={acc.icon} />
+            {acc.name}
+          </AccountName>
           <AccountRest>{acc.rest} RUB</AccountRest>
         </AccountWrapper>
       ))}

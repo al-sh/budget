@@ -95,6 +95,7 @@ export class AccountsController {
 
       return {
         id: account.id,
+        icon: account.icon,
         isActive: account.isActive,
         name: account.name,
         rest: this.calculateRest(transactions, account),

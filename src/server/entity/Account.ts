@@ -18,6 +18,9 @@ export class Account {
   @Column()
   public initialValue: number = 0;
 
+  @Column()
+  public icon?: string;
+
   @OneToMany(() => Transaction, (tran) => tran.account)
   public transactions?: Transaction[];
 
