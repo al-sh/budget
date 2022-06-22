@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { Transaction } from '../server/entity/Transaction';
-import { getApi } from '../services/Api';
 import { API_ENDPOINTS } from '../constants/urls';
+import { Transaction } from '../server/entity/Transaction';
+import { GetTransactionsRequest } from '../server/routes/transactions';
+import { getApi } from '../services/Api';
 
 export const transactionsQueryKey = ['transactions'];
 
@@ -12,7 +13,7 @@ export const useTransactions = () => {
 
   const useGetList = (page?: number) =>
     useQuery([transactionsQueryKey, page], () =>
-      api.send<Transaction[]>({
+      api.send<Transaction[], null, GetTransactionsRequest['query']>({
         endpoint: 'transactions',
         method: 'GET',
         query: { page: String(page) },
@@ -61,7 +62,7 @@ export const useTransactions = () => {
       {
         onMutate: async (id) => {
           // optimistic update
-          const transactions: Transaction[] = queryClient.getQueryData(transactionsQueryKey);
+          const transactions: Transaction[] = queryClient.getQueryData(transactionsQueryKey) as Transaction[];
           queryClient.setQueryData(
             transactionsQueryKey,
             transactions.filter((item) => item.id !== id)

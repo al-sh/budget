@@ -7,6 +7,12 @@ import { TransactionType } from '../entity/TransactionType';
 import { ETRANSACTION_TYPE } from '../types/transactions';
 import { PAGE_SIZE } from '../../constants/misc';
 
+export interface GetTransactionsRequest extends express.Request {
+  query: {
+    page: string;
+  };
+}
+
 export class TransactionsController {
   constructor(ds: DataSource) {
     this.ds = ds;
@@ -61,7 +67,7 @@ export class TransactionsController {
       .catch((err) => response.send(err));
   };
 
-  private getAll = async (request: express.Request, response: express.Response) => {
+  private getAll = async (request: GetTransactionsRequest, response: express.Response) => {
     const pageNumber = Number.isFinite(parseInt(request.query.page as string)) ? parseInt(request.query.page as string) : 0;
 
     console.log('Loading transactions from the database', request.query, pageNumber * PAGE_SIZE);

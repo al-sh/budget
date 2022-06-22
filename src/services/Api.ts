@@ -27,31 +27,32 @@ class ApiService {
 
   private path = process.env.REACT_APP_API_PATH;
 
-  public send: <Result, RequestBody, RequestQuery>(request: ApiRequest<RequestBody, RequestQuery>) => Promise<Result> = async (request) => {
-    const { endpoint, method, data, query } = request;
-    const url = `${this.path}/${endpoint}`;
+  public send: <Result, RequestBody = null, RequestQuery = null>(request: ApiRequest<RequestBody, RequestQuery>) => Promise<Result> =
+    async (request) => {
+      const { endpoint, method, data, query } = request;
+      const url = `${this.path}/${endpoint}`;
 
-    return new Promise((resolve, reject) => {
-      axios({
-        data,
-        headers: { Auth: getStorage().getItem('token'), UserId: getStorage().getItem('userId') },
-        method,
-        params: query,
-        url,
-      })
-        .then((response) => {
-          resolve(response.data);
+      return new Promise((resolve, reject) => {
+        axios({
+          data,
+          headers: { Auth: getStorage().getItem('token'), UserId: getStorage().getItem('userId') },
+          method,
+          params: query,
+          url,
         })
-        .catch((error: AxiosError) => {
-          console.log(error.response);
-          if (error.response && error.response?.status === 401) {
-            console.log('redirected to login');
-            window.location.href = `${window.location.origin}${UI_ROUTES.SETTINGS.LOGIN}`;
-          }
-          reject(error);
-        });
-    });
-  };
+          .then((response) => {
+            resolve(response.data);
+          })
+          .catch((error: AxiosError) => {
+            console.log(error.response);
+            if (error.response && error.response?.status === 401) {
+              console.log('redirected to login');
+              window.location.href = `${window.location.origin}${UI_ROUTES.SETTINGS.LOGIN}`;
+            }
+            reject(error);
+          });
+      });
+    };
 }
 
 export const getApi = () => ApiService.getInstance();
