@@ -19,7 +19,7 @@ export const TransactionsList: React.VFC = () => {
 
   return (
     <>
-      {transactions.map((tran) => (
+      {transactions?.map((tran) => (
         <TransactionItem key={tran.id} tran={tran} />
       ))}
       <div style={{ marginTop: '1rem' }}>

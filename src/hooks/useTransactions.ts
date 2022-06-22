@@ -16,7 +16,7 @@ export const useTransactions = () => {
       api.send<Transaction[], null, GetTransactionsRequest['query']>({
         endpoint: 'transactions',
         method: 'GET',
-        query: { page: String(page) },
+        query: { page: String(page), dateFrom: '2022-06-01' },
       })
     );
 

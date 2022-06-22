@@ -1,5 +1,6 @@
 import * as express from 'express';
-import { DataSource, In } from 'typeorm';
+import { isValid, parse } from 'date-fns';
+import { DataSource, FindOptionsWhere, In, Raw } from 'typeorm';
 import { Account } from '../entity/Account';
 import { Category } from '../entity/Category';
 import { Transaction } from '../entity/Transaction';
@@ -9,6 +10,8 @@ import { PAGE_SIZE } from '../../constants/misc';
 
 export interface GetTransactionsRequest extends express.Request {
   query: {
+    dateEnd?: string;
+    dateFrom?: string;
     page: string;
   };
 }
@@ -74,9 +77,22 @@ export class TransactionsController {
 
     const accounts = await this.ds.manager.find(Account, { where: { user: { id: Number(request.headers.userid) } } });
     const accountIds = accounts.map((acc) => acc.id);
+
+    const whereClause: FindOptionsWhere<Transaction> = { account: In(accountIds) };
+    const dtFrom = request.query.dateFrom;
+    const dtFormat = 'yyyy-MM-dd';
+    if (dtFrom) {
+      if (isValid(parse(dtFrom, dtFormat, new Date()))) {
+        console.log('parse date', dtFrom, parse(dtFrom, dtFormat, new Date()));
+        whereClause.dt = Raw((alias) => `${alias} > :date`, { date: dtFrom });
+      } else {
+        console.error('transactions getAll invalid dtFrom', dtFrom);
+      }
+    }
+
     const transactions = await this.ds.manager.find(Transaction, {
       relations: ['account', 'category', 'type'],
-      where: { account: In(accountIds) },
+      where: whereClause,
       order: {
         dt: 'DESC',
       },

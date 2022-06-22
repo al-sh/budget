@@ -32,6 +32,8 @@ export class CategoriesController {
 
     this.router.get(this.path, this.getAll);
     this.router.get(`${this.path}tree`, this.getTree);
+    this.router.get(`${this.path}tree/stat`, this.getTreeStat);
+
     this.router.get(`${this.path}:id`, this.getById);
     this.router.post(this.path, this.create);
     this.router.put(`${this.path}:id`, this.update);
@@ -155,6 +157,43 @@ export class CategoriesController {
     const whereClause: FindOptionsWhere<Category> = {
       type: typeId ? { id: typeId } : undefined,
       user: { id: Number(request.headers.userid) },
+    };
+
+    const showHidden = request.query.showHidden === '1';
+    if (!showHidden) {
+      whereClause.isActive = true;
+    }
+
+    const categories = await this.ds.manager.find(Category, {
+      relations: ['type', 'parentCategory'],
+      where: whereClause,
+      order: {
+        type: { name: 'ASC' },
+        name: 'ASC',
+      },
+    });
+
+    const tree = categories
+      ?.filter((item) => !item.parentCategory)
+      .map((itemWithoutParents) => this.getTreeItem(itemWithoutParents, categories));
+
+    setTimeout(() => {
+      response.send(tree);
+    }, 1500);
+  };
+
+  private getTreeStat = async (request: GetCategoriesTree, response: express.Response<ICategoryTreeItem[]>) => {
+    let typeId: ETRANSACTION_TYPE = parseInt(
+      Array.isArray(request.query.typeId) ? request.query.typeId.join('') : (request.query.typeId as string)
+    );
+
+    if (typeId === ETRANSACTION_TYPE.RETURN_EXPENSE) typeId = ETRANSACTION_TYPE.EXPENSE;
+    if (typeId === ETRANSACTION_TYPE.RETURN_INCOME) typeId = ETRANSACTION_TYPE.INCOME;
+
+    const whereClause: FindOptionsWhere<Category> = {
+      type: typeId ? { id: typeId } : undefined,
+      user: { id: Number(request.headers.userid) },
+      // transactions: {dt }
     };
 
     const showHidden = request.query.showHidden === '1';
