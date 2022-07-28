@@ -2,6 +2,7 @@ import { Form, Input, Button, InputNumber } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useAccounts } from '../../hooks/useAccounts';
 import { UI_ROUTES } from '../../constants/urls';
+import { AccountIconSelect } from './icons/AccountIconSelect';
 
 export const AccountNewForm: React.VFC<{ onFinish: () => void }> = ({ onFinish }) => {
   const { useItem } = useAccounts();
@@ -46,15 +47,17 @@ export const AccountNewForm: React.VFC<{ onFinish: () => void }> = ({ onFinish }
           <Input />
         </Form.Item>
 
-        {
-          <Form.Item label="Остаток" name="initialValue">
-            <InputNumber
-              style={{
-                width: 300,
-              }}
-            />
-          </Form.Item>
-        }
+        <Form.Item label="Иконка" name="icon">
+          <AccountIconSelect />
+        </Form.Item>
+
+        <Form.Item label="Остаток" name="initialValue">
+          <InputNumber
+            style={{
+              width: 300,
+            }}
+          />
+        </Form.Item>
 
         <Form.Item
           wrapperCol={{

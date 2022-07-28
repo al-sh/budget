@@ -5,6 +5,7 @@ import { useAccounts } from '../../hooks/useAccounts';
 import { AccountWithRest } from '../../server/types/accounts';
 import { formatMoney } from '../../utils/format';
 import { FormHeader } from '../_shared/forms/FormHeader';
+import { AccountIconSelect } from './icons/AccountIconSelect';
 
 export const EditAccountForm: React.VFC<{ account: AccountWithRest }> = ({ account }) => {
   const { useItem } = useAccounts();
@@ -46,6 +47,7 @@ export const EditAccountForm: React.VFC<{ account: AccountWithRest }> = ({ accou
           initialValue: account.initialValue,
           isActive: account?.id ? account.isActive : true,
           name: account?.id ? account.name : '',
+          icon: account.icon,
         }}
         onFinish={(formValues) => {
           query.mutate(formValues);
@@ -64,6 +66,10 @@ export const EditAccountForm: React.VFC<{ account: AccountWithRest }> = ({ accou
           ]}
         >
           <Input />
+        </Form.Item>
+
+        <Form.Item label="Иконка" name="icon">
+          <AccountIconSelect />
         </Form.Item>
 
         <Form.Item
