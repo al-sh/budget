@@ -56,7 +56,7 @@ export class AuthController {
     }
   };
 
-  private handlePasswordAuth = async (request: express.Request, response: express.Response) => {
+  private handlePasswordAuth = async (request: AuthPasswordRequest, response: express.Response) => {
     console.log(request.body);
 
     const { login, password } = request.body;
@@ -97,6 +97,12 @@ export interface AuthResponse {
   token: string;
   userId: number;
 }
+
+
+export interface AuthPasswordRequest extends express.Request {
+  body: { login: string; password: string }
+}
+
 
 export const getPasswordHash = (password: string) =>
   crypto.pbkdf2Sync(password, 'testSalt', Number(process.env.CRYPTO_ITERATIONS), 32, 'sha256').toString('hex');

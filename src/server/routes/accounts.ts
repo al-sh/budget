@@ -1,9 +1,16 @@
+/* eslint-disable sort-exports/sort-exports */
 import * as express from 'express';
 import { DataSource, FindOptionsWhere } from 'typeorm';
 import { Account } from '../entity/Account';
 import { Transaction } from '../entity/Transaction';
 import { AccountWithRest } from '../types/accounts';
 import { ETRANSACTION_TYPE } from '../types/transactions';
+
+export interface GetAccountsRequest extends express.Request {
+  query: {
+    showHidden?: '1' | '0';
+  };
+}
 
 export class AccountsController {
   constructor(ds: DataSource) {
@@ -67,7 +74,7 @@ export class AccountsController {
     response.send({ account: account });
   };
 
-  private getAll = async (request: express.Request, response: express.Response<AccountWithRest[]>) => {
+  private getAll = async (request: GetAccountsRequest, response: express.Response<AccountWithRest[]>) => {
     console.log('Loading accounts from the database...');
     const showHidden = request.query.showHidden === '1';
 
@@ -83,7 +90,7 @@ export class AccountsController {
 
     console.log('Loaded accounts: ', accounts);
 
-    const accountsWithRest = accounts.map((account) => {
+    const accountsWithRest: AccountWithRest[] = accounts.map((account) => {
       let transactions: Transaction[] = [];
       if (account.incomingTransactions?.length) {
         transactions = [...transactions, ...account.incomingTransactions];
@@ -96,6 +103,7 @@ export class AccountsController {
       return {
         id: account.id,
         icon: account.icon,
+        initialValue: account.initialValue,
         isActive: account.isActive,
         name: account.name,
         rest: this.calculateRest(transactions, account),

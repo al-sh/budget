@@ -8,6 +8,12 @@ import { TransactionType } from '../entity/TransactionType';
 import { ETRANSACTION_TYPE } from '../types/transactions';
 import { PAGE_SIZE } from '../../constants/misc';
 
+export interface GetTransactionTypesRequest extends express.Request {
+  query: {
+    hideReturns?: '1' | '0';
+  };
+}
+
 export interface GetTransactionsRequest extends express.Request {
   query: {
     dateEnd?: string;
@@ -138,7 +144,7 @@ export class TransactionsController {
     }
   };
 
-  private getTypes = async (request: express.Request, response: express.Response) => {
+  private getTypes = async (request: GetTransactionTypesRequest, response: express.Response) => {
     console.log('Loading transaction types from the database...');
     const hideReturns = request.query.hideReturns === '1';
     const types = await this.ds.manager.find(

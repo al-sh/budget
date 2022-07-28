@@ -7,13 +7,13 @@ import { EditCategoryForm } from '../EditCategoryForm';
 export const CategoryDetailsPage: React.VFC = () => {
   const { categoryId } = useParams();
   const { useGetOne } = useCategories();
-  const { isFetching, isError, data: category } = useGetOne(parseInt(categoryId));
+  const { isFetching, isError, data: category } = useGetOne(parseInt(categoryId ? categoryId : '')); //TODO: вынести в обязательный пропс чтобы не было этого условия
 
   return (
     <>
       {isFetching && <Loader />}
-      {isError && <div>Ошибка загрузки категории</div>}
-      {!isFetching && !isError && <EditCategoryForm category={category} />}
+      {(isError || !category) && <div>Ошибка загрузки категории</div>}
+      {!isFetching && !isError && category && <EditCategoryForm category={category} />}
     </>
   );
 };

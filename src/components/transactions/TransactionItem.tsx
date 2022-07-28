@@ -52,11 +52,9 @@ export const TransactionItem: React.VFC<{ tran: Transaction }> = ({ tran }) => {
     >
       <span>
         <div>
-          <span>
-            <TypeIcon type={tran.type} />{' '}
-          </span>
+          <span>{tran.type && <TypeIcon type={tran.type} />}</span>
 
-          <span>{formatDate(tran.dt)}</span>
+          <span>{tran.dt && formatDate(tran.dt)}</span>
 
           <span style={{ color: 'gray', marginLeft: '0.5em' }}>
             {tran.type?.id !== ETRANSACTION_TYPE.TRANSFER ? tran?.category?.name : tran.type?.name}

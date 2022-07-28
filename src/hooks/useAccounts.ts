@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { API_ENDPOINTS } from '../constants/urls';
+import { GetAccountsRequest } from '../server/routes/accounts';
 import { AccountWithRest } from '../server/types/accounts';
 import { getApi } from '../services/Api';
 
@@ -12,7 +13,7 @@ export const useAccounts = () => {
 
   const useGetAccountsList = (showHidden?: boolean) =>
     useQuery([accountsQueryKey, showHidden], () =>
-      api.send<AccountWithRest[]>({
+      api.send<AccountWithRest[], null, GetAccountsRequest['query']>({
         endpoint: 'accounts',
         method: 'GET',
         query: { showHidden: showHidden ? '1' : '0' },

@@ -56,8 +56,8 @@ export const useCategories = () => {
 
   const useItem = (method: 'POST' | 'PUT' | 'DELETE', id?: number, onSuccess?: () => void) =>
     useMutation(
-      (formValues: Category) => {
-        return api.send<null, Category, null>({
+      (formValues: Partial<Category>) => {
+        return api.send<null, Partial<Category>, null>({
           data: formValues,
           endpoint: id ? `${API_ENDPOINTS.CATEGORIES.ALL}/${id}` : API_ENDPOINTS.CATEGORIES.ALL,
           method: method,

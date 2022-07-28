@@ -5,15 +5,16 @@ import { Loader } from '../../_shared/Loader';
 import { EditAccountForm } from '../EditAccountForm';
 
 export const AccountPage: React.VFC = () => {
-  const { accountId } = useParams();
+  const params = useParams();
+  const accountId = params?.accountId ? params?.accountId : '';
   const { useGetOne } = useAccounts();
   const { isFetching, isError, data: account } = useGetOne(parseInt(accountId));
 
   return (
     <>
       {isFetching && <Loader />}
-      {isError && <div>Ошибка загрузки счета</div>}
-      {!isFetching && !isError && <EditAccountForm account={account} />}
+      {(isError || !account) && <div>Ошибка загрузки счета</div>}
+      {!isFetching && !isError && account && <EditAccountForm account={account} />}
     </>
   );
 };

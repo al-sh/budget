@@ -15,8 +15,9 @@ export const dbInitializer = async (ds: DataSource) => {
   }
 
   ds.transaction(async (transactionalEntityManager) => {
-    // transactionalEntityManager.delete(Transaction, {})
+    transactionalEntityManager.query('SET FOREIGN_KEY_CHECKS=0');
     const queryBuilder = transactionalEntityManager.createQueryBuilder();
+
     await queryBuilder.delete().from(Transaction).execute();
     await queryBuilder.delete().from(Account).execute();
     await queryBuilder.delete().from(Category).execute();
@@ -98,6 +99,7 @@ export const dbInitializer = async (ds: DataSource) => {
     category4.user = newDemoUser;
 
     await transactionalEntityManager.save([category1, category2, category3, category4]);
+    transactionalEntityManager.query('SET FOREIGN_KEY_CHECKS=1');
     console.log('Categories initialized');
   });
 };

@@ -2,7 +2,7 @@ import { notification } from 'antd';
 import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_ENDPOINTS, UI_ROUTES } from '../../constants/urls';
-import { AuthResponse } from '../../server/routes/auth';
+import { AuthPasswordRequest, AuthResponse } from '../../server/routes/auth';
 import { getApi } from '../../services/Api';
 import { getStorage } from '../../services/Storage';
 import { Form, Input, Button } from 'antd';
@@ -13,9 +13,9 @@ export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
 
   const handleFinish = useCallback(
-    async (formValues: { login: string; password: string }) => {
+    async (formValues: AuthPasswordRequest['body']) => {
       try {
-        const response = await api.send<AuthResponse>({
+        const response = await api.send<AuthResponse, AuthPasswordRequest['body']>({
           data: formValues,
           endpoint: API_ENDPOINTS.AUTH.PASSWORD,
           method: 'POST',
@@ -25,7 +25,9 @@ export const LoginPage: React.FC = () => {
         storage.setItem('userId', String(response.userId));
         navigate(UI_ROUTES.HOME);
       } catch (e) {
-        if (e.response?.status === 403) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        if (e?.response?.status === 403) {
           notification.error({ message: 'Неправильный логин/пароль' });
         } else {
           notification.error({ message: 'Произошла ошибка авторизации. Повторите попытку позже.' });

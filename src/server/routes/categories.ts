@@ -182,6 +182,16 @@ export class CategoriesController {
     }, 1500);
   };
 
+  private getTreeItem = (category: Category, categories: Category[]) => {
+    const item: ICategoryTreeItem = { title: category.name, key: category.id, value: category.id, isActive: category.isActive };
+    const children = categories.filter((item) => item.parentCategory?.id === category?.id);
+    if (children?.length) {
+      item.children = children.map((child) => this.getTreeItem(child, categories));
+    }
+
+    return item;
+  };
+
   private getTreeStat = async (request: GetCategoriesTree, response: express.Response<ICategoryTreeItem[]>) => {
     let typeId: ETRANSACTION_TYPE = parseInt(
       Array.isArray(request.query.typeId) ? request.query.typeId.join('') : (request.query.typeId as string)
@@ -217,16 +227,6 @@ export class CategoriesController {
     setTimeout(() => {
       response.send(tree);
     }, 1500);
-  };
-
-  private getTreeItem = (category: Category, categories: Category[]) => {
-    const item: ICategoryTreeItem = { title: category.name, key: category.id, value: category.id, isActive: category.isActive };
-    const children = categories.filter((item) => item.parentCategory?.id === category?.id);
-    if (children?.length) {
-      item.children = children.map((child) => this.getTreeItem(child, categories));
-    }
-
-    return item;
   };
 
   private update = async (request: express.Request<BaseItemRequest, null, Partial<Category>>, response: express.Response<BaseUpdate>) => {
