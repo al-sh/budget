@@ -1,16 +1,37 @@
+import { observer } from 'mobx-react-lite';
+import { useEffect } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
+import { getUiSizeService } from '../../../services/UiSizeService';
 
-export const AppWrapper = styled.div`
-  max-width: 360px;
+const Wrapper = styled.div<{ height: number; width: number }>`
+  max-width: ${({ width }) => width}px;
   padding-bottom: 50px;
   overflow-x: hidden;
-  overflow-y: scroll;
+  overflow-y: auto;
   display: flex;
-  height: 100vh;
+  height: ${({ height }) => height}px;
   flex-direction: column;
-  background-color: ${(props) => props.theme.background.main};
-  color: ${(props) => props.theme.text.primary};
+  background-color: ${({ theme }) => theme.background.main};
+  color: ${({ theme }) => theme.text.primary};
 `;
+
+const _AppWrapper: React.FC = (props) => {
+  const sizeService = getUiSizeService();
+
+  const { height, width } = sizeService;
+
+  useEffect(() => {
+    sizeService.init();
+
+    return () => {
+      sizeService.destroy();
+    };
+  }, [sizeService]);
+
+  return <Wrapper {...props} height={height} width={width} />;
+};
+
+export const AppWrapper = observer(_AppWrapper);
 
 export const CSSReset = createGlobalStyle`
   *,

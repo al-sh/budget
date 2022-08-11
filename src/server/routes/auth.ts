@@ -2,7 +2,7 @@ import * as express from 'express';
 import * as crypto from 'crypto';
 import { DataSource, Repository } from 'typeorm';
 import { User } from '../entity/User';
-import { API_ENDPOINTS } from '../../constants/urls';
+import { API_ENDPOINTS } from '../../constants/api-endpoints';
 
 export class AuthController {
   constructor(ds: DataSource) {
@@ -98,11 +98,9 @@ export interface AuthResponse {
   userId: number;
 }
 
-
 export interface AuthPasswordRequest extends express.Request {
-  body: { login: string; password: string }
+  body: { login: string; password: string };
 }
-
 
 export const getPasswordHash = (password: string) =>
   crypto.pbkdf2Sync(password, 'testSalt', Number(process.env.CRYPTO_ITERATIONS), 32, 'sha256').toString('hex');

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { API_ENDPOINTS } from '../constants/urls';
+import { API_ENDPOINTS } from '../constants/api-endpoints';
 import { GetAccountsRequest } from '../server/routes/accounts';
 import { AccountWithRest } from '../server/types/accounts';
 import { getApi } from '../services/Api';

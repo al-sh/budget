@@ -1,7 +1,8 @@
 import { notification } from 'antd';
 import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API_ENDPOINTS, UI_ROUTES } from '../../constants/urls';
+import { UI_ROUTES } from '../../constants/urls';
+import { API_ENDPOINTS } from '../../constants/api-endpoints';
 import { AuthPasswordRequest, AuthResponse } from '../../server/routes/auth';
 import { getApi } from '../../services/Api';
 import { getStorage } from '../../services/Storage';

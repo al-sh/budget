@@ -1,21 +1,17 @@
-/* eslint-disable sort-keys */
-export const API_ENDPOINTS = {
-  ACCOUNTS: 'accounts',
-  AUTH: { PASSWORD: 'auth/password' },
-  CATEGORIES: {
-    ALL: 'categories',
-    TREE: 'categories/tree',
-  },
-  TRANSACTIONS: 'transactions',
-};
+/* eslint-disable sort-exports/sort-exports */
+export const homepage = 'budget';
+
+export const publicUrl = location?.origin + '/' + homepage;
+
+const uiRoot = '/' + homepage;
 
 export const UI_ROUTES = {
-  ACCOUNTS: '/accounts',
-  HOME: '/home',
+  ACCOUNTS: `${uiRoot}/accounts`,
+  HOME: `${uiRoot}/home`,
   SETTINGS: {
-    ROOT: '/settings',
-    CATEGORIES: '/settings/categories',
-    LOGIN: '/settings/login',
+    ROOT: `${uiRoot}/settings`,
+    CATEGORIES: `${uiRoot}/settings/categories`,
+    LOGIN: `${uiRoot}/settings/login`,
   },
-  TRANSACTIONS: '/transactions',
+  TRANSACTIONS: `${uiRoot}/transactions`,
 };

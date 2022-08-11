@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { Category, ICategoryTreeItem } from '../server/entity/Category';
 import { getApi } from '../services/Api';
-import { API_ENDPOINTS } from '../constants/urls';
+import { API_ENDPOINTS } from '../constants/api-endpoints';
 import { ETRANSACTION_TYPE } from '../server/types/transactions';
 import { GetAllCategoriesQuery, GetCategoriesTree } from '../server/routes/categories';
 
