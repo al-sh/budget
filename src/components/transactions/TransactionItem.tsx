@@ -28,6 +28,21 @@ const TransactionWrapper = styled.div`
   border-bottom: 1px solid black;
 `;
 
+const CategoryName = styled.span`
+  margin-left: 0.5em;
+  color: gray;
+`;
+
+const CurrencyName = styled.div`
+  text-align: right;
+  white-space: nowrap;
+`;
+
+const AccountName = styled.div`
+  text-align: right;
+  color: gray;
+`;
+
 export const TransactionItem: React.VFC<{ tran: Transaction }> = ({ tran }) => {
   const navigate = useNavigate();
 
@@ -43,17 +58,15 @@ export const TransactionItem: React.VFC<{ tran: Transaction }> = ({ tran }) => {
 
           <span>{tran.dt && formatDate(tran.dt)}</span>
 
-          <span style={{ color: 'gray', marginLeft: '0.5em' }}>
-            {tran.type?.id !== ETRANSACTION_TYPE.TRANSFER ? tran?.category?.name : tran.type?.name}
-          </span>
+          <CategoryName>{tran.type?.id !== ETRANSACTION_TYPE.TRANSFER ? tran?.category?.name : tran.type?.name}</CategoryName>
         </div>
 
         <span>{tran.description}</span>
       </span>
 
       <span>
-        <div style={{ whiteSpace: 'nowrap' }}>{tran.amount} RUB</div>
-        <div style={{ color: 'gray', textAlign: 'right' }}>{tran.account?.name}</div>
+        <CurrencyName>{tran.amount} RUB</CurrencyName>
+        <AccountName>{tran.account?.name}</AccountName>
       </span>
     </TransactionWrapper>
   );

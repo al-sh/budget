@@ -11,14 +11,17 @@ export const useTransactions = () => {
 
   const queryClient = useQueryClient();
 
-  const useGetList = (page?: number) =>
-    useQuery([transactionsQueryKey, page], () =>
+  const useGetList = (params: { accountId?: number; pageNum?: number }) => {
+    const accId = params.accountId;
+
+    return useQuery([transactionsQueryKey, accId, params.pageNum], () =>
       api.send<Transaction[], null, GetTransactionsRequest['query']>({
         endpoint: 'transactions',
         method: 'GET',
-        query: { page: String(page), dateFrom: '2022-06-01' },
+        query: { accountId: String(params.accountId), page: String(params.pageNum), dateFrom: '2022-06-01' },
       })
     );
+  };
 
   const useGetOne = (id: number) =>
     useQuery([transactionsQueryKey, 'details', id], () => api.send<Transaction>({ endpoint: `transactions/${id}`, method: 'GET' }), {

@@ -1,20 +1,21 @@
-import { Select } from 'antd';
 import { useAccounts } from '../../../hooks/useAccounts';
+import { Select, SelectOption } from '../_base/Select';
 
 interface Props {
-  onChange?: (newValue: number) => void;
+  allowClear?: boolean;
   value?: number;
+  onChange?: (newValue: number) => void;
 }
 
-export const AccountsSelect: React.VFC<Props> = ({ value, onChange }) => {
+export const AccountsSelect: React.VFC<Props> = ({ allowClear, value, onChange }) => {
   const { isLoading: isAccountsLoading, data: accounts } = useAccounts().useGetAccountsList(false);
 
   return (
-    <Select loading={isAccountsLoading} value={value} onChange={onChange}>
+    <Select loading={isAccountsLoading} allowClear={allowClear} value={value} onChange={onChange}>
       {accounts?.map((acc) => (
-        <Select.Option key={acc.id} value={acc.id}>
+        <SelectOption key={acc.id} value={acc.id}>
           {acc.name}
-        </Select.Option>
+        </SelectOption>
       ))}
     </Select>
   );

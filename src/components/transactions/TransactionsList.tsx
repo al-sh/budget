@@ -7,7 +7,7 @@ import { TransactionItem } from './TransactionItem';
 export const TransactionsList: React.VFC = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const { useGetList: useGetTransactions } = useTransactions();
-  const { isLoading, isError, data: transactions } = useGetTransactions(currentPage);
+  const { isLoading, isError, data: transactions } = useGetTransactions({ pageNum: currentPage });
 
   if (isLoading)
     return (

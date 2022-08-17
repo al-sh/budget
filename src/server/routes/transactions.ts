@@ -16,6 +16,7 @@ export interface GetTransactionTypesRequest extends express.Request {
 
 export interface GetTransactionsRequest extends express.Request {
   query: {
+    accountId?: string;
     dateEnd?: string;
     dateFrom?: string;
     page: string;
@@ -83,8 +84,22 @@ export class TransactionsController {
 
     const accounts = await this.ds.manager.find(Account, { where: { user: { id: Number(request.headers.userid) } } });
     const accountIds = accounts.map((acc) => acc.id);
-
     const whereClause: FindOptionsWhere<Transaction> = { account: In(accountIds) };
+
+    const filterAccountId = parseInt(request.query.accountId || '');
+    if (request.query.accountId && Number.isFinite(filterAccountId)) {
+      if (accounts.find((acc) => acc.id === filterAccountId)) {
+        whereClause.account = { id: filterAccountId };
+      } else {
+        console.error(
+          'Данный счет не принадлежит данному клиенту! request.query.accountId',
+          request.query.accountId,
+          'request.headers.userid',
+          request.headers.userid
+        );
+      }
+    }
+
     const dtFrom = request.query.dateFrom;
     const dtFormat = 'yyyy-MM-dd';
     if (dtFrom) {
