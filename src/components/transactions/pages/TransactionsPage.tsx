@@ -1,10 +1,10 @@
 import React from 'react';
-import { TransactionsList } from '../TransactionsList';
+import { TransactionsListByDates } from '../TransactionsListByDates';
 
 export const TransactionsPage: React.FC = () => {
   return (
     <>
-      <TransactionsList />
+      <TransactionsListByDates />
     </>
   );
 };

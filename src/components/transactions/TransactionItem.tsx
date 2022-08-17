@@ -5,10 +5,9 @@ import styled from 'styled-components';
 import { Transaction } from '../../server/entity/Transaction';
 import { TransactionType } from '../../server/entity/TransactionType';
 import { ETRANSACTION_TYPE } from '../../server/types/transactions';
-import format from 'date-fns/format';
-import isValid from 'date-fns/isValid';
-import { parseISO } from 'date-fns';
+
 import { UI_ROUTES } from '../../constants/urls';
+import { formatDate } from '../../utils/format';
 
 const TypeIcon: React.VFC<{ type: TransactionType }> = ({ type }) => {
   return (
@@ -28,18 +27,6 @@ const TransactionWrapper = styled.div`
   justify-content: space-between;
   border-bottom: 1px solid black;
 `;
-
-const formatDate = (dt: Date) => {
-  if (!dt) {
-    return '';
-  }
-  const newDt = parseISO(dt as unknown as string);
-  if (!isValid(newDt)) {
-    console.log('invalid date: ', newDt);
-    return '';
-  }
-  return format(newDt, 'HH:mm dd.MM.yyyy');
-};
 
 export const TransactionItem: React.VFC<{ tran: Transaction }> = ({ tran }) => {
   const navigate = useNavigate();
