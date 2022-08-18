@@ -13,8 +13,14 @@ export const TransactionsPage: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [filterAccountId, setFilterAccountId] = useState(0);
+  const [filterCategorytId, setFilterCategorytId] = useState(0);
+  const [filterTypeId, setFilterTypeId] = useState(0);
   const { useGetList: useGetTransactions } = useTransactions();
-  const { isLoading, isError, data: transactions } = useGetTransactions({ accountId: filterAccountId, pageNum: currentPage });
+  const {
+    isLoading,
+    isError,
+    data: transactions,
+  } = useGetTransactions({ accountId: filterAccountId, categoryId: filterCategorytId, typeId: filterTypeId, pageNum: currentPage });
 
   return (
     <>
@@ -28,9 +34,14 @@ export const TransactionsPage: React.FC = () => {
       {showFilters && (
         <TransactionsFilters
           accountId={filterAccountId}
-          onFinish={(accId) => {
+          typeId={filterTypeId}
+          categoryId={filterCategorytId}
+          onFinish={(accId, typeId, catId) => {
+            console.log('onFinish', accId, typeId, catId);
             setShowFilters(false);
             setFilterAccountId(accId || 0);
+            setFilterTypeId(typeId || 0);
+            setFilterCategorytId(catId || 0);
           }}
         />
       )}

@@ -13,7 +13,7 @@ import { TransactionTypeSelect } from '../_shared/selects/TransactionTypeSelect'
 export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ transaction }) => {
   const [form] = Form.useForm();
 
-  const [typeId, setTypeId] = useState(transaction?.type?.id ? transaction.type?.id : ETRANSACTION_TYPE.EXPENSE);
+  const [typeId, setTypeId] = useState(transaction?.category?.type?.id ? transaction.category?.type?.id : ETRANSACTION_TYPE.EXPENSE);
 
   const query = useTransactions().useItem(transaction ? 'PUT' : 'POST', {
     id: transaction ? transaction.id : undefined,
@@ -50,7 +50,7 @@ export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ tran
           description: transaction?.description || '',
           dt: moment(transaction?.dt) || new Date(),
           toAccountId: transaction?.toAccount?.id || '',
-          typeId: transaction?.type?.id || ETRANSACTION_TYPE.EXPENSE,
+          typeId: transaction?.category?.type?.id || ETRANSACTION_TYPE.EXPENSE,
         }}
         onFinish={(formValues) => {
           query.mutate(formValues);

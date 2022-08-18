@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable @typescript-eslint/explicit-member-accessibility */
-import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { ETRANSACTION_TYPE } from '../types/transactions';
 import { Category } from './Category';
-import { Transaction } from './Transaction';
 
 @Entity()
 export class TransactionType {
@@ -15,9 +14,6 @@ export class TransactionType {
 
   @Column()
   imageUrl?: string = '';
-
-  @OneToMany(() => Transaction, (tran) => tran.type)
-  transactions?: Transaction[];
 
   @OneToMany(() => Category, (cat) => cat.type)
   categories?: Category[];

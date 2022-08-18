@@ -54,11 +54,11 @@ export const TransactionItem: React.VFC<{ tran: Transaction }> = ({ tran }) => {
     >
       <span>
         <div>
-          <span>{tran.type && <TypeIcon type={tran.type} />}</span>
+          <span>{tran.category?.type && <TypeIcon type={tran.category?.type} />}</span>
 
           <span>{tran.dt && formatDate(tran.dt)}</span>
 
-          <CategoryName>{tran.type?.id !== ETRANSACTION_TYPE.TRANSFER ? tran?.category?.name : tran.type?.name}</CategoryName>
+          <CategoryName>{tran.category?.type?.id !== ETRANSACTION_TYPE.TRANSFER ? tran?.category?.name : tran.category?.name}</CategoryName>
         </div>
 
         <span>{tran.description}</span>

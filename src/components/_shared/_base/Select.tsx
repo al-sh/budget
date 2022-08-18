@@ -4,14 +4,15 @@ import { ReactNode } from 'react';
 interface Props {
   allowClear?: boolean;
   children?: ReactNode;
+  disabled?: boolean;
   loading?: boolean;
   value?: number;
   onChange?: (newValue: number) => void;
 }
 
-export const Select: React.FC<Props> = ({ allowClear, children, loading, value, onChange }) => {
+export const Select: React.FC<Props> = ({ allowClear, children, disabled, loading, value, onChange }) => {
   return (
-    <AntdSelect allowClear={allowClear} loading={loading} value={value} onChange={onChange}>
+    <AntdSelect allowClear={allowClear} disabled={disabled} loading={loading} value={value != 0 ? value : undefined} onChange={onChange}>
       {children}
     </AntdSelect>
   );

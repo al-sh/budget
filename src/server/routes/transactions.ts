@@ -1,6 +1,6 @@
 import * as express from 'express';
 import { isValid, parse } from 'date-fns';
-import { DataSource, FindOptionsWhere, In, Raw } from 'typeorm';
+import { DataSource, FindOptionsWhere, In, Raw, TypeORMError } from 'typeorm';
 import { Account } from '../entity/Account';
 import { Category } from '../entity/Category';
 import { Transaction } from '../entity/Transaction';
@@ -17,9 +17,11 @@ export interface GetTransactionTypesRequest extends express.Request {
 export interface GetTransactionsRequest extends express.Request {
   query: {
     accountId?: string;
+    categoryId?: string;
     dateEnd?: string;
     dateFrom?: string;
     page: string;
+    typeId?: string;
   };
 }
 
@@ -80,14 +82,15 @@ export class TransactionsController {
   private getAll = async (request: GetTransactionsRequest, response: express.Response) => {
     const pageNumber = Number.isFinite(parseInt(request.query.page as string)) ? parseInt(request.query.page as string) : 0;
 
-    console.log('Loading transactions from the database', request.query, pageNumber * PAGE_SIZE);
+    console.log('Loading transactions from the database. Query: ', request.query);
 
     const accounts = await this.ds.manager.find(Account, { where: { user: { id: Number(request.headers.userid) } } });
+
     const accountIds = accounts.map((acc) => acc.id);
-    const whereClause: FindOptionsWhere<Transaction> = { account: In(accountIds) };
+    const whereClause: FindOptionsWhere<Transaction> = { account: { id: In(accountIds) } };
 
     const filterAccountId = parseInt(request.query.accountId || '');
-    if (request.query.accountId && Number.isFinite(filterAccountId)) {
+    if (Number.isFinite(filterAccountId)) {
       if (accounts.find((acc) => acc.id === filterAccountId)) {
         whereClause.account = { id: filterAccountId };
       } else {
@@ -98,6 +101,35 @@ export class TransactionsController {
           request.headers.userid
         );
       }
+    }
+
+    //фильтрация по типу происходит через фильтрацию по категориям
+    const categoriesWhereClause: FindOptionsWhere<Category> = { user: { id: Number(request.headers.userid) } };
+
+    const filterTypeId = parseInt(request.query?.typeId || '');
+    if (Number.isFinite(filterTypeId)) {
+      categoriesWhereClause.type = { id: filterTypeId };
+    }
+    console.log('categoriesWhereClause', categoriesWhereClause);
+
+    const categories = await this.ds.manager.find(Category, { where: categoriesWhereClause });
+
+    const categoriesIds = categories.map((cat) => cat.id);
+    whereClause.category = { id: In(categoriesIds) };
+    const filterCategoryId = parseInt(request.query?.categoryId || '');
+    if (Number.isFinite(filterCategoryId)) {
+      if (categories.findIndex((cat) => cat.id === filterCategoryId) === -1) {
+        console.error(
+          'Данная категория не принадлежит данному клиенту! request.query.categoryId',
+          request.query.categoryId,
+          'request.headers.userid',
+          request.headers.userid
+        );
+        response.status(403);
+        response.send({ message: 'Данная категория не принадлежит данному пользователю' });
+        return;
+      }
+      whereClause.category = { id: filterCategoryId };
     }
 
     const dtFrom = request.query.dateFrom;
@@ -111,8 +143,10 @@ export class TransactionsController {
       }
     }
 
+    console.log(whereClause);
+
     const transactions = await this.ds.manager.find(Transaction, {
-      relations: ['account', 'category', 'type'],
+      relations: ['account', 'category', 'category.type'],
       where: whereClause,
       order: {
         dt: 'DESC',
@@ -121,15 +155,6 @@ export class TransactionsController {
       take: PAGE_SIZE,
     });
 
-    /*
-    пример поиска юзера со связанными сущностям
-    const userRepository = this.ds.getRepository(User);
-    const transactions = await userRepository.findOne({
-      relations: ['accounts', 'accounts.transactions'],
-      where: { id: Number(request.headers.userid) },
-    });
-*/
-    // console.log('Loaded transactions: ', transactions);
     setTimeout(() => {
       response.send(transactions);
     }, 1500);
@@ -140,7 +165,7 @@ export class TransactionsController {
 
     try {
       const tran = await this.ds.manager.findOne(Transaction, {
-        relations: ['account', 'toAccount', 'category', 'type'],
+        relations: ['account', 'toAccount', 'category', 'category.type'],
         where: { id: tranId },
       });
 
@@ -154,20 +179,18 @@ export class TransactionsController {
       response.send(tran);
     } catch (err) {
       response.status(500);
-      console.log(err);
-      response.send(err);
+      console.log('transactions getById error', err);
+      response.send({ message: (err as TypeORMError)?.message });
     }
   };
 
   private getTypes = async (request: GetTransactionTypesRequest, response: express.Response) => {
-    console.log('Loading transaction types from the database...');
     const hideReturns = request.query.hideReturns === '1';
     const types = await this.ds.manager.find(
       TransactionType,
       hideReturns ? { where: { id: In([ETRANSACTION_TYPE.EXPENSE, ETRANSACTION_TYPE.INCOME]) } } : undefined
     );
 
-    console.log('Loaded types: ', types);
     response.send(types);
   };
 
@@ -177,7 +200,6 @@ export class TransactionsController {
       amount: request.body.amount,
       description: request.body.description,
       dt: request.body.dt,
-      type: { id: request.body.typeId },
     };
 
     if (request.body.typeId !== ETRANSACTION_TYPE.TRANSFER) {

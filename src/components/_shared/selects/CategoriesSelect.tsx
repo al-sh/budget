@@ -20,7 +20,7 @@ export const CategoriesSelect: React.VFC<Props> = ({ typeId, onChange, value, al
       loading={isLoading}
       disabled={disabled || !typeId}
       onChange={onChange}
-      value={value}
+      value={value != 0 ? value : undefined}
       dropdownStyle={{
         overflow: 'auto',
       }}

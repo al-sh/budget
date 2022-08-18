@@ -11,14 +11,29 @@ export const useTransactions = () => {
 
   const queryClient = useQueryClient();
 
-  const useGetList = (params: { accountId?: number; pageNum?: number }) => {
-    const accId = params.accountId;
+  const useGetList = (params: { accountId?: number; categoryId?: number; pageNum?: number; typeId?: number }) => {
+    const query: GetTransactionsRequest['query'] = { page: String(params.pageNum), dateFrom: '2022-04-01' };
 
-    return useQuery([transactionsQueryKey, accId, params.pageNum], () =>
+    const accId = params.accountId;
+    if (accId) {
+      query.accountId = String(accId);
+    }
+
+    const categoryId = params.categoryId;
+    if (categoryId) {
+      query.categoryId = String(categoryId);
+    }
+
+    const typeId = params.typeId;
+    if (typeId) {
+      query.typeId = String(typeId);
+    }
+
+    return useQuery([transactionsQueryKey, accId, typeId, categoryId, params.pageNum], () =>
       api.send<Transaction[], null, GetTransactionsRequest['query']>({
         endpoint: 'transactions',
         method: 'GET',
-        query: { accountId: String(params.accountId), page: String(params.pageNum), dateFrom: '2022-06-01' },
+        query: query,
       })
     );
   };

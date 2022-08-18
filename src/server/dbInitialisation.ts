@@ -78,28 +78,53 @@ export const dbInitializer = async (ds: DataSource) => {
     await transactionalEntityManager.save([type1, type2, type3, type4, type5]);
     console.log('TransactionTypes initialized');
 
-    const category1 = new Category();
-    category1.type = { id: ETRANSACTION_TYPE.INCOME };
-    category1.name = 'Зарплата';
-    category1.user = newDemoUser;
+    const salaryCategory = new Category();
+    salaryCategory.type = { id: ETRANSACTION_TYPE.INCOME };
+    salaryCategory.name = 'Зарплата';
+    salaryCategory.user = newDemoUser;
 
-    const category2 = new Category();
-    category2.type = { id: ETRANSACTION_TYPE.INCOME };
-    category2.name = 'Премия';
-    category2.user = newDemoUser;
+    const bonusIncomeCategory = new Category();
+    bonusIncomeCategory.type = { id: ETRANSACTION_TYPE.INCOME };
+    bonusIncomeCategory.name = 'Премия';
+    bonusIncomeCategory.user = newDemoUser;
 
-    const category3 = new Category();
-    category3.type = { id: ETRANSACTION_TYPE.EXPENSE };
-    category3.name = 'Продукты';
-    category3.user = newDemoUser;
+    const groceryCategory = new Category();
+    groceryCategory.type = { id: ETRANSACTION_TYPE.EXPENSE };
+    groceryCategory.name = 'Продукты';
+    groceryCategory.user = newDemoUser;
 
-    const category4 = new Category();
-    category4.type = { id: ETRANSACTION_TYPE.EXPENSE };
-    category4.name = 'Квартира';
-    category4.user = newDemoUser;
+    const apartmentCategory = new Category();
+    apartmentCategory.type = { id: ETRANSACTION_TYPE.EXPENSE };
+    apartmentCategory.name = 'Квартира';
+    apartmentCategory.user = newDemoUser;
 
-    await transactionalEntityManager.save([category1, category2, category3, category4]);
-    transactionalEntityManager.query('SET FOREIGN_KEY_CHECKS=1');
+    await transactionalEntityManager.save([salaryCategory, bonusIncomeCategory, groceryCategory, apartmentCategory]);
     console.log('Categories initialized');
+
+    const utilitiesTran = new Transaction();
+    utilitiesTran.account = account2;
+    utilitiesTran.amount = 4230;
+    utilitiesTran.category = apartmentCategory;
+    utilitiesTran.dt = new Date();
+    utilitiesTran.description = 'Коммуналка';
+
+    const capitalRepairTran = new Transaction();
+    capitalRepairTran.account = account2;
+    capitalRepairTran.amount = 815;
+    capitalRepairTran.category = apartmentCategory;
+    capitalRepairTran.dt = new Date();
+    capitalRepairTran.description = 'Капремонт';
+
+    const avanceTran = new Transaction();
+    avanceTran.account = account;
+    avanceTran.amount = 80000;
+    avanceTran.category = salaryCategory;
+    avanceTran.dt = new Date();
+    avanceTran.description = 'Аванс';
+
+    await transactionalEntityManager.save([utilitiesTran, capitalRepairTran, avanceTran]);
+    console.log('Transactions initialized');
+
+    transactionalEntityManager.query('SET FOREIGN_KEY_CHECKS=1');
   });
 };

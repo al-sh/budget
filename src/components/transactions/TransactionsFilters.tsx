@@ -5,10 +5,15 @@ import { AccountsSelect } from '../_shared/selects/AccountsSelect';
 import { CategoriesSelect } from '../_shared/selects/CategoriesSelect';
 import { TransactionTypeSelect } from '../_shared/selects/TransactionTypeSelect';
 
-export const TransactionsFilters: React.VFC<{ accountId?: number; onFinish?: (accId?: number) => void }> = ({ accountId, onFinish }) => {
+export const TransactionsFilters: React.VFC<{
+  accountId?: number;
+  categoryId?: number;
+  onFinish?: (accId?: number, typeId?: number, catId?: number) => void;
+  typeId?: number;
+}> = ({ accountId, categoryId, onFinish, typeId: initialTypeId }) => {
   const [form] = Form.useForm();
 
-  const [typeId, setTypeId] = useState(ETRANSACTION_TYPE.EXPENSE);
+  const [typeId, setTypeId] = useState(initialTypeId ? initialTypeId : ETRANSACTION_TYPE.EXPENSE);
 
   const [isSubmitDisabled, setisSubmitDisabled] = useState(false);
 
@@ -31,11 +36,12 @@ export const TransactionsFilters: React.VFC<{ accountId?: number; onFinish?: (ac
         }}
         initialValues={{
           accountId: accountId,
-          typeId: ETRANSACTION_TYPE.EXPENSE,
+          categoryId: categoryId,
+          typeId: initialTypeId,
         }}
         onFinish={(formValues) => {
           console.log('filter transactions values:', formValues);
-          onFinish && onFinish(formValues?.accountId);
+          onFinish && onFinish(formValues?.accountId, formValues?.typeId, formValues?.categoryId);
         }}
         autoComplete="off"
       >
@@ -44,11 +50,15 @@ export const TransactionsFilters: React.VFC<{ accountId?: number; onFinish?: (ac
         </Form.Item>
 
         <Form.Item label="Счет" name="accountId">
-          <AccountsSelect />
+          <AccountsSelect allowClear />
         </Form.Item>
 
         <Form.Item label="Тип" name="typeId">
-          <TransactionTypeSelect />
+          <TransactionTypeSelect
+            onChange={() => {
+              form.setFieldsValue({ categoryId: undefined });
+            }}
+          />
         </Form.Item>
 
         {typeId !== ETRANSACTION_TYPE.TRANSFER && (
@@ -63,6 +73,14 @@ export const TransactionsFilters: React.VFC<{ accountId?: number; onFinish?: (ac
             span: 16,
           }}
         >
+          <Button
+            type="link"
+            onClick={() => {
+              form.setFieldsValue({ accountId: 0, categoryId: undefined, typeId: 0 });
+            }}
+          >
+            Очистить
+          </Button>
           <Button type="primary" htmlType="submit" disabled={isSubmitDisabled}>
             Применить
           </Button>
