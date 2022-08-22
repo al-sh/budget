@@ -23,9 +23,11 @@ class ApiService {
     return ApiService.instance;
   }
 
-  private constructor() {}
+  private constructor() {
+    console.log('ApiService create. path:', this.path);
+  }
 
-  private path = process.env.REACT_APP_API_PATH;
+  private path = `${window.location.origin}/api`;
 
   public send: <Result, RequestBody = null, RequestQuery = null>(request: ApiRequest<RequestBody, RequestQuery>) => Promise<Result> =
     async (request) => {

@@ -35,16 +35,16 @@ AppDataSource.initialize()
     dbInitializer(AppDataSource);
 
     const authController = new AuthController(AppDataSource);
-    app.use('/', authController.router);
+    app.use('/api', authController.router);
 
     const categoriesController = new CategoriesController(AppDataSource);
-    app.use('/categories', categoriesController.router);
+    app.use('/api/categories', categoriesController.router);
 
     const accountsController = new AccountsController(AppDataSource);
-    app.use('/accounts', accountsController.router);
+    app.use('/api/accounts', accountsController.router);
 
     const transactionsController = new TransactionsController(AppDataSource);
-    app.use('/transactions', transactionsController.router);
+    app.use('/api/transactions', transactionsController.router);
 
     app.listen(port, '0.0.0.0', () => {
       console.log(`Example app listening on port ${port}`);
