@@ -4,7 +4,7 @@ import { TransactionsListByDates } from '../TransactionsListByDates';
 
 import { Button } from 'antd';
 import styled from 'styled-components';
-import { useTransactions } from '../../../hooks/useTransactions';
+import { GetTransactionsQueryParams, useTransactions } from '../../../hooks/useTransactions';
 import { Loader } from '../../_shared/Loader';
 
 const FilterButton = styled(Button)``;
@@ -12,15 +12,10 @@ const FilterButton = styled(Button)``;
 export const TransactionsPage: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-  const [filterAccountId, setFilterAccountId] = useState(0);
-  const [filterCategorytId, setFilterCategorytId] = useState(0);
-  const [filterTypeId, setFilterTypeId] = useState(0);
+  const [filterParams, setFilterParams] = useState<GetTransactionsQueryParams>({});
+
   const { useGetList: useGetTransactions } = useTransactions();
-  const {
-    isLoading,
-    isError,
-    data: transactions,
-  } = useGetTransactions({ accountId: filterAccountId, categoryId: filterCategorytId, typeId: filterTypeId, pageNum: currentPage });
+  const { isLoading, isError, data: transactions } = useGetTransactions(filterParams);
 
   return (
     <>
@@ -33,15 +28,15 @@ export const TransactionsPage: React.FC = () => {
       </FilterButton>
       {showFilters && (
         <TransactionsFilters
-          accountId={filterAccountId}
-          typeId={filterTypeId}
-          categoryId={filterCategorytId}
-          onFinish={(accId, typeId, catId) => {
-            console.log('onFinish', accId, typeId, catId);
+          params={filterParams}
+          onClear={() => {
             setShowFilters(false);
-            setFilterAccountId(accId || 0);
-            setFilterTypeId(typeId || 0);
-            setFilterCategorytId(catId || 0);
+            setFilterParams({ ...{} });
+          }}
+          onFinish={(params) => {
+            console.log('onFinish', params);
+            setShowFilters(false);
+            setFilterParams(params);
           }}
         />
       )}

@@ -1,18 +1,29 @@
+import { Moment } from 'moment';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { API_ENDPOINTS } from '../constants/api-endpoints';
+import { formats } from '../constants/formats';
 import { Transaction } from '../server/entity/Transaction';
 import { GetTransactionsRequest } from '../server/routes/transactions';
 import { getApi } from '../services/Api';
 
-export const transactionsQueryKey = ['transactions'];
+export type GetTransactionsQueryParams = {
+  accountId?: number;
+  categoryId?: number;
+  dateEnd?: Moment;
+  dateFrom?: Moment;
+  pageNum?: number;
+  typeId?: number;
+};
+
+export const transactionsQueryKey = 'transactions';
 
 export const useTransactions = () => {
   const api = getApi();
 
   const queryClient = useQueryClient();
 
-  const useGetList = (params: { accountId?: number; categoryId?: number; pageNum?: number; typeId?: number }) => {
-    const query: GetTransactionsRequest['query'] = { page: String(params.pageNum), dateFrom: '2022-04-01' };
+  const useGetList = (params: GetTransactionsQueryParams) => {
+    const query: GetTransactionsRequest['query'] = { page: String(params.pageNum) };
 
     const accId = params.accountId;
     if (accId) {
@@ -24,12 +35,22 @@ export const useTransactions = () => {
       query.categoryId = String(categoryId);
     }
 
+    const dateFrom = params.dateFrom;
+    if (dateFrom?.isValid()) {
+      query.dateFrom = dateFrom.format(formats.dateMoment.short);
+    }
+
+    const dateEnd = params.dateEnd;
+    if (dateEnd?.isValid()) {
+      query.dateEnd = dateEnd.format(formats.dateMoment.short);
+    }
+
     const typeId = params.typeId;
     if (typeId) {
       query.typeId = String(typeId);
     }
 
-    return useQuery([transactionsQueryKey, accId, typeId, categoryId, params.pageNum], () =>
+    return useQuery([transactionsQueryKey, JSON.stringify(query)], () =>
       api.send<Transaction[], null, GetTransactionsRequest['query']>({
         endpoint: 'transactions',
         method: 'GET',
@@ -55,12 +76,12 @@ export const useTransactions = () => {
       {
         onSuccess: async () => {
           console.log('useItem onSuccess', method);
-          await queryClient.cancelQueries(transactionsQueryKey);
+          await queryClient.cancelQueries([transactionsQueryKey]);
           if (method === 'PUT' && params?.id) {
             queryClient.invalidateQueries([transactionsQueryKey, 'details', params.id]);
           }
 
-          queryClient.invalidateQueries(transactionsQueryKey);
+          queryClient.invalidateQueries([transactionsQueryKey]);
           params?.onSuccess && params?.onSuccess();
         },
       }

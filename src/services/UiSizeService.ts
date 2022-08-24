@@ -27,6 +27,7 @@ class UiSizeService {
 
   private constructor() {
     makeAutoObservable(this);
+    this.handleResize(1);
   }
 
   private _height = window.innerHeight;
@@ -43,7 +44,7 @@ class UiSizeService {
 
   private handleResize = throttle(() => {
     this._height = window.innerHeight;
-    this._width = window.innerWidth;
+    this._width = window.innerWidth > 800 ? 800 : window.innerWidth;
   }, 50);
 
   public destroy() {

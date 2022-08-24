@@ -1,16 +1,19 @@
-import { Button, DatePicker, Form } from 'antd';
+import { Button, Form } from 'antd';
+
 import { useState } from 'react';
+import { GetTransactionsQueryParams } from '../../hooks/useTransactions';
 import { ETRANSACTION_TYPE } from '../../server/types/transactions';
 import { AccountsSelect } from '../_shared/selects/AccountsSelect';
 import { CategoriesSelect } from '../_shared/selects/CategoriesSelect';
 import { TransactionTypeSelect } from '../_shared/selects/TransactionTypeSelect';
+import { DatePicker } from '../_shared/_base/DatePicker';
 
 export const TransactionsFilters: React.VFC<{
-  accountId?: number;
-  categoryId?: number;
-  onFinish?: (accId?: number, typeId?: number, catId?: number) => void;
+  onClear: () => void;
+  onFinish: (params: GetTransactionsQueryParams) => void;
+  params: GetTransactionsQueryParams;
   typeId?: number;
-}> = ({ accountId, categoryId, onFinish, typeId: initialTypeId }) => {
+}> = ({ params, onClear, onFinish, typeId: initialTypeId }) => {
   const [form] = Form.useForm();
 
   const [typeId, setTypeId] = useState(initialTypeId ? initialTypeId : ETRANSACTION_TYPE.EXPENSE);
@@ -34,19 +37,19 @@ export const TransactionsFilters: React.VFC<{
         wrapperCol={{
           span: 16,
         }}
-        initialValues={{
-          accountId: accountId,
-          categoryId: categoryId,
-          typeId: initialTypeId,
-        }}
+        initialValues={params}
         onFinish={(formValues) => {
           console.log('filter transactions values:', formValues);
-          onFinish && onFinish(formValues?.accountId, formValues?.typeId, formValues?.categoryId);
+          onFinish(formValues);
         }}
         autoComplete="off"
       >
-        <Form.Item label="Дата" name="dt">
-          <DatePicker format="YYYY-MM-DD HH:mm" showTime placeholder="Выберите дату" />
+        <Form.Item label="Начало периода" name="dateFrom">
+          <DatePicker />
+        </Form.Item>
+
+        <Form.Item label="Окончание периода" name="dateEnd">
+          <DatePicker />
         </Form.Item>
 
         <Form.Item label="Счет" name="accountId">
@@ -76,7 +79,7 @@ export const TransactionsFilters: React.VFC<{
           <Button
             type="link"
             onClick={() => {
-              form.setFieldsValue({ accountId: 0, categoryId: undefined, typeId: 0 });
+              onClear();
             }}
           >
             Очистить
