@@ -27,6 +27,8 @@ const queryClient = new QueryClient({
 const AccountPage = React.lazy(() => import('./components/accounts/pages/AccountPage'));
 const AccountsPage = React.lazy(() => import('./components/accounts/pages/AccountsPage'));
 
+const StatisticsPage = React.lazy(() => import('./components/statistics/StatisticsPage'));
+
 const SettingsPage = React.lazy(() => import('./components/settings/SettingsPage'));
 const LoginPage = React.lazy(() => import('./components/settings/LoginPage'));
 const CategoriesPage = React.lazy(() => import('./components/settings/categories/pages/CategoriesPage'));
@@ -50,10 +52,11 @@ export const App = () => {
               <Suspense fallback={<Loader size="large" />}>
                 <Routes>
                   <Route path={UI_ROUTES.HOME} element={<MainPage />} />
-                  <Route path={UI_ROUTES.ACCOUNTS} element={<AccountsPage />} />
-                  <Route path={`${UI_ROUTES.ACCOUNTS}/:accountId`} element={<AccountPage />} />
+                  <Route path={UI_ROUTES.SETTINGS.ACCOUNTS} element={<AccountsPage />} />
+                  <Route path={`${UI_ROUTES.SETTINGS.ACCOUNTS}/:accountId`} element={<AccountPage />} />
                   <Route path={UI_ROUTES.SETTINGS.ROOT} element={<SettingsPage />} />
                   <Route path={UI_ROUTES.SETTINGS.CATEGORIES} element={<CategoriesPage />} />
+                  <Route path={UI_ROUTES.STATISTICS} element={<StatisticsPage />} />
                   <Route path={`${UI_ROUTES.SETTINGS.CATEGORIES}/:categoryId`} element={<CategoryDetailsPage />} />
                   <Route path={UI_ROUTES.SETTINGS.LOGIN} element={<LoginPage />} />
                   <Route path={UI_ROUTES.TRANSACTIONS} element={<TransactionsPage />} />

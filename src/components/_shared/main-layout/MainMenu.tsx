@@ -1,9 +1,9 @@
+import { HomeOutlined, PieChartOutlined, PlusCircleOutlined, SettingOutlined, ShoppingOutlined } from '@ant-design/icons';
 import React from 'react';
-import { HomeOutlined, PlusCircleOutlined, SettingOutlined, ShoppingOutlined, WalletOutlined } from '@ant-design/icons';
 import { Link, useLocation } from 'react-router-dom';
-import { Navbar } from './Navbar';
 import styled from 'styled-components';
 import { UI_ROUTES } from '../../../constants/urls';
+import { Navbar } from './Navbar';
 
 const MenuItem: React.FC<{ icon: React.ReactElement; title: string; to: string }> = ({ to, title, icon }) => {
   const location = useLocation();
@@ -30,7 +30,7 @@ export const MainMenu = () => {
     <Navbar.Wrapper>
       <Navbar.Items>
         <MenuItem to={UI_ROUTES.HOME} title="Обзор" icon={<HomeOutlined />} />
-        <MenuItem to={UI_ROUTES.ACCOUNTS} title="Счета" icon={<WalletOutlined />} />
+        <MenuItem to={UI_ROUTES.STATISTICS} title="Статистика" icon={<PieChartOutlined />} />
         <MenuItem
           to={`${UI_ROUTES.TRANSACTIONS}/new`}
           title=""

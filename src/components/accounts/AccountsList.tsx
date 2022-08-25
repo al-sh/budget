@@ -40,7 +40,7 @@ export const AccountsList: React.VFC<{ fromMainPage?: boolean }> = ({ fromMainPa
         <AccountWrapper
           key={acc.id}
           onClick={() => {
-            navigate(`${UI_ROUTES.ACCOUNTS}/${acc.id}`);
+            navigate(`${UI_ROUTES.SETTINGS.ACCOUNTS}/${acc.id}`);
           }}
         >
           <AccountName active={acc.isActive}>

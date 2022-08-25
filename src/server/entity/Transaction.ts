@@ -24,5 +24,5 @@ export class Transaction {
   public toAccount?: Account;
 
   @ManyToOne(() => Category, (cat) => cat.transactions)
-  public category?: Category;
+  public category?: Category; //в случае переводов между своими счетами поле пустое, но заполнен toAccount
 }

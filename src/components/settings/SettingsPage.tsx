@@ -15,6 +15,9 @@ const SettingsPage: React.FC = () => {
       <Link to={UI_ROUTES.SETTINGS.LOGIN}>
         <div>Логин</div>
       </Link>
+      <Link to={UI_ROUTES.SETTINGS.ACCOUNTS}>
+        <div>Счета</div>
+      </Link>
       <Link to={UI_ROUTES.SETTINGS.CATEGORIES}>
         <div>Категории</div>
       </Link>

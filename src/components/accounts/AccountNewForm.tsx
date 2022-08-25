@@ -29,7 +29,7 @@ export const AccountNewForm: React.VFC<{ onFinish: () => void }> = ({ onFinish }
         onFinish={(formValues) => {
           query.mutate(formValues);
           console.log('query.isSuccess');
-          navigate(UI_ROUTES.ACCOUNTS);
+          navigate(UI_ROUTES.SETTINGS.ACCOUNTS);
           onFinish();
         }}
         autoComplete="off"

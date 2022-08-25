@@ -35,3 +35,10 @@ const formatter = new Intl.NumberFormat('ru-RU', {
 });
 
 export const formatMoney = formatter.format;
+
+const percentFormatter = new Intl.NumberFormat('ru-RU', {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+});
+
+export const formatPercent = percentFormatter.format;

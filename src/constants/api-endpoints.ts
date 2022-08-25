@@ -5,5 +5,9 @@ export const API_ENDPOINTS = {
     ALL: 'categories',
     TREE: 'categories/tree',
   },
+  STATISTICS: {
+    ALL: 'statistics',
+    TREE: 'statistics/tree',
+  },
   TRANSACTIONS: 'transactions',
 };

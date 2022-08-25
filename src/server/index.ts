@@ -9,6 +9,7 @@ import { dbInitializer } from './dbInitialisation';
 import { AccountsController } from './routes/accounts';
 import { AuthController } from './routes/auth';
 import { CategoriesController } from './routes/categories';
+import { StatisticsController } from './routes/statistics';
 import { TransactionsController } from './routes/transactions';
 
 console.time('serverInit');
@@ -37,11 +38,14 @@ AppDataSource.initialize()
     const authController = new AuthController(AppDataSource);
     app.use('/api', authController.router);
 
+    const accountsController = new AccountsController(AppDataSource);
+    app.use('/api/accounts', accountsController.router);
+
     const categoriesController = new CategoriesController(AppDataSource);
     app.use('/api/categories', categoriesController.router);
 
-    const accountsController = new AccountsController(AppDataSource);
-    app.use('/api/accounts', accountsController.router);
+    const statisticsController = new StatisticsController(AppDataSource);
+    app.use('/api/statistics', statisticsController.router);
 
     const transactionsController = new TransactionsController(AppDataSource);
     app.use('/api/transactions', transactionsController.router);

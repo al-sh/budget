@@ -13,13 +13,13 @@ export const EditAccountForm: React.VFC<{ account: AccountWithRest }> = ({ accou
   const query = useItem('PUT', {
     id: account.id,
     onSuccess: () => {
-      navigate(UI_ROUTES.ACCOUNTS);
+      navigate(UI_ROUTES.SETTINGS.ACCOUNTS);
     },
   });
   const deleteAccountMutation = useItem('DELETE', {
     id: account.id,
     onSuccess: () => {
-      navigate(UI_ROUTES.ACCOUNTS);
+      navigate(UI_ROUTES.SETTINGS.ACCOUNTS);
     },
   });
 
@@ -51,7 +51,7 @@ export const EditAccountForm: React.VFC<{ account: AccountWithRest }> = ({ accou
         }}
         onFinish={(formValues) => {
           query.mutate(formValues);
-          navigate(UI_ROUTES.ACCOUNTS);
+          navigate(UI_ROUTES.SETTINGS.ACCOUNTS);
         }}
         autoComplete="off"
       >

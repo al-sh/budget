@@ -36,7 +36,7 @@ export class AccountsController {
         return prev + current.amount;
       }
 
-      if (current.category?.type?.id === ETRANSACTION_TYPE.TRANSFER && current?.toAccount?.id === account.id) {
+      if (current.toAccount && current?.toAccount?.id === account.id) {
         return prev + current.amount;
       }
 
