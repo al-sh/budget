@@ -16,12 +16,12 @@ export const dbInitializer = async (ds: DataSource) => {
 
   ds.transaction(async (transactionalEntityManager) => {
     /** MYSQL SPECIFIC START */
-    transactionalEntityManager.query('SET FOREIGN_KEY_CHECKS=0');
+    /*transactionalEntityManager.query('SET FOREIGN_KEY_CHECKS=0');
     transactionalEntityManager.query('ALTER TABLE account CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;');
     transactionalEntityManager.query('ALTER TABLE transaction_type CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;');
     transactionalEntityManager.query('ALTER TABLE transaction CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;');
     transactionalEntityManager.query('ALTER TABLE category CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;');
-    transactionalEntityManager.query('ALTER TABLE user CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;');
+    transactionalEntityManager.query('ALTER TABLE user CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;');*/
     /** MYSQL SPECIFIC END */
 
     const queryBuilder = transactionalEntityManager.createQueryBuilder();
@@ -133,6 +133,6 @@ export const dbInitializer = async (ds: DataSource) => {
     await transactionalEntityManager.save([utilitiesTran, capitalRepairTran, avanceTran]);
     console.log('Transactions initialized');
 
-    transactionalEntityManager.query('SET FOREIGN_KEY_CHECKS=1');
+    // transactionalEntityManager.query('SET FOREIGN_KEY_CHECKS=1');
   });
 };

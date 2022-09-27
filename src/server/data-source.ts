@@ -5,7 +5,7 @@ import { DataSource } from 'typeorm';
 console.log('TypeORM starting form dirname:', __dirname, 'DB Logging:', !!process.env.DB_LOGGING);
 
 export const AppDataSource = new DataSource({
-  type: 'mysql',
+  type: 'postgres',
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT),
   username: process.env.DB_USERNAME,
