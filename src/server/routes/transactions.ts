@@ -1,13 +1,12 @@
 import * as express from 'express';
-import { format, isValid, parse } from 'date-fns';
-import { DataSource, FindOptionsWhere, In, Raw, TypeORMError } from 'typeorm';
+import { DataSource, FindOptionsWhere, In, TypeORMError } from 'typeorm';
+import { PAGE_SIZE } from '../../constants/misc';
 import { Account } from '../entity/Account';
 import { Category } from '../entity/Category';
 import { Transaction } from '../entity/Transaction';
 import { TransactionType } from '../entity/TransactionType';
 import { ETRANSACTION_TYPE } from '../types/transactions';
-import { PAGE_SIZE } from '../../constants/misc';
-import { formats } from '../../constants/formats';
+import { buildPeriodFilterString } from '../utils/dates';
 
 export interface GetTransactionTypesRequest extends express.Request {
   query: {
@@ -43,44 +42,6 @@ export class TransactionsController {
   private ds: DataSource;
 
   private path = '/';
-
-  private buildPeriodFilterString = (dtFrom?: string, dtEnd?: string) => {
-    let result: FindOptionsWhere<Transaction>['dt'];
-
-    if (dtFrom && !dtEnd) {
-      if (isValid(parse(dtFrom, formats.date.short, new Date()))) {
-        result = Raw((alias) => `${alias} >= :dtFrom`, { dtFrom: dtFrom });
-      } else {
-        console.error('transactions getAll invalid dtFrom', dtFrom);
-      }
-    }
-
-    if (!dtFrom && dtEnd) {
-      if (isValid(parse(dtEnd, formats.date.short, new Date()))) {
-        const dtEndValue = parse(dtEnd, formats.date.short, new Date());
-        dtEndValue.setDate(dtEndValue.getDate() + 1);
-        const dtEndToFilter = format(dtEndValue, formats.date.short);
-
-        result = Raw((alias) => `${alias} <= :dtEnd`, { dtEnd: dtEndToFilter });
-      } else {
-        console.error('transactions getAll invalid dtEnd', dtEnd);
-      }
-    }
-
-    if (dtFrom && dtEnd) {
-      if (isValid(parse(dtFrom, formats.date.short, new Date())) && isValid(parse(dtEnd, formats.date.short, new Date()))) {
-        const dtEndValue = parse(dtEnd, formats.date.short, new Date());
-        dtEndValue.setDate(dtEndValue.getDate() + 1);
-        const dtEndToFilter = format(dtEndValue, formats.date.short);
-
-        result = Raw((alias) => `${alias} >= :dtFrom AND ${alias} <= :dtEnd`, { dtFrom: dtFrom, dtEnd: dtEndToFilter });
-      } else {
-        console.error('transactions getAll invalid dtFrom or dtEnd', dtFrom, dtEnd);
-      }
-    }
-
-    return result;
-  };
 
   private create = async (request: express.Request, response: express.Response) => {
     console.log('tran create', request.body); //todo: типизировать body для запросов
@@ -174,10 +135,8 @@ export class TransactionsController {
     const dtFrom = request.query.dateFrom;
     const dtEnd = request.query.dateEnd;
     if (dtFrom || dtEnd) {
-      whereClause.dt = this.buildPeriodFilterString(dtFrom, dtEnd);
+      whereClause.dt = buildPeriodFilterString(dtFrom, dtEnd);
     }
-
-    console.log(whereClause);
 
     const transactions = await this.ds.manager.find(Transaction, {
       relations: ['account', 'category', 'category.type'],

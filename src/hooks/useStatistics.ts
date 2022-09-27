@@ -1,48 +1,47 @@
+import { Moment } from 'moment';
 import { useQuery } from 'react-query';
 import { API_ENDPOINTS } from '../constants/api-endpoints';
-import { Category, ICategoryStatItem } from '../server/entity/Category';
-import { GetAllCategoriesQuery, GetCategoriesTree } from '../server/routes/categories';
+import { formats } from '../constants/formats';
+import { ICategoryStatItem } from '../server/entity/Category';
+import { GetStatTree } from '../server/routes/statistics';
 import { ETRANSACTION_TYPE } from '../server/types/transactions';
 import { getApi } from '../services/Api';
+
+export interface GetStatTreeFormParams {
+  dateFrom?: Moment;
+  dateEnd?: Moment;
+  showHidden?: boolean;
+  typeId?: ETRANSACTION_TYPE;
+}
 
 export const statQueryKey = 'statistics';
 
 export const useStatistics = () => {
   const api = getApi();
 
-  const useGetList = (typeId?: ETRANSACTION_TYPE) =>
-    useQuery(
-      [statQueryKey, typeId],
-      () =>
-        api.send<Category[], null, GetAllCategoriesQuery>({
-          endpoint: API_ENDPOINTS.STATISTICS.ALL,
-          method: 'GET',
-          query: { typeId: String(typeId) },
-        })
-      /*{
-        enabled: !!typeId,
-      }*/
-    );
+  const useGetTree = (params: GetStatTreeFormParams) => {
+    const { dateFrom, dateEnd, typeId, showHidden } = params;
+    const query: GetStatTree['query'] = {};
 
-  const useGetTree = (params: { showHidden?: boolean; typeId?: ETRANSACTION_TYPE }) => {
-    const { typeId, showHidden } = params;
+    if (dateFrom?.isValid()) {
+      query.dateFrom = dateFrom.format(formats.dateMoment.short);
+    }
 
-    return useQuery(
-      [statQueryKey, 'tree', typeId, showHidden],
-      () =>
-        api.send<ICategoryStatItem[], null, GetCategoriesTree['params']>({
-          endpoint: API_ENDPOINTS.STATISTICS.TREE,
-          method: 'GET',
-          query: {
-            showHidden: showHidden ? '1' : '0',
-            typeId: String(typeId),
-          },
-        })
-      /*{
-        enabled: !!typeId,
-      }*/
+    if (dateEnd?.isValid()) {
+      query.dateEnd = dateEnd.format(formats.dateMoment.short);
+    }
+
+    query.showHidden = showHidden ? '1' : '0';
+    query.typeId = String(typeId);
+
+    return useQuery([statQueryKey, 'tree', JSON.stringify(query)], () =>
+      api.send<ICategoryStatItem[], null, GetStatTree['query']>({
+        endpoint: API_ENDPOINTS.STATISTICS.TREE,
+        method: 'GET',
+        query: query,
+      })
     );
   };
 
-  return { useGetList, useGetTree };
+  return { useGetTree };
 };

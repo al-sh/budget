@@ -3,11 +3,9 @@ import { TransactionsFilters } from '../TransactionsFilters';
 import { TransactionsListByDates } from '../TransactionsListByDates';
 
 import { Button } from 'antd';
-import styled from 'styled-components';
 import { GetTransactionsQueryParams, useTransactions } from '../../../hooks/useTransactions';
+import { FilterButton } from '../../_shared/buttons/FilterButton';
 import { Loader } from '../../_shared/Loader';
-
-const FilterButton = styled(Button)``;
 
 export const TransactionsPage: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
@@ -23,9 +21,9 @@ export const TransactionsPage: React.FC = () => {
         onClick={() => {
           setShowFilters(!showFilters);
         }}
-      >
-        {showFilters ? 'Скрыть фильтры' : 'Показать фильтры'}
-      </FilterButton>
+        showFilters={showFilters}
+      />
+
       {showFilters && (
         <TransactionsFilters
           params={filterParams}
@@ -34,7 +32,6 @@ export const TransactionsPage: React.FC = () => {
             setFilterParams({ ...{} });
           }}
           onFinish={(params) => {
-            console.log('onFinish', params);
             setShowFilters(false);
             setFilterParams(params);
           }}

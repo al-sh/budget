@@ -1,9 +1,7 @@
 import { Tree } from 'antd';
 import styled from 'styled-components';
-import { useStatistics } from '../../hooks/useStatistics';
-import { ETRANSACTION_TYPE } from '../../server/types/transactions';
+import { ICategoryStatItem } from '../../server/entity/Category';
 import { formatMoney, formatPercent } from '../../utils/format';
-import { Loader } from '../_shared/Loader';
 
 const CategoriesListWrapper = styled.div`
   margin-bottom: 1em;
@@ -26,14 +24,7 @@ const Amount = styled.span`
   color: green;
 `;
 
-export const StatCategoriesList: React.VFC<{ showHidden?: boolean; typeId: ETRANSACTION_TYPE }> = ({ showHidden, typeId }) => {
-  const { useGetTree } = useStatistics();
-
-  const { isLoading, isError, data: categoriesTree } = useGetTree({ showHidden: !!showHidden, typeId: typeId });
-
-  if (isLoading) return <Loader />;
-  if (isError) return <>Error</>;
-
+export const StatCategoriesList: React.VFC<{ categoriesTree: ICategoryStatItem[] }> = ({ categoriesTree }) => {
   return (
     <>
       <CategoriesListWrapper>
@@ -44,7 +35,7 @@ export const StatCategoriesList: React.VFC<{ showHidden?: boolean; typeId: ETRAN
             <StatTreeItem>
               <CategoryName active={!!item.isActive}>{item.title}</CategoryName>
               <Amount>
-                {formatMoney(item.amount)} RUB ({formatPercent(item.share)}%)
+                {formatMoney(item.totalAmount)} RUB ({formatPercent(item.share)}%)
               </Amount>
             </StatTreeItem>
           )}

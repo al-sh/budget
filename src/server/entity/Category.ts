@@ -34,7 +34,8 @@ export class Category {
 }
 
 export interface CategoryWithAmount extends Category {
-  amount: number;
+  selfAmount: number;
+  totalAmount: number;
 }
 
 export interface CategoryWithAmountAndShare extends CategoryWithAmount {
@@ -53,6 +54,7 @@ export interface ICategoryTreeItem {
 
 // eslint-disable-next-line sort-exports/sort-exports
 export interface ICategoryStatItem extends ICategoryTreeItem {
-  amount: number;
+  selfAmount: number;
+  totalAmount: number;
   share: number;
 }
