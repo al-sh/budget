@@ -4,6 +4,8 @@ import { DataSource, FindOptionsWhere } from 'typeorm';
 import { Category, ICategoryTreeItem } from '../entity/Category';
 import { BaseItemRequest, BaseUpdate } from '../types/api';
 import { ETRANSACTION_TYPE } from '../types/transactions';
+import fs from 'fs';
+import format from 'date-fns/format';
 
 export interface GetAllCategoriesRequest extends express.Request {
   query: {
@@ -32,6 +34,7 @@ export class CategoriesController {
 
     this.router.get(this.path, this.getAll);
     this.router.get(`${this.path}tree`, this.getTree);
+    this.router.get(`${this.path}file`, this.export);
     this.router.get(`${this.path}tree/stat`, this.getTreeStat);
 
     this.router.get(`${this.path}:id`, this.getById);
@@ -93,6 +96,32 @@ export class CategoriesController {
       console.error('category delete error: ', err);
       response.send({ message: `category delete error. request.params.id: ${request.params.id}`, additional: err });
     }
+  };
+
+  private export = async (request: express.Request<BaseItemRequest>, response: express.Response) => {
+    const getCategoriesQuery = `SELECT id, name, "isActive", mpath, "typeId", "parentCategoryId" FROM category where "userId" = ${request.headers.userid}`;
+    const queryRunner = await this.ds.createQueryRunner();
+    const result = await queryRunner.manager.query(getCategoriesQuery);
+
+    response.send(result);
+  };
+
+  private exportToFile = async (request: express.Request<BaseItemRequest>, response: express.Response) => {
+    const getCategoriesQuery = `SELECT id, name, "isActive", mpath, "typeId", "parentCategoryId" FROM category where "userId" = ${request.headers.userid}`;
+    const queryRunner = await this.ds.createQueryRunner();
+    const result = await queryRunner.manager.query(getCategoriesQuery);
+
+    const dt = new Date();
+    const fileName = `${format(dt, 'yyyyMMdd_HHmmss')}`;
+    const fileFullPath = `${__dirname}/${fileName}.txt`;
+
+    fs.writeFile(fileFullPath, JSON.stringify(result), function (err) {
+      if (err) {
+        return console.log(err);
+      }
+      response.sendFile(fileFullPath);
+      console.log('The file was saved!');
+    });
   };
 
   private getAll = async (request: GetAllCategoriesRequest, response: express.Response<Category[]>) => {

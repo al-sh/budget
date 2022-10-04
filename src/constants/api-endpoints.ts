@@ -4,6 +4,7 @@ export const API_ENDPOINTS = {
   CATEGORIES: {
     ALL: 'categories',
     TREE: 'categories/tree',
+    EXPORT: 'categories/file',
   },
   STATISTICS: {
     ALL: 'statistics',
