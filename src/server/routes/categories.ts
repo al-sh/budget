@@ -6,6 +6,7 @@ import { BaseItemRequest, BaseUpdate } from '../types/api';
 import { ETRANSACTION_TYPE } from '../types/transactions';
 import fs from 'fs';
 import format from 'date-fns/format';
+import multer from 'multer';
 
 export interface GetAllCategoriesRequest extends express.Request {
   query: {
@@ -34,7 +35,8 @@ export class CategoriesController {
 
     this.router.get(this.path, this.getAll);
     this.router.get(`${this.path}tree`, this.getTree);
-    this.router.get(`${this.path}file`, this.export);
+    this.router.get(`${this.path}download`, this.export);
+    this.router.post(`${this.path}upload`, multer().single('myfile'), this.import);
     this.router.get(`${this.path}tree/stat`, this.getTreeStat);
 
     this.router.get(`${this.path}:id`, this.getById);
@@ -60,7 +62,7 @@ export class CategoriesController {
       },
     };
 
-    const parentCategoryId = parseInt(String(request.body.parentCategory?.id));
+    const parentCategoryId = String(request.body.parentCategory?.id);
     if (Number.isFinite(parentCategoryId)) {
       categoryToCreate.parentCategory = { id: parentCategoryId } as Category;
     }
@@ -99,11 +101,18 @@ export class CategoriesController {
   };
 
   private export = async (request: express.Request<BaseItemRequest>, response: express.Response) => {
-    const getCategoriesQuery = `SELECT id, name, "isActive", mpath, "typeId", "parentCategoryId" FROM category where "userId" = ${request.headers.userid}`;
-    const queryRunner = await this.ds.createQueryRunner();
-    const result = await queryRunner.manager.query(getCategoriesQuery);
+    const getCategoriesQuery = `SELECT id, name, "isActive", mpath, "typeId", "parentCategoryId" FROM category where "userId" = $1`;
 
-    response.send(result);
+    try {
+      const queryRunner = await this.ds.createQueryRunner();
+      const result = await queryRunner.manager.query(getCategoriesQuery, [parseInt(String(request.headers.userid))]);
+
+      response.send(result);
+    } catch (err) {
+      console.error('category export error: ', err);
+      response.status(500);
+      response.send({ message: `category export error`, additional: err });
+    }
   };
 
   private exportToFile = async (request: express.Request<BaseItemRequest>, response: express.Response) => {
@@ -157,7 +166,7 @@ export class CategoriesController {
   };
 
   private getById = async (request: express.Request<BaseItemRequest>, response: express.Response) => {
-    const id = parseInt(request.params.id);
+    const id = request.params.id;
 
     const category = await this.ds.manager.findOne(Category, {
       relations: ['type', 'childrenCategories', 'parentCategory'],
@@ -265,14 +274,49 @@ export class CategoriesController {
     }, 1500);
   };
 
+  private import = async (request: express.Request<BaseItemRequest>, response: express.Response) => {
+    console.log('import!', request.file);
+    try {
+      // console.log('import!', request.file?.buffer + '');
+      const categoriesFromFile = JSON.parse(request.file?.buffer + '');
+      if (!Array.isArray(categoriesFromFile)) {
+        response.status(500);
+        response.send({ message: 'Некорректный формат файла' });
+      }
+
+      const itemsToCreate: Category[] = [];
+      for (let i = 0; i < categoriesFromFile.length; i++) {
+        const itemFromFile = categoriesFromFile[i];
+
+        const newCat = new Category();
+        newCat.id = itemFromFile.id;
+        newCat.type = { id: itemFromFile.typeId };
+        newCat.name = itemFromFile.name;
+        newCat.user = { id: parseInt(String(request.headers.userid)) };
+        newCat.parentCategory = { id: itemFromFile.parentCategoryId } as Category;
+        itemsToCreate.push(newCat);
+      }
+
+      await this.ds.manager.save(itemsToCreate);
+      response.send('save - ok');
+      // const queryRunner = await this.ds.createQueryRunner();
+      //const insertQuery = `INSERT category ("userId", name, "isActive", "typeId", "parentCategoryId") values ($1, $2, $3, $4, $5) `;
+      //const result = await queryRunner.manager.query(insertQuery, [parseInt(String(request.headers.userid))]);
+    } catch (err) {
+      console.error('category import error: ', err);
+      response.status(500);
+      response.send({ message: `category import error`, additional: err });
+    }
+  };
+
   private update = async (request: express.Request<BaseItemRequest, null, Partial<Category>>, response: express.Response<BaseUpdate>) => {
     console.log('cat update request.body:', request.body);
 
-    const categoryId = parseInt(String(request.params.id));
+    const categoryId = String(request.params.id);
 
-    if (!Number.isFinite(categoryId)) {
+    if (!categoryId) {
       response.status(500);
-      response.send({ message: 'cannot parse categoryId: ' + request.params.id });
+      response.send({ message: 'categoryId is null: ' + request.params.id });
       return;
     }
 
@@ -282,13 +326,11 @@ export class CategoriesController {
       isActive: request.body.isActive,
     };
 
-    if (Number.isFinite(categoryId)) {
-      categoryToUpdate.id = categoryId;
-    }
+    categoryToUpdate.id = categoryId;
 
-    const parentCategoryId = parseInt(String(request.body.parentCategory?.id));
+    const parentCategoryId = String(request.body.parentCategory?.id);
 
-    if (Number.isFinite(parentCategoryId)) {
+    if (parentCategoryId) {
       categoryToUpdate.parentCategory = { id: parentCategoryId } as Category;
     } else {
       categoryToUpdate.parentCategory = { id: undefined } as unknown as Category;

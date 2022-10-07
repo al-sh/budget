@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosPromise } from 'axios';
+import axios, { AxiosError, AxiosPromise, AxiosRequestHeaders } from 'axios';
 import { getStorage } from './Storage';
 import { UI_ROUTES } from '../constants/urls';
 
@@ -7,6 +7,7 @@ interface ApiRequest<ReqBody, ReqQuery> {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE';
   data?: ReqBody;
   query?: ReqQuery;
+  isFile?: boolean;
 }
 
 export type ApiResponse<T = Record<string, unknown>> = AxiosPromise<T>;
@@ -31,13 +32,19 @@ class ApiService {
 
   public send: <Result, RequestBody = null, RequestQuery = null>(request: ApiRequest<RequestBody, RequestQuery>) => Promise<Result> =
     async (request) => {
-      const { endpoint, method, data, query } = request;
+      const { endpoint, method, data, query, isFile } = request;
       const url = `${this.path}/${endpoint}`;
+
+      const headers: AxiosRequestHeaders = { Auth: getStorage().getItem('token'), UserId: getStorage().getItem('userId') };
+      if (isFile) {
+        headers['Content-Type'] = 'multipart/form-data';
+      }
+      console.log(headers);
 
       return new Promise((resolve, reject) => {
         axios({
           data,
-          headers: { Auth: getStorage().getItem('token'), UserId: getStorage().getItem('userId') },
+          headers: headers,
           method,
           params: query,
           url,

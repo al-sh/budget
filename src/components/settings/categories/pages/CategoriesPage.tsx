@@ -19,6 +19,8 @@ const downloadToFile = (content: string, filename: string, contentType: string) 
 
 export const CategoriesPage: React.VFC = () => {
   const [isAdd, setIsAdd] = useState(false);
+  const [fileToLoad, setFileToLoad] = useState<File | undefined>(undefined);
+  const [isUpload, setIsUpload] = useState(false);
   const [typeId, setTypeId] = useState(ETRANSACTION_TYPE.EXPENSE);
   const [showHidden, setShowHidden] = useState(false);
   const api = getApi();
@@ -53,17 +55,56 @@ export const CategoriesPage: React.VFC = () => {
       >
         Добавить
       </Button>
-      <Button
-        onClick={async () => {
-          const res = await api.send({
-            endpoint: API_ENDPOINTS.CATEGORIES.EXPORT,
-            method: 'GET',
-          });
-          downloadToFile(JSON.stringify(res as string), 'categories.json', 'text/plain');
-        }}
-      >
-        Выгрузить
-      </Button>
+      <div>
+        <Button
+          onClick={async () => {
+            const res = await api.send({
+              endpoint: API_ENDPOINTS.CATEGORIES.DOWNLOAD,
+              method: 'GET',
+            });
+            downloadToFile(JSON.stringify(res as string), 'categories.json', 'text/plain');
+          }}
+        >
+          Выгрузить
+        </Button>
+        <Button
+          onClick={() => {
+            setIsUpload(true);
+          }}
+        >
+          Загрузить
+        </Button>
+      </div>
+      {isUpload && (
+        <div>
+          <input
+            type="file"
+            id="file"
+            name="file"
+            placeholder="Выберите файл"
+            onChange={(evt) => {
+              if (evt.target.files && evt.target.files[0]) {
+                setFileToLoad(evt.target.files[0]);
+              }
+            }}
+          />
+          <Button
+            onClick={async () => {
+              const formData = new FormData();
+              fileToLoad && formData.append('myfile', fileToLoad);
+              formData.append('test', 'test1');
+              const res = await api.send({
+                endpoint: API_ENDPOINTS.CATEGORIES.UPLOAD,
+                method: 'POST',
+                isFile: true,
+                data: formData,
+              });
+            }}
+          >
+            Отправить файл
+          </Button>
+        </div>
+      )}
       {isAdd && (
         <CategoryNewForm
           onFinish={() => {

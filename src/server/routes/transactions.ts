@@ -116,7 +116,7 @@ export class TransactionsController {
 
     const categoriesIds = categories.map((cat) => cat.id);
     whereClause.category = { id: In(categoriesIds) };
-    const filterCategoryId = parseInt(request.query?.categoryId || '');
+    const filterCategoryId = request.query?.categoryId;
     if (Number.isFinite(filterCategoryId)) {
       if (categories.findIndex((cat) => cat.id === filterCategoryId) === -1) {
         console.error(

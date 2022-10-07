@@ -8,8 +8,8 @@ import { User } from './User';
 @Entity()
 @Tree('materialized-path')
 export class Category {
-  @PrimaryGeneratedColumn()
-  public id!: number;
+  @PrimaryGeneratedColumn('uuid')
+  public id!: string;
 
   @Column()
   public name?: string;
@@ -44,9 +44,9 @@ export interface CategoryWithAmountAndShare extends CategoryWithAmount {
 
 export interface ICategoryTreeItem {
   title?: string;
-  id: number;
+  id: string;
   key: string | number; //key и value - для Tree в antd
-  value: number;
+  value: string;
   isActive?: boolean;
   children?: ICategoryTreeItem[];
   transactions?: Transaction[];

@@ -7,7 +7,7 @@ import { EditCategoryForm } from '../EditCategoryForm';
 export const CategoryDetailsPage: React.VFC = () => {
   const { categoryId } = useParams();
   const { useGetOne } = useCategories();
-  const { isFetching, isError, data: category } = useGetOne(parseInt(categoryId ? categoryId : '')); //TODO: вынести в обязательный пропс чтобы не было этого условия
+  const { isFetching, isError, data: category } = useGetOne(categoryId || ''); //TODO: вынести в обязательный пропс чтобы не было этого условия
 
   return (
     <>

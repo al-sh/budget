@@ -4,7 +4,8 @@ export const API_ENDPOINTS = {
   CATEGORIES: {
     ALL: 'categories',
     TREE: 'categories/tree',
-    EXPORT: 'categories/file',
+    DOWNLOAD: 'categories/download',
+    UPLOAD: 'categories/upload',
   },
   STATISTICS: {
     ALL: 'statistics',
