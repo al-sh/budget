@@ -89,7 +89,7 @@ export class TransactionsController {
     const accountIds = accounts.map((acc) => acc.id);
     const whereClause: FindOptionsWhere<Transaction> = { account: { id: In(accountIds) } };
 
-    const filterAccountId = parseInt(request.query.accountId || '');
+    const filterAccountId = request.query.accountId;
     if (Number.isFinite(filterAccountId)) {
       if (accounts.find((acc) => acc.id === filterAccountId)) {
         whereClause.account = { id: filterAccountId };
@@ -154,7 +154,7 @@ export class TransactionsController {
   };
 
   private getById = async (request: express.Request, response: express.Response) => {
-    const tranId = parseInt(request.params.id);
+    const tranId = request.params.id;
 
     try {
       const tran = await this.ds.manager.findOne(Transaction, {

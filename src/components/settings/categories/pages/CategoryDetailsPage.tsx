@@ -12,7 +12,7 @@ export const CategoryDetailsPage: React.VFC = () => {
   return (
     <>
       {isFetching && <Loader />}
-      {(isError || !category) && <div>Ошибка загрузки категории</div>}
+      {isError && !isFetching && <div>Ошибка загрузки категории</div>}
       {!isFetching && !isError && category && <EditCategoryForm category={category} />}
     </>
   );

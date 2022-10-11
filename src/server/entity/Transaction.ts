@@ -5,8 +5,8 @@ import { Category } from './Category';
 
 @Entity()
 export class Transaction {
-  @PrimaryGeneratedColumn()
-  public id!: number;
+  @PrimaryGeneratedColumn('uuid')
+  public id!: string;
 
   @Column()
   public description?: string;

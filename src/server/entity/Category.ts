@@ -52,7 +52,6 @@ export interface ICategoryTreeItem {
   transactions?: Transaction[];
 }
 
-// eslint-disable-next-line sort-exports/sort-exports
 export interface ICategoryStatItem extends ICategoryTreeItem {
   selfAmount: number;
   totalAmount: number;

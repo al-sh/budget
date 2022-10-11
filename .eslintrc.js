@@ -12,7 +12,7 @@ module.exports = {
     ecmaVersion: 'latest',
     sourceType: 'module',
   },
-  plugins: ['react', '@typescript-eslint', 'sort-exports'],
+  plugins: ['react', '@typescript-eslint'],
   root: true,
   rules: {
     '@typescript-eslint/explicit-member-accessibility': [
@@ -46,6 +46,5 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'warn',
     'react/prop-types': 'off',
     'react/react-in-jsx-scope': 'off',
-    'sort-exports/sort-exports': ['warn', { sortDir: 'asc' }],
   },
 };

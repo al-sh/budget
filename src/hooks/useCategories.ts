@@ -1,9 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { Category, ICategoryTreeItem } from '../server/entity/Category';
 import { getApi } from '../services/Api';
-import { API_ENDPOINTS } from '../constants/api-endpoints';
 import { ETRANSACTION_TYPE } from '../server/types/transactions';
 import { GetAllCategoriesQuery, GetCategoriesTree } from '../server/routes/categories';
+import { API_ROUTES } from '../constants/api-routes';
 
 export const categoriesQueryKey = 'categories';
 
@@ -17,7 +17,7 @@ export const useCategories = () => {
       [categoriesQueryKey, typeId],
       () =>
         api.send<Category[], null, GetAllCategoriesQuery>({
-          endpoint: API_ENDPOINTS.CATEGORIES.ALL,
+          endpoint: API_ROUTES.CATEGORIES,
           method: 'GET',
           query: { typeId: String(typeId) },
         })
@@ -33,7 +33,7 @@ export const useCategories = () => {
       [categoriesQueryKey, 'tree', typeId, showHidden],
       () =>
         api.send<ICategoryTreeItem[], null, GetCategoriesTree['params']>({
-          endpoint: API_ENDPOINTS.CATEGORIES.TREE,
+          endpoint: API_ROUTES.CATEGORIES + '/tree',
           method: 'GET',
           query: {
             showHidden: showHidden ? '1' : '0',
@@ -48,7 +48,7 @@ export const useCategories = () => {
   const useGetOne = (id: string) =>
     useQuery(
       [categoriesQueryKey, id],
-      () => api.send<Category, null, null>({ endpoint: `${API_ENDPOINTS.CATEGORIES.ALL}/${id}`, method: 'GET' }),
+      () => api.send<Category, null, null>({ endpoint: `${API_ROUTES.CATEGORIES}/${id}`, method: 'GET' }),
       {
         enabled: !!id,
       }
@@ -59,7 +59,7 @@ export const useCategories = () => {
       (formValues: Partial<Category>) => {
         return api.send<null, Partial<Category>, null>({
           data: formValues,
-          endpoint: id ? `${API_ENDPOINTS.CATEGORIES.ALL}/${id}` : API_ENDPOINTS.CATEGORIES.ALL,
+          endpoint: id ? `${API_ROUTES.CATEGORIES}/${id}` : API_ROUTES.CATEGORIES,
           method: method,
         });
       },

@@ -10,7 +10,7 @@ export const TransactionsPage: React.FC = () => {
   const { transactionId } = useParams();
   const { useGetOne, useDelete } = useTransactions();
   const useDeleleQuery = useDelete();
-  const { isFetching, data: transaction } = useGetOne(parseInt(transactionId ? transactionId : '')); // TODO: переделать структуру, transactionId должен идти как обязательный props
+  const { isFetching, data: transaction } = useGetOne(transactionId ? transactionId : ''); // TODO: переделать структуру, transactionId должен идти как обязательный props
   const navigate = useNavigate();
 
   return (
@@ -21,7 +21,7 @@ export const TransactionsPage: React.FC = () => {
           text="Редактирование транзакции"
           onDeleteButtonClick={() => {
             if (confirm('Удалить транзакцию?')) {
-              useDeleleQuery.mutate(parseInt(transactionId ? transactionId : ''));
+              useDeleleQuery.mutate(transactionId ? transactionId : '');
               navigate(UI_ROUTES.TRANSACTIONS);
             }
           }}

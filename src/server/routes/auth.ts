@@ -2,7 +2,7 @@ import * as express from 'express';
 import * as crypto from 'crypto';
 import { DataSource, Repository } from 'typeorm';
 import { User } from '../entity/User';
-import { API_ENDPOINTS } from '../../constants/api-endpoints';
+import { API_ROUTES } from '../../constants/api-routes';
 
 export class AuthController {
   constructor(ds: DataSource) {
@@ -10,7 +10,7 @@ export class AuthController {
     this.userRepository = this.ds.getRepository(User);
 
     this.router.use(this.checkTokenMiddleware);
-    this.router.post(`${this.path}${API_ENDPOINTS.AUTH.PASSWORD}`, this.handlePasswordAuth);
+    this.router.post(`${this.path}${API_ROUTES.AUTH}/password`, this.handlePasswordAuth);
   }
 
   public router = express.Router();
@@ -23,7 +23,7 @@ export class AuthController {
 
   private checkTokenMiddleware = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
     console.log('req:', request.path);
-    if (request.method === 'OPTIONS' || request.path === `/${API_ENDPOINTS.AUTH.PASSWORD}`) {
+    if (request.method === 'OPTIONS' || request.path === `/${API_ROUTES.AUTH}/password`) {
       next();
       return;
     }
@@ -45,9 +45,6 @@ export class AuthController {
 
     const user: User | null = await this.userRepository.findOne({ where: { id: reqUserId, isBlocked: false, token: reqToken } });
     if (user) {
-      const reqAccountId = Number(Array.isArray(request.body.accountId) ? request.body.accountId.join('') : request.body.accountId);
-      //TODO проверить reqAccountId на принадлежность текущему пользователю
-
       next();
     } else {
       response.status(401);

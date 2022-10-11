@@ -1,6 +1,6 @@
 import { Moment } from 'moment';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { API_ENDPOINTS } from '../constants/api-endpoints';
+import { API_ROUTES } from '../constants/api-routes';
 import { formats } from '../constants/formats';
 import { Transaction } from '../server/entity/Transaction';
 import { GetTransactionsRequest } from '../server/routes/transactions';
@@ -59,17 +59,17 @@ export const useTransactions = () => {
     );
   };
 
-  const useGetOne = (id: number) =>
+  const useGetOne = (id: string) =>
     useQuery([transactionsQueryKey, 'details', id], () => api.send<Transaction>({ endpoint: `transactions/${id}`, method: 'GET' }), {
       enabled: !!id,
     });
 
-  const useItem = (method: 'POST' | 'PUT' | 'DELETE', params?: { id?: number; onSuccess?: () => void }) =>
+  const useItem = (method: 'POST' | 'PUT' | 'DELETE', params?: { id?: string; onSuccess?: () => void }) =>
     useMutation(
       (formValues: Record<string, unknown>) => {
         return api.send({
           data: formValues,
-          endpoint: params?.id ? `${API_ENDPOINTS.TRANSACTIONS}/${params.id}` : API_ENDPOINTS.TRANSACTIONS,
+          endpoint: params?.id ? `${API_ROUTES.TRANSACTIONS}/${params.id}` : API_ROUTES.TRANSACTIONS,
           method: method,
         });
       },
@@ -89,12 +89,12 @@ export const useTransactions = () => {
 
   const useDelete = () =>
     useMutation(
-      (id: number) => {
+      (id: string) => {
         return api.send({
           data: {
             id: id,
           },
-          endpoint: API_ENDPOINTS.TRANSACTIONS,
+          endpoint: API_ROUTES.TRANSACTIONS,
           method: 'DELETE',
         });
       },

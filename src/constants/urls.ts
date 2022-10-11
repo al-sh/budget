@@ -1,4 +1,3 @@
-/* eslint-disable sort-exports/sort-exports */
 export const homepage = 'budget';
 
 export const publicUrl = location?.origin + '/' + homepage;
@@ -11,6 +10,7 @@ export const UI_ROUTES = {
     ROOT: `${uiRoot}/settings`,
     ACCOUNTS: `${uiRoot}/accounts`,
     CATEGORIES: `${uiRoot}/settings/categories`,
+    SYNC: `${uiRoot}/settings/sync`,
     LOGIN: `${uiRoot}/settings/login`,
   },
   STATISTICS: `${uiRoot}/statistics`,

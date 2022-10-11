@@ -1,4 +1,3 @@
-/* eslint-disable sort-exports/sort-exports */
 import { Checkbox as AntdCheckbox, CheckboxProps as AntdCheckboxProps } from 'antd';
 import 'moment/locale/ru';
 

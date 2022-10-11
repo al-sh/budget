@@ -2,11 +2,11 @@ import { notification } from 'antd';
 import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UI_ROUTES } from '../../constants/urls';
-import { API_ENDPOINTS } from '../../constants/api-endpoints';
 import { AuthPasswordRequest, AuthResponse } from '../../server/routes/auth';
 import { getApi } from '../../services/Api';
 import { getStorage } from '../../services/Storage';
 import { Form, Input, Button } from 'antd';
+import { API_ROUTES } from '../../constants/api-routes';
 
 export const LoginPage: React.FC = () => {
   const api = getApi();
@@ -18,7 +18,7 @@ export const LoginPage: React.FC = () => {
       try {
         const response = await api.send<AuthResponse, AuthPasswordRequest['body']>({
           data: formValues,
-          endpoint: API_ENDPOINTS.AUTH.PASSWORD,
+          endpoint: API_ROUTES + '/password',
           method: 'POST',
         });
         console.log('response: ', response);

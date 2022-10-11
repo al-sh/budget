@@ -3,6 +3,7 @@ dotenvFlow.config();
 console.log('env loaded');
 
 import express from 'express';
+import { API_ROUTES } from '../constants/api-routes';
 
 import { AppDataSource } from './data-source';
 import { dbInitializer } from './dbInitialisation';
@@ -37,20 +38,22 @@ AppDataSource.initialize()
   .then(async () => {
     dbInitializer(AppDataSource);
 
+    const MAIN_ROUTE = '/api/';
+
     const authController = new AuthController(AppDataSource);
-    app.use('/api', authController.router);
+    app.use(MAIN_ROUTE, authController.router);
 
     const accountsController = new AccountsController(AppDataSource);
-    app.use('/api/accounts', accountsController.router);
+    app.use(MAIN_ROUTE + API_ROUTES.ACCOUNTS, accountsController.router);
 
     const categoriesController = new CategoriesController(AppDataSource);
-    app.use('/api/categories', categoriesController.router);
+    app.use(MAIN_ROUTE + API_ROUTES.CATEGORIES, categoriesController.router);
 
     const statisticsController = new StatisticsController(AppDataSource);
-    app.use('/api/statistics', statisticsController.router);
+    app.use(MAIN_ROUTE + API_ROUTES.STATISTICS, statisticsController.router);
 
     const transactionsController = new TransactionsController(AppDataSource);
-    app.use('/api/transactions', transactionsController.router);
+    app.use(MAIN_ROUTE + API_ROUTES.TRANSACTIONS, transactionsController.router);
 
     app.listen(port, '0.0.0.0', () => {
       console.log(`Example app listening on port ${port}`);

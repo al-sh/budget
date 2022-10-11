@@ -21,6 +21,9 @@ const SettingsPage: React.FC = () => {
       <Link to={UI_ROUTES.SETTINGS.CATEGORIES}>
         <div>Категории</div>
       </Link>
+      <Link to={UI_ROUTES.SETTINGS.SYNC}>
+        <div>Синхронизация</div>
+      </Link>
       <Switch
         title="Тема"
         checkedChildren="Темная"

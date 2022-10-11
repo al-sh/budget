@@ -1,4 +1,3 @@
-/* eslint-disable sort-exports/sort-exports */
 import { DatePicker as AntdDatePicker, DatePickerProps as AntdDatePickerProps } from 'antd';
 import { Moment } from 'moment';
 import 'moment/locale/ru';

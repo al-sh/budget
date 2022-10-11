@@ -1,6 +1,6 @@
 import { Moment } from 'moment';
 import { useQuery } from 'react-query';
-import { API_ENDPOINTS } from '../constants/api-endpoints';
+import { API_ROUTES } from '../constants/api-routes';
 import { formats } from '../constants/formats';
 import { ICategoryStatItem } from '../server/entity/Category';
 import { GetStatTree } from '../server/routes/statistics';
@@ -36,7 +36,7 @@ export const useStatistics = () => {
 
     return useQuery([statQueryKey, 'tree', JSON.stringify(query)], () =>
       api.send<ICategoryStatItem[], null, GetStatTree['query']>({
-        endpoint: API_ENDPOINTS.STATISTICS.TREE,
+        endpoint: API_ROUTES.STATISTICS + '/tree',
         method: 'GET',
         query: query,
       })

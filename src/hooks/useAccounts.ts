@@ -1,5 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { API_ENDPOINTS } from '../constants/api-endpoints';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { API_ROUTES } from '../constants/api-routes';
 import { GetAccountsRequest } from '../server/routes/accounts';
 import { AccountWithRest } from '../server/types/accounts';
 import { getApi } from '../services/Api';
@@ -14,23 +14,27 @@ export const useAccounts = () => {
   const useGetAccountsList = (showHidden?: boolean) =>
     useQuery([accountsQueryKey, showHidden], () =>
       api.send<AccountWithRest[], null, GetAccountsRequest['query']>({
-        endpoint: 'accounts',
+        endpoint: API_ROUTES.ACCOUNTS,
         method: 'GET',
         query: { showHidden: showHidden ? '1' : '0' },
       })
     );
 
-  const useGetOne = (id: number) =>
-    useQuery([accountsQueryKey, 'details', id], () => api.send<AccountWithRest>({ endpoint: `accounts/${id}`, method: 'GET' }), {
-      enabled: !!id,
-    });
+  const useGetOne = (id: string) =>
+    useQuery(
+      [accountsQueryKey, 'details', id],
+      () => api.send<AccountWithRest>({ endpoint: `${API_ROUTES.ACCOUNTS}/${id}`, method: 'GET' }),
+      {
+        enabled: !!id,
+      }
+    );
 
   const useCreate = () =>
     useMutation(
       (formValues: Record<string, unknown>) => {
         return api.send({
           data: formValues,
-          endpoint: API_ENDPOINTS.ACCOUNTS,
+          endpoint: API_ROUTES.ACCOUNTS,
           method: 'POST',
         });
       },
@@ -41,12 +45,12 @@ export const useAccounts = () => {
       }
     );
 
-  const useItem = (method: 'POST' | 'PUT' | 'DELETE', params?: { id?: number; onSuccess?: () => void }) =>
+  const useItem = (method: 'POST' | 'PUT' | 'DELETE', params?: { id?: string; onSuccess?: () => void }) =>
     useMutation(
       (formValues: Record<string, unknown>) => {
         return api.send({
           data: formValues,
-          endpoint: params?.id ? `accounts/${params.id}` : 'accounts',
+          endpoint: params?.id ? `${API_ROUTES.ACCOUNTS}/${params.id}` : API_ROUTES.ACCOUNTS,
           method: method,
         });
       },

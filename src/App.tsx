@@ -32,6 +32,7 @@ const StatisticsPage = React.lazy(() => import('./components/statistics/Statisti
 const SettingsPage = React.lazy(() => import('./components/settings/SettingsPage'));
 const LoginPage = React.lazy(() => import('./components/settings/LoginPage'));
 const CategoriesPage = React.lazy(() => import('./components/settings/categories/pages/CategoriesPage'));
+const SyncPage = React.lazy(() => import('./components/settings/SyncPage'));
 const CategoryDetailsPage = React.lazy(() => import('./components/settings/categories/pages/CategoryDetailsPage'));
 
 const TransactionPage = React.lazy(() => import('./components/transactions/pages/TransactionPage'));
@@ -56,6 +57,7 @@ export const App = () => {
                   <Route path={`${UI_ROUTES.SETTINGS.ACCOUNTS}/:accountId`} element={<AccountPage />} />
                   <Route path={UI_ROUTES.SETTINGS.ROOT} element={<SettingsPage />} />
                   <Route path={UI_ROUTES.SETTINGS.CATEGORIES} element={<CategoriesPage />} />
+                  <Route path={UI_ROUTES.SETTINGS.SYNC} element={<SyncPage />} />
                   <Route path={UI_ROUTES.STATISTICS} element={<StatisticsPage />} />
                   <Route path={`${UI_ROUTES.SETTINGS.CATEGORIES}/:categoryId`} element={<CategoryDetailsPage />} />
                   <Route path={UI_ROUTES.SETTINGS.LOGIN} element={<LoginPage />} />

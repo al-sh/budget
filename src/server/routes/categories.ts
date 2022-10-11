@@ -1,4 +1,3 @@
-/* eslint-disable sort-exports/sort-exports */
 import * as express from 'express';
 import { DataSource, FindOptionsWhere } from 'typeorm';
 import { Category, ICategoryTreeItem } from '../entity/Category';

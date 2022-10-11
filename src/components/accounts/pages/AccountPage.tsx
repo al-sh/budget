@@ -8,12 +8,12 @@ export const AccountPage: React.VFC = () => {
   const params = useParams();
   const accountId = params?.accountId ? params?.accountId : '';
   const { useGetOne } = useAccounts();
-  const { isFetching, isError, data: account } = useGetOne(parseInt(accountId));
+  const { isFetching, isError, data: account } = useGetOne(accountId);
 
   return (
     <>
       {isFetching && <Loader />}
-      {(isError || !account) && <div>Ошибка загрузки счета</div>}
+      {isError && !isFetching && <div>Ошибка загрузки счета</div>}
       {!isFetching && !isError && account && <EditAccountForm account={account} />}
     </>
   );

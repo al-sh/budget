@@ -1,4 +1,3 @@
-/* eslint-disable sort-exports/sort-exports */
 import * as express from 'express';
 import { DataSource, FindOptionsWhere } from 'typeorm';
 import { Account } from '../entity/Account';
@@ -113,7 +112,7 @@ export class AccountsController {
   };
 
   private getById = async (request: express.Request, response: express.Response) => {
-    const accId = parseInt(request.params.id);
+    const accId = request.params.id;
 
     const account = await this.ds.manager.findOne(Account, {
       where: { id: accId, user: { id: Number(request.headers.userid) } },
