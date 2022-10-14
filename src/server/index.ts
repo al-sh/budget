@@ -11,6 +11,7 @@ import { AccountsController } from './routes/accounts';
 import { AuthController } from './routes/auth';
 import { CategoriesController } from './routes/categories';
 import { StatisticsController } from './routes/statistics';
+import { SyncController } from './routes/sync';
 import { TransactionsController } from './routes/transactions';
 
 console.time('serverInit');
@@ -54,6 +55,9 @@ AppDataSource.initialize()
 
     const transactionsController = new TransactionsController(AppDataSource);
     app.use(MAIN_ROUTE + API_ROUTES.TRANSACTIONS, transactionsController.router);
+
+    const syncController = new SyncController(AppDataSource);
+    app.use(MAIN_ROUTE + API_ROUTES.SYNC, syncController.router);
 
     app.listen(port, '0.0.0.0', () => {
       console.log(`Example app listening on port ${port}`);
