@@ -208,9 +208,10 @@ export class TransactionsController {
     const tranToUpdate = this.transformTranFromRequest(request);
 
     try {
-      const tran = await this.ds.manager.update(Transaction, parseInt(request.params.id), tranToUpdate);
+      const tran = await this.ds.manager.update(Transaction, request.params.id, tranToUpdate);
       response.send({ tran: tran });
     } catch (err) {
+      console.error('tran update error', err);
       response.send(err);
     }
   };

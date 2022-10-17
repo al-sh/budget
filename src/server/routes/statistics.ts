@@ -51,13 +51,17 @@ export class StatisticsController {
   };
 
   private calculatePercents = (category: CategoryWithAmount, categories: CategoryWithAmount[]) => {
+    const parentSelfAmount = category.parentCategory?.id
+      ? categories.find((cat) => cat.id === category.parentCategory?.id)?.selfAmount || 0
+      : 0;
+
     const total = categories.reduce((prev, current) => {
       if (category?.parentCategory?.id === current?.parentCategory?.id) {
         return prev + current.totalAmount;
       }
 
       return prev;
-    }, 0);
+    }, parentSelfAmount);
 
     return total ? (category.totalAmount * 100) / total : 0;
   };
@@ -89,9 +93,22 @@ export class StatisticsController {
       totalAmount: category.totalAmount,
       share: category.share,
     };
+
     const children = categories.filter((item) => item.parentCategory?.id === category?.id);
     if (children?.length) {
       item.children = children.map((child) => this.getTreeItem(child, categories));
+      if (category.selfAmount > 0) {
+        (item.children as ICategoryStatItem[]).unshift({
+          title: category.name + ' (общ)',
+          id: category.id + '_general',
+          key: category.id + '_general',
+          value: category.id + '_general',
+          isActive: category.isActive,
+          selfAmount: category.selfAmount,
+          totalAmount: category.selfAmount,
+          share: (category.selfAmount * 100) / category.totalAmount,
+        });
+      }
     }
 
     return item;
@@ -116,14 +133,6 @@ export class StatisticsController {
       whereClause.isActive = true;
     }
 
-    const withTransactionsWhereClause = { ...whereClause };
-    const dtFrom = request.query.dateFrom;
-    const dtEnd = request.query.dateEnd;
-    if (dtFrom || dtEnd) {
-      console.log('PERIOD STR:', buildPeriodFilterString(dtFrom, dtEnd));
-      withTransactionsWhereClause.transactions = { dt: buildPeriodFilterString(dtFrom, dtEnd) };
-    }
-
     const categoriesList = await this.ds.manager.find(Category, {
       //  const categories  = await this.ds.manager.getTreeRepository(Category).findTrees({
       relations: ['type', 'parentCategory', 'childrenCategories'],
@@ -135,6 +144,9 @@ export class StatisticsController {
     });
 
     const transactionsWhere: FindOptionsWhere<Transaction> = {};
+
+    const dtFrom = request.query.dateFrom;
+    const dtEnd = request.query.dateEnd;
     if (dtFrom || dtEnd) {
       console.log('PERIOD STR:', buildPeriodFilterString(dtFrom, dtEnd));
       transactionsWhere.dt = buildPeriodFilterString(dtFrom, dtEnd);
@@ -145,17 +157,6 @@ export class StatisticsController {
       ...category,
       transactions: transactions.filter((tran) => tran.category?.id === category.id),
     }));
-    /*const categoriesWithTransactions = await this.ds.manager.find(Category, {
-      //  const categories  = await this.ds.manager.getTreeRepository(Category).findTrees({
-      relations: ['type', 'parentCategory', 'transactions', 'childrenCategories', 'childrenCategories.transactions'],
-      where: withTransactionsWhereClause,
-      order: {
-        type: { name: 'ASC' },
-        name: 'ASC',
-      },
-    });*/
-
-    console.log('categories1', categoriesWithTransactions);
 
     const categoriesWithAmounts: CategoryWithAmount[] = categoriesWithTransactions.map((category) => {
       const amounts = this.calculateAmount(category, categoriesWithTransactions);
