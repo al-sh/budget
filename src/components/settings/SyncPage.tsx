@@ -40,6 +40,10 @@ const SyncPage: React.FC = () => {
     fileToLoad && (await sendFile(API_ROUTES.SYNC + '/upload/transactions', fileToLoad));
   };
 
+  const handleAllFile = async () => {
+    fileToLoad && (await sendFile(API_ROUTES.SYNC + '/upload/all', fileToLoad));
+  };
+
   return (
     <>
       <h2>Синхронизация</h2>
@@ -100,6 +104,22 @@ const SyncPage: React.FC = () => {
           Выгрузить
         </Button>
         <Button onClick={handleSendTransactionsFile}>Загрузить</Button>
+      </div>
+
+      <h3 style={{ marginTop: 30 }}>Всё сразу</h3>
+      <div>
+        <Button
+          onClick={async () => {
+            const res = await api.send({
+              endpoint: API_ROUTES.SYNC + '/download/all',
+              method: 'GET',
+            });
+            downloadToFile(JSON.stringify(res as string), 'budget.json', 'text/plain');
+          }}
+        >
+          Выгрузить
+        </Button>
+        <Button onClick={handleAllFile}>Загрузить</Button>
       </div>
     </>
   );

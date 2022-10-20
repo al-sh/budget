@@ -39,7 +39,6 @@ class ApiService {
       if (isFile) {
         headers['Content-Type'] = 'multipart/form-data';
       }
-      console.log(headers);
 
       return new Promise((resolve, reject) => {
         axios({

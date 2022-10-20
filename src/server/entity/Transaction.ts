@@ -2,6 +2,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Account } from './Account';
 import { Category } from './Category';
+import { User } from './User';
 
 @Entity()
 export class Transaction {
@@ -25,4 +26,7 @@ export class Transaction {
 
   @ManyToOne(() => Category, (cat) => cat.transactions)
   public category?: Category; //в случае переводов между своими счетами поле пустое, но заполнен toAccount
+
+  @ManyToOne(() => User, (user) => user.transactions)
+  public user?: User;
 }

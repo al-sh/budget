@@ -3,6 +3,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Account } from './Account';
 import { Category } from './Category';
+import { Transaction } from './Transaction';
 
 @Entity()
 export class User {
@@ -32,4 +33,7 @@ export class User {
 
   @OneToMany(() => Category, (cat) => cat.user)
   public categories?: Category[];
+
+  @OneToMany(() => Transaction, (tran) => tran.user)
+  public transactions?: Transaction[];
 }
