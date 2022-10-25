@@ -17,6 +17,9 @@ export class Category {
   @Column()
   public isActive?: boolean = true;
 
+  @Column({ type: 'int', nullable: true })
+  public order?: number = 0;
+
   @ManyToOne(() => TransactionType, (type) => type.categories)
   public type!: TransactionType;
 

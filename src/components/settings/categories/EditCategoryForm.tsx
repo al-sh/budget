@@ -42,9 +42,8 @@ export const EditCategoryForm: React.VFC<{ category: Category }> = ({ category }
           span: 16,
         }}
         initialValues={{
+          ...category,
           isActive: category?.id ? category.isActive : true,
-          name: category?.id ? category.name : '',
-          parentCategory: category?.parentCategory,
           type: { id: initialTypeId },
         }}
         onValuesChange={() => {
@@ -84,6 +83,10 @@ export const EditCategoryForm: React.VFC<{ category: Category }> = ({ category }
 
         <Form.Item label="Родительская категория" name={['parentCategory', 'id']}>
           <CategoriesSelect typeId={typeId} allowClear />
+        </Form.Item>
+
+        <Form.Item label="Порядок" name="order">
+          <Input type="number" />
         </Form.Item>
 
         <Form.Item name="isActive" valuePropName="checked">

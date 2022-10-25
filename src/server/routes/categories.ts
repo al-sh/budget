@@ -1,6 +1,7 @@
 import * as express from 'express';
 import { DataSource, FindOptionsWhere } from 'typeorm';
 import { Category, ICategoryTreeItem } from '../entity/Category';
+import { CategoriesService } from '../modules/categories.service';
 import { BaseItemRequest, BaseUpdate } from '../types/api';
 import { ETRANSACTION_TYPE } from '../types/transactions';
 
@@ -28,6 +29,7 @@ export interface GetAllCategoriesQuery {
 export class CategoriesController {
   constructor(ds: DataSource) {
     this.ds = ds;
+    this.categoriesService = new CategoriesService(ds);
 
     this.router.get(this.path, this.getAll);
     this.router.get(`${this.path}tree`, this.getTree);
@@ -40,13 +42,13 @@ export class CategoriesController {
 
   public router = express.Router();
 
+  private categoriesService: CategoriesService;
+
   private ds: DataSource;
 
   private path = '/';
 
   private create = async (request: express.Request<null, null, Category>, response: express.Response) => {
-    console.log('cat create', request.body);
-
     const categoryToCreate: Omit<Category, 'id'> = {
       name: request.body.name as string,
       type: { id: parseInt(String(request.body.type?.id)) },
@@ -55,9 +57,14 @@ export class CategoriesController {
       },
     };
 
-    const parentCategoryId = String(request.body.parentCategory?.id);
-    if (Number.isFinite(parentCategoryId)) {
+    const parentCategoryId = request.body.parentCategory?.id;
+    if (parentCategoryId) {
       categoryToCreate.parentCategory = { id: parentCategoryId } as Category;
+    }
+
+    const order = parseInt(String(request.body.order));
+    if (Number.isFinite(order)) {
+      categoryToCreate.order = order;
     }
 
     const category = this.ds.manager.create(Category, categoryToCreate);
@@ -65,17 +72,14 @@ export class CategoriesController {
     this.ds.manager
       .save(category)
       .then((cat) => {
-        console.log('create - ok: ', category, cat);
         setTimeout(() => {
           response.send({ category: cat });
-        }, 1500); //load emulation
+        }, 500); //load emulation
       })
       .catch((err) => response.send(err));
   };
 
   private delete = async (request: express.Request<BaseItemRequest>, response: express.Response<BaseUpdate>) => {
-    console.log('category delete', request.body);
-
     const categoryId = parseInt(request.params.id);
 
     if (!categoryId) {
@@ -101,28 +105,13 @@ export class CategoriesController {
     if (typeId === ETRANSACTION_TYPE.RETURN_EXPENSE) typeId = ETRANSACTION_TYPE.EXPENSE;
     if (typeId === ETRANSACTION_TYPE.RETURN_INCOME) typeId = ETRANSACTION_TYPE.INCOME;
 
-    const whereClause: FindOptionsWhere<Category> = {
-      type: typeId ? { id: typeId } : undefined,
-      user: { id: Number(request.headers.userid) },
-    };
-
     const showHidden = request.query.showHidden === '1';
-    if (!showHidden) {
-      whereClause.isActive = true;
-    }
 
-    const categories = await this.ds.manager.find(Category, {
-      relations: ['type', 'childrenCategories', 'parentCategory'],
-      where: whereClause,
-      order: {
-        type: { name: 'ASC' },
-        name: 'ASC',
-      },
-    });
+    const categories = await this.categoriesService.getAll(Number(request.headers.userid), showHidden, typeId);
 
     setTimeout(() => {
       response.send(categories);
-    }, 1500);
+    }, 500);
   };
 
   private getById = async (request: express.Request<BaseItemRequest>, response: express.Response) => {
@@ -162,39 +151,11 @@ export class CategoriesController {
       whereClause.isActive = true;
     }
 
-    const categories = await this.ds.manager.find(Category, {
-      relations: ['type', 'parentCategory'],
-      where: whereClause,
-      order: {
-        type: { name: 'ASC' },
-        name: 'ASC',
-      },
-    });
-
-    const tree = categories
-      ?.filter((item) => !item.parentCategory)
-      .map((itemWithoutParents) => this.getTreeItem(itemWithoutParents, categories));
+    const categoriesTree = await this.categoriesService.getTree(Number(request.headers.userid), showHidden, typeId);
 
     setTimeout(() => {
-      response.send(tree);
-    }, 1500);
-  };
-
-  private getTreeItem = (category: Category, categories: Category[]) => {
-    const item: ICategoryTreeItem = {
-      title: category.name,
-      key: category.id,
-      id: category.id,
-      value: category.id,
-      isActive: category.isActive,
-      transactions: category.transactions,
-    };
-    const children = categories.filter((item) => item.parentCategory?.id === category?.id);
-    if (children?.length) {
-      item.children = children.map((child) => this.getTreeItem(child, categories));
-    }
-
-    return item;
+      response.send(categoriesTree);
+    }, 500);
   };
 
   private update = async (request: express.Request<BaseItemRequest, null, Partial<Category>>, response: express.Response<BaseUpdate>) => {
@@ -216,12 +177,15 @@ export class CategoriesController {
 
     categoryToUpdate.id = categoryId;
 
-    const parentCategoryId = String(request.body.parentCategory?.id);
-
-    if (parentCategoryId) {
-      categoryToUpdate.parentCategory = { id: parentCategoryId } as Category;
+    if (request.body.parentCategory?.id) {
+      categoryToUpdate.parentCategory = { id: request.body.parentCategory?.id } as Category;
     } else {
       categoryToUpdate.parentCategory = { id: undefined } as unknown as Category;
+    }
+
+    const order = parseInt(String(request.body.order));
+    if (Number.isFinite(order)) {
+      categoryToUpdate.order = order;
     }
 
     try {

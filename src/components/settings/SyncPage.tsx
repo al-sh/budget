@@ -59,50 +59,16 @@ const SyncPage: React.FC = () => {
       />
       <h3>Категории</h3>
       <div>
-        <Button
-          onClick={async () => {
-            const res = await api.send({
-              endpoint: API_ROUTES.SYNC + '/download/categories',
-              method: 'GET',
-            });
-            downloadToFile(JSON.stringify(res as string), 'categories.json', 'text/plain');
-          }}
-        >
-          Выгрузить
-        </Button>
-
         <Button onClick={handleSendFile}>Загрузить</Button>
       </div>
       <h3 style={{ marginTop: 30 }}>Счета</h3>
       <div>
-        <Button
-          onClick={async () => {
-            const res = await api.send({
-              endpoint: API_ROUTES.SYNC + '/download/accounts',
-              method: 'GET',
-            });
-            downloadToFile(JSON.stringify(res as string), 'accounts.json', 'text/plain');
-          }}
-        >
-          Выгрузить
-        </Button>
         <span>
           <Button onClick={handleSendAccountsFile}>Загрузить</Button>
         </span>
       </div>
       <h3 style={{ marginTop: 30 }}>Транзакции</h3>
       <div>
-        <Button
-          onClick={async () => {
-            const res = await api.send({
-              endpoint: API_ROUTES.SYNC + '/download/transactions',
-              method: 'GET',
-            });
-            downloadToFile(JSON.stringify(res as string), 'transactions.json', 'text/plain');
-          }}
-        >
-          Выгрузить
-        </Button>
         <Button onClick={handleSendTransactionsFile}>Загрузить</Button>
       </div>
 

@@ -18,9 +18,6 @@ export class SyncController {
     //TODO: проверять что в системе нет таких счетов/транзакций у других пользователей
     // вариант - сделать через просто удаление всех предыдущих счетов/категорий и insert новых (не использовать save)
     this.router.get(`${this.path}download/all`, this.exportAll);
-    this.router.get(`${this.path}download/accounts`, this.exportAccounts);
-    this.router.get(`${this.path}download/categories`, this.exportCategories);
-    this.router.get(`${this.path}download/transactions`, this.exportTransactions);
     this.router.post(`${this.path}upload/all`, multer().single('fileData'), this.importAll);
     this.router.post(`${this.path}upload/accounts`, multer().single('fileData'), this.importAccounts);
     this.router.post(`${this.path}upload/categories`, multer().single('fileData'), this.importCategories);
@@ -73,10 +70,17 @@ export class SyncController {
     } else {
       errorText = 'id is null';
     }
+
     newCat.name = String(object.name);
     newCat.isActive = !!object.isActive;
     newCat.type = { id: object.typeId as ETRANSACTION_TYPE };
     newCat.parentCategory = { id: object.parentCategoryId } as Category;
+
+    const order = parseInt(object.order as string);
+    if (Number.isFinite(order)) {
+      newCat.order = order;
+    }
+
     newCat.user = { id: userId };
 
     return { errorText: errorText, item: !errorText ? newCat : undefined };
@@ -141,24 +145,9 @@ export class SyncController {
     return { errorText: errorText, item: !errorText ? newTran : undefined };
   };
 
-  private exportAccounts = async (request: express.Request<BaseItemRequest>, response: express.Response) => {
-    const getAccountsQuery = `SELECT id, name, "isActive", "initialValue", icon FROM account where "userId" = $1`;
-
-    try {
-      const queryRunner = await this.ds.createQueryRunner();
-      const result = await queryRunner.manager.query(getAccountsQuery, [parseInt(String(request.headers.userid))]);
-
-      response.send(result);
-    } catch (err) {
-      console.error('accounts export error: ', err);
-      response.status(500);
-      response.send({ message: `accounts export error`, additional: err });
-    }
-  };
-
   private exportAll = async (request: express.Request<BaseItemRequest>, response: express.Response) => {
     const getAccountsQuery = `SELECT id, name, "isActive", "initialValue", icon FROM account where "userId" = $1`;
-    const getCategoriesQuery = `SELECT id, name, "isActive", mpath, "typeId", "parentCategoryId" FROM category where "userId" = $1`;
+    const getCategoriesQuery = `SELECT id, name, "isActive", mpath, "typeId", "parentCategoryId", "order" FROM category where "userId" = $1`;
     const getTransactionsQuery = `SELECT description, amount, dt, "categoryId", id, "accountId", "toAccountId" FROM "transaction" where "userId"=$1`;
 
     try {
@@ -174,21 +163,6 @@ export class SyncController {
       console.error('exportAll error: ', err);
       response.status(500);
       response.send({ message: `exportAll error`, additional: err });
-    }
-  };
-
-  private exportCategories = async (request: express.Request<BaseItemRequest>, response: express.Response) => {
-    const getCategoriesQuery = `SELECT id, name, "isActive", mpath, "typeId", "parentCategoryId" FROM category where "userId" = $1`;
-
-    try {
-      const queryRunner = await this.ds.createQueryRunner();
-      const result = await queryRunner.manager.query(getCategoriesQuery, [parseInt(String(request.headers.userid))]);
-
-      response.send(result);
-    } catch (err) {
-      console.error('category export error: ', err);
-      response.status(500);
-      response.send({ message: `category export error`, additional: err });
     }
   };
 
@@ -208,21 +182,6 @@ export class SyncController {
       response.sendFile(fileFullPath);
       console.log('The file was saved!');
     });
-  };
-
-  private exportTransactions = async (request: express.Request<BaseItemRequest>, response: express.Response) => {
-    const getTransactionsQuery = `SELECT description, amount, dt, "categoryId", id, "accountId", "toAccountId" FROM "transaction" where "categoryId" in (SELECT id FROM category c where c."userId"=$1)`;
-
-    try {
-      const queryRunner = await this.ds.createQueryRunner();
-      const result = await queryRunner.manager.query(getTransactionsQuery, [parseInt(String(request.headers.userid))]);
-
-      response.send(result);
-    } catch (err) {
-      console.error('transactions export error: ', err);
-      response.status(500);
-      response.send({ message: `transactions export error`, additional: err });
-    }
   };
 
   private importAccounts = async (request: express.Request<BaseItemRequest>, response: express.Response) => {
