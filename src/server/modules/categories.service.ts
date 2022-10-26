@@ -1,4 +1,4 @@
-import { DataSource, FindOptionsOrder, FindOptionsWhere } from 'typeorm';
+import { DataSource, FindOptionsOrder, FindOptionsWhere, IsNull } from 'typeorm';
 import { Category, ICategoryTreeItem } from '../entity/Category';
 import { User } from '../entity/User';
 
@@ -14,7 +14,41 @@ export class CategoriesService {
 
   private ds: DataSource;
 
-  public async getAll(userId: User['id'], showHidden: boolean, typeId: Category['type']['id']): Promise<Category[]> {
+  public async create(userId: User['id'], categoryToCreate: Omit<Category, 'id'>) {
+    const category = this.ds.manager.create(Category, { ...categoryToCreate, user: { id: userId } });
+    category.order = 1;
+
+    let siblings: Category[] = [];
+    if (category.parentCategory?.id) {
+      const parentCategory = await this.ds.manager.findOne(Category, {
+        relations: ['childrenCategories'],
+        where: { id: category.parentCategory?.id, user: { id: userId } },
+        order: defaultCategoriesOrder,
+      });
+      siblings = parentCategory?.childrenCategories || [];
+    } else {
+      siblings = (
+        await this.ds.manager.find(Category, {
+          relations: ['parentCategory'],
+          where: { user: { id: userId } },
+          order: defaultCategoriesOrder,
+        })
+      ).filter((cat) => !cat.parentCategory?.id);
+      console.log('siblings', siblings);
+    }
+    const lastSiblingOrder = siblings.length ? siblings[siblings.length - 1].order || 1 : 0;
+    category.order = lastSiblingOrder + 1;
+
+    try {
+      this.ds.getRepository(Category).insert(category);
+      return true;
+    } catch (e) {
+      console.error('CategoriesService create error', e);
+      return false;
+    }
+  }
+
+  public async getAll(userId: User['id'], showHidden?: boolean, typeId?: Category['type']['id']): Promise<Category[]> {
     const whereClause: FindOptionsWhere<Category> = {
       type: typeId ? { id: typeId } : undefined,
       user: { id: userId },
@@ -33,7 +67,7 @@ export class CategoriesService {
     return categories;
   }
 
-  public async getTree(userId: User['id'], showHidden: boolean, typeId: Category['type']['id']): Promise<ICategoryTreeItem[]> {
+  public async getTree(userId: User['id'], showHidden?: boolean, typeId?: Category['type']['id']): Promise<ICategoryTreeItem[]> {
     const whereClause: FindOptionsWhere<Category> = {
       type: typeId ? { id: typeId } : undefined,
       user: { id: userId },

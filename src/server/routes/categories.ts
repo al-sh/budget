@@ -52,9 +52,6 @@ export class CategoriesController {
     const categoryToCreate: Omit<Category, 'id'> = {
       name: request.body.name as string,
       type: { id: parseInt(String(request.body.type?.id)) },
-      user: {
-        id: parseInt(String(request.headers.userid)),
-      },
     };
 
     const parentCategoryId = request.body.parentCategory?.id;
@@ -62,21 +59,8 @@ export class CategoriesController {
       categoryToCreate.parentCategory = { id: parentCategoryId } as Category;
     }
 
-    const order = parseInt(String(request.body.order));
-    if (Number.isFinite(order)) {
-      categoryToCreate.order = order;
-    }
-
-    const category = this.ds.manager.create(Category, categoryToCreate);
-
-    this.ds.manager
-      .save(category)
-      .then((cat) => {
-        setTimeout(() => {
-          response.send({ category: cat });
-        }, 500); //load emulation
-      })
-      .catch((err) => response.send(err));
+    const res = await this.categoriesService.create(parseInt(String(request.headers.userid)), categoryToCreate);
+    response.send(res);
   };
 
   private delete = async (request: express.Request<BaseItemRequest>, response: express.Response<BaseUpdate>) => {

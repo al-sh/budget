@@ -32,7 +32,7 @@ export const CategoryNewForm: React.VFC<{ onFinish: () => void }> = ({ onFinish 
         initialValues={{
           initialValue: 0,
           name: '',
-          typeId: ETRANSACTION_TYPE.EXPENSE,
+          type: { id: ETRANSACTION_TYPE.EXPENSE },
           order: 1,
         }}
         onValuesChange={() => {
@@ -74,10 +74,6 @@ export const CategoryNewForm: React.VFC<{ onFinish: () => void }> = ({ onFinish 
 
         <Form.Item label="Родительская категория" name={['parentCategory', 'id']}>
           <CategoriesSelect typeId={typeId} allowClear />
-        </Form.Item>
-
-        <Form.Item label="Порядок" name="order">
-          <Input type="number" />
         </Form.Item>
 
         <Form.Item
