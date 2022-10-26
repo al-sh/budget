@@ -1,4 +1,4 @@
-import { DataSource, FindOptionsOrder, FindOptionsWhere, IsNull } from 'typeorm';
+import { DataSource, FindOptionsOrder, FindOptionsWhere } from 'typeorm';
 import { Category, ICategoryTreeItem } from '../entity/Category';
 import { User } from '../entity/User';
 

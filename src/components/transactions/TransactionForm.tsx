@@ -1,4 +1,4 @@
-import { Form, InputNumber, Input, Button } from 'antd';
+import { Form, InputNumber, Input, Button, Checkbox } from 'antd';
 import moment from 'moment';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -6,6 +6,7 @@ import { UI_ROUTES } from '../../constants/urls';
 import { useTransactions } from '../../hooks/useTransactions';
 import { Transaction } from '../../server/entity/Transaction';
 import { ETRANSACTION_TYPE } from '../../server/types/transactions';
+import { getTrasactionsService } from '../../services/Transactions';
 import { AccountsSelect } from '../_shared/selects/AccountsSelect';
 import { CategoriesSelect } from '../_shared/selects/CategoriesSelect';
 import { TransactionTypeSelect } from '../_shared/selects/TransactionTypeSelect';
@@ -19,13 +20,15 @@ export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ tran
   const query = useTransactions().useItem(transaction ? 'PUT' : 'POST', {
     id: transaction ? transaction.id : undefined,
     onSuccess: () => {
-      navigate(UI_ROUTES.TRANSACTIONS);
+      !createMore && navigate(UI_ROUTES.TRANSACTIONS);
     },
   });
 
   const navigate = useNavigate();
 
   const [isSubmitDisabled, setisSubmitDisabled] = useState(true);
+  const [createMore, setCreateMore] = useState(false);
+  const transactionsService = getTrasactionsService();
 
   return (
     <div>
@@ -41,12 +44,13 @@ export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ tran
         }}
         layout="horizontal"
         labelAlign="left"
+        preserve
         wrapperCol={{
           span: 16,
         }}
         initialValues={{
           accountId: transaction?.account?.id || '',
-          amount: transaction?.amount || 1,
+          amount: (!!transaction?.amount && transaction?.amount / 100) || 1,
           categoryId: transaction?.category?.id || '',
           description: transaction?.description || '',
           dt: moment(transaction?.dt) || new Date(),
@@ -94,15 +98,34 @@ export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ tran
           </Form.Item>
         )}
 
+        <Checkbox
+          onChange={(e) => {
+            setCreateMore(e.target.checked);
+          }}
+        >
+          Создать еще
+        </Checkbox>
+
         <Form.Item
           wrapperCol={{
             offset: 8,
             span: 16,
           }}
         >
-          <Button type="primary" htmlType="submit" disabled={isSubmitDisabled}>
-            Сохранить
-          </Button>
+          {createMore ? (
+            <Button
+              onClick={() => {
+                console.log('go create tran', form.getFieldsValue());
+                transactionsService.create(form.getFieldsValue());
+              }}
+            >
+              Создать
+            </Button>
+          ) : (
+            <Button type="primary" htmlType="submit" disabled={isSubmitDisabled}>
+              Сохранить
+            </Button>
+          )}
         </Form.Item>
       </Form>
     </div>

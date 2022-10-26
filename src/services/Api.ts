@@ -12,7 +12,7 @@ interface ApiRequest<ReqBody, ReqQuery> {
 
 export type ApiResponse<T = Record<string, unknown>> = AxiosPromise<T>;
 
-class ApiService {
+export class ApiService {
   private static instance: ApiService;
 
   public static getInstance(): ApiService {

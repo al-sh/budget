@@ -67,8 +67,9 @@ export const useTransactions = () => {
   const useItem = (method: 'POST' | 'PUT' | 'DELETE', params?: { id?: string; onSuccess?: () => void }) =>
     useMutation(
       (formValues: Record<string, unknown>) => {
+        console.log('amt', formValues.amount);
         return api.send({
-          data: formValues,
+          data: { ...formValues, amount: Math.floor(parseFloat(formValues.amount as string) * 100) },
           endpoint: params?.id ? `${API_ROUTES.TRANSACTIONS}/${params.id}` : API_ROUTES.TRANSACTIONS,
           method: method,
         });
@@ -90,6 +91,7 @@ export const useTransactions = () => {
   const useDelete = () =>
     useMutation(
       (id: string) => {
+        console.log('delete tran', id);
         return api.send({
           data: {
             id: id,
@@ -99,15 +101,6 @@ export const useTransactions = () => {
         });
       },
       {
-        onMutate: async (id) => {
-          // optimistic update
-          const transactions: Transaction[] = queryClient.getQueryData(transactionsQueryKey) as Transaction[];
-          queryClient.setQueryData(
-            transactionsQueryKey,
-            transactions.filter((item) => item.id !== id)
-          );
-          return {};
-        },
         onSuccess: async () => {
           queryClient.invalidateQueries(transactionsQueryKey);
         },

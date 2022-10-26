@@ -7,7 +7,7 @@ import { TransactionType } from '../../server/entity/TransactionType';
 import { ETRANSACTION_TYPE } from '../../server/types/transactions';
 
 import { UI_ROUTES } from '../../constants/urls';
-import { formatDate } from '../../utils/format';
+import { formatDate, formatMoney } from '../../utils/format';
 
 const TypeIcon: React.VFC<{ type: TransactionType }> = ({ type }) => {
   return (
@@ -65,7 +65,7 @@ export const TransactionItem: React.VFC<{ tran: Transaction }> = ({ tran }) => {
       </span>
 
       <span>
-        <CurrencyName>{tran.amount} RUB</CurrencyName>
+        <CurrencyName>{formatMoney(tran.amount)}</CurrencyName>
         <AccountName>{tran.account?.name}</AccountName>
       </span>
     </TransactionWrapper>

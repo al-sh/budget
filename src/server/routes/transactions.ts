@@ -48,7 +48,7 @@ export class TransactionsController {
 
     const tranToCreate = this.transformTranFromRequest(request);
 
-    const tran = this.ds.manager.create(Transaction, tranToCreate);
+    const tran = this.ds.manager.create(Transaction, { ...tranToCreate, user: { id: parseInt(String(request.headers.userid)) } });
 
     this.ds.manager
       .save(tran)
@@ -186,6 +186,8 @@ export class TransactionsController {
   };
 
   private transformTranFromRequest(request: express.Request): Omit<Transaction, 'id'> {
+    //todo: проверка формата
+
     const tran: Omit<Transaction, 'id'> = {
       account: { id: request.body.accountId } as Account,
       amount: request.body.amount,
