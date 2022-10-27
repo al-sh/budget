@@ -2,6 +2,7 @@ import * as express from 'express';
 import { DataSource, FindOptionsWhere } from 'typeorm';
 import { Category, ICategoryTreeItem, ICategoryStatItem, CategoryWithAmount, CategoryWithAmountAndShare } from '../entity/Category';
 import { Transaction } from '../entity/Transaction';
+import { CategoriesService } from '../services/categories.service';
 import { ETRANSACTION_TYPE } from '../types/transactions';
 import { buildPeriodFilterString } from '../utils/dates';
 
@@ -29,11 +30,14 @@ export interface GetAllCategoriesQuery {
 export class StatisticsController {
   constructor(ds: DataSource) {
     this.ds = ds;
+    this.categoriesService = CategoriesService.getInstance(ds);
 
     this.router.get(`${this.path}tree`, this.getTreeStat);
   }
 
   public router = express.Router();
+
+  private categoriesService: CategoriesService;
 
   private ds: DataSource;
 
@@ -133,15 +137,7 @@ export class StatisticsController {
       whereClause.isActive = true;
     }
 
-    const categoriesList = await this.ds.manager.find(Category, {
-      //  const categories  = await this.ds.manager.getTreeRepository(Category).findTrees({
-      relations: ['type', 'parentCategory', 'childrenCategories'],
-      where: whereClause,
-      order: {
-        type: { name: 'ASC' },
-        name: 'ASC',
-      },
-    });
+    const categoriesList = await this.categoriesService.getAll(Number(request.headers.userid), showHidden, typeId);
 
     const transactionsWhere: FindOptionsWhere<Transaction> = {};
 

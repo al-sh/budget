@@ -5,6 +5,7 @@ import { Account } from '../entity/Account';
 import { Category } from '../entity/Category';
 import { Transaction } from '../entity/Transaction';
 import { TransactionType } from '../entity/TransactionType';
+import { CategoriesService } from '../services/categories.service';
 import { ETRANSACTION_TYPE } from '../types/transactions';
 import { buildPeriodFilterString } from '../utils/dates';
 
@@ -29,6 +30,8 @@ export class TransactionsController {
   constructor(ds: DataSource) {
     this.ds = ds;
 
+    this.categoriesService = CategoriesService.getInstance(ds);
+
     this.router.get(this.path, this.getAll);
     this.router.get(`${this.path}types`, this.getTypes);
     this.router.get(`${this.path}:id`, this.getById);
@@ -38,6 +41,8 @@ export class TransactionsController {
   }
 
   public router = express.Router();
+
+  private categoriesService: CategoriesService;
 
   private ds: DataSource;
 
@@ -80,6 +85,7 @@ export class TransactionsController {
   };
 
   private getAll = async (request: GetTransactionsRequest, response: express.Response) => {
+    const userId = parseInt(String(request.headers.userid));
     const pageNumber = Number.isFinite(parseInt(request.query.page as string)) ? parseInt(request.query.page as string) : 0;
 
     console.log('Loading transactions from the database. Query: ', request.query);
@@ -110,14 +116,13 @@ export class TransactionsController {
     if (Number.isFinite(filterTypeId)) {
       categoriesWhereClause.type = { id: filterTypeId };
     }
-    console.log('categoriesWhereClause', categoriesWhereClause);
 
-    const categories = await this.ds.manager.find(Category, { where: categoriesWhereClause });
+    const categories = await this.categoriesService.getAll(userId, false, filterTypeId);
 
     const categoriesIds = categories.map((cat) => cat.id);
     whereClause.category = { id: In(categoriesIds) };
     const filterCategoryId = request.query?.categoryId;
-    if (Number.isFinite(filterCategoryId)) {
+    if (filterCategoryId) {
       if (categories.findIndex((cat) => cat.id === filterCategoryId) === -1) {
         console.error(
           'Данная категория не принадлежит данному клиенту! request.query.categoryId',
@@ -129,7 +134,9 @@ export class TransactionsController {
         response.send({ message: 'Данная категория не принадлежит данному пользователю' });
         return;
       }
-      whereClause.category = { id: filterCategoryId };
+      const childrenCategories = categories.filter((cat) => cat.parentCategory?.id === filterCategoryId);
+      const categoriesIds: Category['id'][] = [...childrenCategories.map((cat) => cat.id), filterCategoryId];
+      whereClause.category = { id: In(categoriesIds) };
     }
 
     const dtFrom = request.query.dateFrom;
@@ -137,6 +144,8 @@ export class TransactionsController {
     if (dtFrom || dtEnd) {
       whereClause.dt = buildPeriodFilterString(dtFrom, dtEnd);
     }
+
+    console.log('categoriesIds', categoriesIds);
 
     const transactions = await this.ds.manager.find(Transaction, {
       relations: ['account', 'category', 'category.type'],
@@ -150,7 +159,7 @@ export class TransactionsController {
 
     setTimeout(() => {
       response.send(transactions);
-    }, 1500);
+    }, 500);
   };
 
   private getById = async (request: express.Request, response: express.Response) => {

@@ -3,7 +3,6 @@ import moment from 'moment';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UI_ROUTES } from '../../constants/urls';
-import { useTransactions } from '../../hooks/useTransactions';
 import { Transaction } from '../../server/entity/Transaction';
 import { ETRANSACTION_TYPE } from '../../server/types/transactions';
 import { getTrasactionsService } from '../../services/Transactions';
@@ -16,13 +15,6 @@ export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ tran
   const [form] = Form.useForm();
 
   const [typeId, setTypeId] = useState(transaction?.category?.type?.id ? transaction.category?.type?.id : ETRANSACTION_TYPE.EXPENSE);
-
-  const query = useTransactions().useItem(transaction ? 'PUT' : 'POST', {
-    id: transaction ? transaction.id : undefined,
-    onSuccess: () => {
-      !createMore && navigate(UI_ROUTES.TRANSACTIONS);
-    },
-  });
 
   const navigate = useNavigate();
 
@@ -40,7 +32,7 @@ export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ tran
         }}
         onValuesChange={() => {
           setTypeId(form.getFieldValue('typeId'));
-          setisSubmitDisabled(query.isLoading || form.getFieldsError().filter(({ errors }) => errors.length).length > 0);
+          setisSubmitDisabled(form.getFieldsError().filter(({ errors }) => errors.length).length > 0);
         }}
         layout="horizontal"
         labelAlign="left"
@@ -58,7 +50,8 @@ export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ tran
           typeId: transaction?.category?.type?.id || ETRANSACTION_TYPE.EXPENSE,
         }}
         onFinish={(formValues) => {
-          query.mutate(formValues);
+          transactionsService.create(formValues);
+          !createMore && navigate(UI_ROUTES.TRANSACTIONS);
         }}
         autoComplete="off"
       >
@@ -112,20 +105,9 @@ export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ tran
             span: 16,
           }}
         >
-          {createMore ? (
-            <Button
-              onClick={() => {
-                console.log('go create tran', form.getFieldsValue());
-                transactionsService.create(form.getFieldsValue());
-              }}
-            >
-              Создать
-            </Button>
-          ) : (
-            <Button type="primary" htmlType="submit" disabled={isSubmitDisabled}>
-              Сохранить
-            </Button>
-          )}
+          <Button type="primary" htmlType="submit" disabled={isSubmitDisabled}>
+            Сохранить
+          </Button>
         </Form.Item>
       </Form>
     </div>

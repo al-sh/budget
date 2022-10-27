@@ -111,21 +111,21 @@ export const dbInitializer = async (ds: DataSource) => {
 
     const utilitiesTran = new Transaction();
     utilitiesTran.account = account2;
-    utilitiesTran.amount = 4230;
+    utilitiesTran.amount = 423000;
     utilitiesTran.category = apartmentCategory;
     utilitiesTran.dt = new Date();
     utilitiesTran.description = 'Коммуналка';
 
     const capitalRepairTran = new Transaction();
     capitalRepairTran.account = account2;
-    capitalRepairTran.amount = 815;
+    capitalRepairTran.amount = 81500;
     capitalRepairTran.category = apartmentCategory;
     capitalRepairTran.dt = new Date();
     capitalRepairTran.description = 'Капремонт';
 
     const avanceTran = new Transaction();
     avanceTran.account = account;
-    avanceTran.amount = 80000;
+    avanceTran.amount = 8000000;
     avanceTran.category = salaryCategory;
     avanceTran.dt = new Date();
     avanceTran.description = 'Аванс';

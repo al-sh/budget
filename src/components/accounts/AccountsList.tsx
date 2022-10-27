@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { UI_ROUTES } from '../../constants/urls';
 import { useAccounts } from '../../hooks/useAccounts';
+import { formatMoney } from '../../utils/format';
 import { Loader } from '../_shared/Loader';
 import { AccountIcon } from './icons/AccountIcon';
 
@@ -47,7 +48,7 @@ export const AccountsList: React.VFC<{ fromMainPage?: boolean }> = ({ fromMainPa
             <AccountIcon icon={acc.icon} />
             {acc.name}
           </AccountName>
-          <AccountRest>{acc.rest} RUB</AccountRest>
+          <AccountRest>{formatMoney(acc.rest)}</AccountRest>
         </AccountWrapper>
       ))}
       {!fromMainPage && !showHidden && (

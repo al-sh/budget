@@ -8,7 +8,17 @@ const defaultCategoriesOrder: FindOptionsOrder<Category> = {
 };
 
 export class CategoriesService {
-  constructor(ds: DataSource) {
+  private static instance: CategoriesService;
+
+  public static getInstance(ds: DataSource): CategoriesService {
+    if (!CategoriesService.instance) {
+      CategoriesService.instance = new CategoriesService(ds);
+    }
+
+    return CategoriesService.instance;
+  }
+
+  private constructor(ds: DataSource) {
     this.ds = ds;
   }
 
