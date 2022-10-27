@@ -41,6 +41,7 @@ export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ tran
           span: 16,
         }}
         initialValues={{
+          ...(transaction?.id && { id: transaction?.id }),
           accountId: transaction?.account?.id || '',
           amount: (!!transaction?.amount && transaction?.amount / 100) || 1,
           categoryId: transaction?.category?.id || '',
@@ -50,7 +51,8 @@ export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ tran
           typeId: transaction?.category?.type?.id || ETRANSACTION_TYPE.EXPENSE,
         }}
         onFinish={(formValues) => {
-          transactionsService.create(formValues);
+          transaction ? transactionsService.update(formValues) : transactionsService.create(formValues);
+
           !createMore && navigate(UI_ROUTES.TRANSACTIONS);
         }}
         autoComplete="off"
@@ -91,13 +93,15 @@ export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ tran
           </Form.Item>
         )}
 
-        <Checkbox
-          onChange={(e) => {
-            setCreateMore(e.target.checked);
-          }}
-        >
-          Создать еще
-        </Checkbox>
+        {!transaction && (
+          <Checkbox
+            onChange={(e) => {
+              setCreateMore(e.target.checked);
+            }}
+          >
+            Создать еще
+          </Checkbox>
+        )}
 
         <Form.Item
           wrapperCol={{

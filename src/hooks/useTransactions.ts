@@ -7,8 +7,8 @@ import { GetTransactionsRequest } from '../server/routes/transactions';
 import { getApi } from '../services/Api';
 
 export type GetTransactionsQueryParams = {
-  accountId?: number;
-  categoryId?: number;
+  accountId?: string;
+  categoryId?: string;
   dateEnd?: Moment;
   dateFrom?: Moment;
   pageNum?: number;

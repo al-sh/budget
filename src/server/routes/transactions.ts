@@ -145,8 +145,6 @@ export class TransactionsController {
       whereClause.dt = buildPeriodFilterString(dtFrom, dtEnd);
     }
 
-    console.log('categoriesIds', categoriesIds);
-
     const transactions = await this.ds.manager.find(Transaction, {
       relations: ['account', 'category', 'category.type'],
       where: whereClause,

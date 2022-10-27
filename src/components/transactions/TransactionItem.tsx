@@ -7,7 +7,7 @@ import { TransactionType } from '../../server/entity/TransactionType';
 import { ETRANSACTION_TYPE } from '../../server/types/transactions';
 
 import { UI_ROUTES } from '../../constants/urls';
-import { formatDate, formatMoney } from '../../utils/format';
+import { formatDate, formatMoney, formatOnlyTime } from '../../utils/format';
 
 const TypeIcon: React.VFC<{ type: TransactionType }> = ({ type }) => {
   return (
@@ -43,7 +43,7 @@ const AccountName = styled.div`
   color: gray;
 `;
 
-export const TransactionItem: React.VFC<{ tran: Transaction }> = ({ tran }) => {
+export const TransactionItem: React.VFC<{ tran: Transaction; showOnlyTime?: boolean }> = ({ tran, showOnlyTime }) => {
   const navigate = useNavigate();
 
   return (
@@ -56,7 +56,7 @@ export const TransactionItem: React.VFC<{ tran: Transaction }> = ({ tran }) => {
         <div>
           <span>{tran.category?.type && <TypeIcon type={tran.category?.type} />}</span>
 
-          <span>{tran.dt && formatDate(tran.dt)}</span>
+          <span>{tran.dt && showOnlyTime ? formatOnlyTime(tran.dt) : formatDate(tran.dt)}</span>
 
           <CategoryName>{tran.category?.type?.id !== ETRANSACTION_TYPE.TRANSFER ? tran?.category?.name : tran.category?.name}</CategoryName>
         </div>

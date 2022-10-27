@@ -12,11 +12,10 @@ export const TransactionsFilters: React.VFC<{
   onClear: () => void;
   onFinish: (params: GetTransactionsQueryParams) => void;
   params: GetTransactionsQueryParams;
-  typeId?: number;
-}> = ({ params, onClear, onFinish, typeId: initialTypeId }) => {
+}> = ({ params, onClear, onFinish }) => {
   const [form] = Form.useForm();
 
-  const [typeId, setTypeId] = useState(initialTypeId ? initialTypeId : ETRANSACTION_TYPE.EXPENSE);
+  const [typeId, setTypeId] = useState(params.typeId ? params.typeId : ETRANSACTION_TYPE.EXPENSE);
 
   const [isSubmitDisabled, setisSubmitDisabled] = useState(false);
 
@@ -39,7 +38,6 @@ export const TransactionsFilters: React.VFC<{
         }}
         initialValues={params}
         onFinish={(formValues) => {
-          console.log('filter transactions values:', formValues);
           onFinish(formValues);
         }}
         autoComplete="off"

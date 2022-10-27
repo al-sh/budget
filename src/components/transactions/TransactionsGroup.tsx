@@ -17,7 +17,7 @@ export const TransactionsGroup: React.VFC<{ date: string; transactions: Transact
   <TransactionsGroupWrapper>
     <DateWrapper>{date}</DateWrapper>
     {transactions.map((tran) => (
-      <TransactionItem key={tran.id} tran={tran} />
+      <TransactionItem key={tran.id} tran={tran} showOnlyTime />
     ))}
   </TransactionsGroupWrapper>
 ));

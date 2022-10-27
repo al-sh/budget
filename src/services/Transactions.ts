@@ -1,4 +1,5 @@
 import { API_ROUTES } from '../constants/api-routes';
+import { Transaction } from '../server/entity/Transaction';
 import { ApiService, getApi } from './Api';
 
 class TransactionsService {
@@ -23,6 +24,14 @@ class TransactionsService {
       endpoint: API_ROUTES.TRANSACTIONS,
       method: 'POST',
       data: { ...item, amount: Math.floor(parseFloat(item.amount as string) * 100) },
+    });
+  }
+
+  public update(item: Transaction) {
+    this.api.send({
+      endpoint: API_ROUTES.TRANSACTIONS + '/' + item.id,
+      method: 'PUT',
+      data: { ...item, amount: Math.floor(item.amount * 100) },
     });
   }
 }
