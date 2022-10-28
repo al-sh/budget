@@ -7,7 +7,31 @@ export const formatDate = (dt?: Date) => {
   if (!dt) {
     return '';
   }
-  const newDt = parseISO(dt as unknown as string);
+
+  if (!isValid(dt)) {
+    console.log('invalid date: ', dt);
+    return '';
+  }
+  return format(dt, 'HH:mm dd.MM.yyyy');
+};
+
+export const formatDateTechnical = (dt?: Date) => {
+  if (!dt) {
+    return '';
+  }
+
+  if (!isValid(dt)) {
+    console.log('invalid date: ', dt);
+    return '';
+  }
+  return format(dt, 'yyyyMMdd_HHmm');
+};
+
+export const formatDateISOstr = (dt?: string) => {
+  if (!dt) {
+    return '';
+  }
+  const newDt = parseISO(dt);
   if (!isValid(newDt)) {
     console.log('invalid date: ', newDt);
     return '';

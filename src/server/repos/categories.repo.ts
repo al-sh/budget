@@ -7,15 +7,15 @@ const defaultCategoriesOrder: FindOptionsOrder<Category> = {
   name: 'ASC',
 };
 
-export class CategoriesService {
-  private static instance: CategoriesService;
+export class CategoriesRepo {
+  private static instance: CategoriesRepo;
 
-  public static getInstance(ds: DataSource): CategoriesService {
-    if (!CategoriesService.instance) {
-      CategoriesService.instance = new CategoriesService(ds);
+  public static getInstance(ds: DataSource): CategoriesRepo {
+    if (!CategoriesRepo.instance) {
+      CategoriesRepo.instance = new CategoriesRepo(ds);
     }
 
-    return CategoriesService.instance;
+    return CategoriesRepo.instance;
   }
 
   private constructor(ds: DataSource) {

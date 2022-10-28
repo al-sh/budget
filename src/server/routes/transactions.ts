@@ -1,13 +1,12 @@
 import * as express from 'express';
-import { DataSource, FindOptionsWhere, In, TypeORMError } from 'typeorm';
-import { PAGE_SIZE } from '../../constants/misc';
+import { DataSource, In, TypeORMError } from 'typeorm';
 import { Account } from '../entity/Account';
 import { Category } from '../entity/Category';
 import { Transaction } from '../entity/Transaction';
 import { TransactionType } from '../entity/TransactionType';
-import { CategoriesService } from '../services/categories.service';
+import { CategoriesRepo } from '../repos/categories.repo';
+import { TransactionsRepo } from '../repos/transactions.repo';
 import { ETRANSACTION_TYPE } from '../types/transactions';
-import { buildPeriodFilterString } from '../utils/dates';
 
 export interface GetTransactionTypesRequest extends express.Request {
   query: {
@@ -30,7 +29,8 @@ export class TransactionsController {
   constructor(ds: DataSource) {
     this.ds = ds;
 
-    this.categoriesService = CategoriesService.getInstance(ds);
+    this.categoriesRepo = CategoriesRepo.getInstance(ds);
+    this.transactionsRepo = TransactionsRepo.getInstance(ds);
 
     this.router.get(this.path, this.getAll);
     this.router.get(`${this.path}types`, this.getTypes);
@@ -42,11 +42,13 @@ export class TransactionsController {
 
   public router = express.Router();
 
-  private categoriesService: CategoriesService;
+  private categoriesRepo: CategoriesRepo;
 
   private ds: DataSource;
 
   private path = '/';
+
+  private transactionsRepo: TransactionsRepo;
 
   private create = async (request: express.Request, response: express.Response) => {
     console.log('tran create', request.body); //todo: типизировать body для запросов
@@ -87,72 +89,19 @@ export class TransactionsController {
   private getAll = async (request: GetTransactionsRequest, response: express.Response) => {
     const userId = parseInt(String(request.headers.userid));
     const pageNumber = Number.isFinite(parseInt(request.query.page as string)) ? parseInt(request.query.page as string) : 0;
-
-    console.log('Loading transactions from the database. Query: ', request.query);
-
-    const accounts = await this.ds.manager.find(Account, { where: { user: { id: Number(request.headers.userid) } } });
-
-    const accountIds = accounts.map((acc) => acc.id);
-    const whereClause: FindOptionsWhere<Transaction> = { account: { id: In(accountIds) } };
-
-    const filterAccountId = request.query.accountId;
-    if (Number.isFinite(filterAccountId)) {
-      if (accounts.find((acc) => acc.id === filterAccountId)) {
-        whereClause.account = { id: filterAccountId };
-      } else {
-        console.error(
-          'Данный счет не принадлежит данному клиенту! request.query.accountId',
-          request.query.accountId,
-          'request.headers.userid',
-          request.headers.userid
-        );
-      }
-    }
-
-    //фильтрация по типу происходит через фильтрацию по категориям
-    const categoriesWhereClause: FindOptionsWhere<Category> = { user: { id: Number(request.headers.userid) } };
-
-    const filterTypeId = parseInt(request.query?.typeId || '');
-    if (Number.isFinite(filterTypeId)) {
-      categoriesWhereClause.type = { id: filterTypeId };
-    }
-
-    const categories = await this.categoriesService.getAll(userId, false, filterTypeId);
-
-    const categoriesIds = categories.map((cat) => cat.id);
-    whereClause.category = { id: In(categoriesIds) };
-    const filterCategoryId = request.query?.categoryId;
-    if (filterCategoryId) {
-      if (categories.findIndex((cat) => cat.id === filterCategoryId) === -1) {
-        console.error(
-          'Данная категория не принадлежит данному клиенту! request.query.categoryId',
-          request.query.categoryId,
-          'request.headers.userid',
-          request.headers.userid
-        );
-        response.status(403);
-        response.send({ message: 'Данная категория не принадлежит данному пользователю' });
-        return;
-      }
-      const childrenCategories = categories.filter((cat) => cat.parentCategory?.id === filterCategoryId);
-      const categoriesIds: Category['id'][] = [...childrenCategories.map((cat) => cat.id), filterCategoryId];
-      whereClause.category = { id: In(categoriesIds) };
-    }
-
     const dtFrom = request.query.dateFrom;
     const dtEnd = request.query.dateEnd;
-    if (dtFrom || dtEnd) {
-      whereClause.dt = buildPeriodFilterString(dtFrom, dtEnd);
-    }
+    const accountId = request.query.accountId;
+    const categoryId = request.query?.categoryId;
+    const typeId = parseInt(request.query?.typeId || '');
 
-    const transactions = await this.ds.manager.find(Transaction, {
-      relations: ['account', 'category', 'category.type'],
-      where: whereClause,
-      order: {
-        dt: 'DESC',
-      },
-      skip: 0 + pageNumber * PAGE_SIZE,
-      take: PAGE_SIZE,
+    const transactions = await this.transactionsRepo.getAll(userId, {
+      accountId: accountId,
+      categoryId: categoryId,
+      dateEnd: dtEnd,
+      dateFrom: dtFrom,
+      typeId: typeId,
+      pageNumber: pageNumber,
     });
 
     setTimeout(() => {

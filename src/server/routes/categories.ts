@@ -1,7 +1,7 @@
 import * as express from 'express';
 import { DataSource, FindOptionsWhere } from 'typeorm';
 import { Category, ICategoryTreeItem } from '../entity/Category';
-import { CategoriesService } from '../services/categories.service';
+import { CategoriesRepo } from '../repos/categories.repo';
 import { BaseItemRequest, BaseUpdate } from '../types/api';
 import { ETRANSACTION_TYPE } from '../types/transactions';
 
@@ -29,7 +29,7 @@ export interface GetAllCategoriesQuery {
 export class CategoriesController {
   constructor(ds: DataSource) {
     this.ds = ds;
-    this.categoriesService = CategoriesService.getInstance(ds);
+    this.categoriesService = CategoriesRepo.getInstance(ds);
 
     this.router.get(this.path, this.getAll);
     this.router.get(`${this.path}tree`, this.getTree);
@@ -42,7 +42,7 @@ export class CategoriesController {
 
   public router = express.Router();
 
-  private categoriesService: CategoriesService;
+  private categoriesService: CategoriesRepo;
 
   private ds: DataSource;
 

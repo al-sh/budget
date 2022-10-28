@@ -2,6 +2,7 @@ import { Button } from 'antd';
 import React, { useState } from 'react';
 import { API_ROUTES } from '../../constants/api-routes';
 import { getApi } from '../../services/Api';
+import { formatDateTechnical } from '../../utils/format';
 
 const downloadToFile = (content: string, filename: string, contentType: string) => {
   const a = document.createElement('a');
@@ -80,7 +81,7 @@ const SyncPage: React.FC = () => {
               endpoint: API_ROUTES.SYNC + '/download/all',
               method: 'GET',
             });
-            downloadToFile(JSON.stringify(res as string), 'budget.json', 'text/plain');
+            downloadToFile(JSON.stringify(res as string), `budget_${formatDateTechnical(new Date())}.json`, 'text/plain');
           }}
         >
           Выгрузить

@@ -2,7 +2,8 @@ import * as express from 'express';
 import { DataSource, FindOptionsWhere } from 'typeorm';
 import { Category, ICategoryTreeItem, ICategoryStatItem, CategoryWithAmount, CategoryWithAmountAndShare } from '../entity/Category';
 import { Transaction } from '../entity/Transaction';
-import { CategoriesService } from '../services/categories.service';
+import { CategoriesRepo } from '../repos/categories.repo';
+import { TransactionsRepo } from '../repos/transactions.repo';
 import { ETRANSACTION_TYPE } from '../types/transactions';
 import { buildPeriodFilterString } from '../utils/dates';
 
@@ -30,18 +31,21 @@ export interface GetAllCategoriesQuery {
 export class StatisticsController {
   constructor(ds: DataSource) {
     this.ds = ds;
-    this.categoriesService = CategoriesService.getInstance(ds);
+    this.categoriesRepo = CategoriesRepo.getInstance(ds);
+    this.transactionsRepo = TransactionsRepo.getInstance(ds);
 
     this.router.get(`${this.path}tree`, this.getTreeStat);
   }
 
   public router = express.Router();
 
-  private categoriesService: CategoriesService;
+  private categoriesRepo: CategoriesRepo;
 
   private ds: DataSource;
 
   private path = '/';
+
+  private transactionsRepo: TransactionsRepo;
 
   private calculateAmount = (category: Category, categories: Category[]) => {
     const selfAmount = this.calculateTransactions(category.transactions || []);
@@ -119,6 +123,7 @@ export class StatisticsController {
   };
 
   private getTreeStat = async (request: GetStatTree, response: express.Response<ICategoryTreeItem[]>) => {
+    const userId = Number(request.headers.userid);
     let typeId: ETRANSACTION_TYPE = parseInt(
       Array.isArray(request.query.typeId) ? request.query.typeId.join('') : (request.query.typeId as string)
     );
@@ -137,17 +142,12 @@ export class StatisticsController {
       whereClause.isActive = true;
     }
 
-    const categoriesList = await this.categoriesService.getAll(Number(request.headers.userid), showHidden, typeId);
-
-    const transactionsWhere: FindOptionsWhere<Transaction> = {};
+    const categoriesList = await this.categoriesRepo.getAll(userId, showHidden, typeId);
 
     const dtFrom = request.query.dateFrom;
     const dtEnd = request.query.dateEnd;
-    if (dtFrom || dtEnd) {
-      console.log('PERIOD STR:', buildPeriodFilterString(dtFrom, dtEnd));
-      transactionsWhere.dt = buildPeriodFilterString(dtFrom, dtEnd);
-    }
-    const transactions = await this.ds.manager.find(Transaction, { relations: ['category'], where: transactionsWhere });
+
+    const transactions = await this.transactionsRepo.getAll(userId, { dateEnd: dtEnd, dateFrom: dtFrom, typeId: typeId });
 
     const categoriesWithTransactions = categoriesList.map((category) => ({
       ...category,
@@ -169,6 +169,19 @@ export class StatisticsController {
     const tree = categoriesWithAmountsAndShares
       ?.filter((item) => !item.parentCategory)
       .map((itemWithoutParents) => this.getTreeItem(itemWithoutParents, categoriesWithAmountsAndShares));
+
+    const totalAmount = this.calculateTransactions(transactions);
+
+    const totalItem: ICategoryStatItem = {
+      id: 'total',
+      key: 'total',
+      value: 'Итого',
+      title: 'Итого',
+      share: 100,
+      selfAmount: totalAmount,
+      totalAmount: totalAmount,
+    };
+    tree.push(totalItem);
 
     setTimeout(() => {
       response.send(tree);

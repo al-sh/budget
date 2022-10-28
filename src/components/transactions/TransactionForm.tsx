@@ -13,7 +13,6 @@ import { DatePicker } from '../_shared/_base/DatePicker';
 
 export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ transaction }) => {
   const [form] = Form.useForm();
-
   const [typeId, setTypeId] = useState(transaction?.category?.type?.id ? transaction.category?.type?.id : ETRANSACTION_TYPE.EXPENSE);
 
   const navigate = useNavigate();
@@ -41,9 +40,8 @@ export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ tran
           span: 16,
         }}
         initialValues={{
-          ...(transaction?.id && { id: transaction?.id }),
           accountId: transaction?.account?.id || '',
-          amount: (!!transaction?.amount && transaction?.amount / 100) || 1,
+          amount: (!!transaction?.amount && transaction?.amount / 100) || undefined,
           categoryId: transaction?.category?.id || '',
           description: transaction?.description || '',
           dt: moment(transaction?.dt) || new Date(),
@@ -51,8 +49,9 @@ export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ tran
           typeId: transaction?.category?.type?.id || ETRANSACTION_TYPE.EXPENSE,
         }}
         onFinish={(formValues) => {
-          transaction ? transactionsService.update(formValues) : transactionsService.create(formValues);
-
+          console.log('formValues', formValues);
+          transaction ? transactionsService.update({ ...formValues, id: transaction?.id }) : transactionsService.create(formValues);
+          form.setFieldsValue({ amount: undefined, description: '' });
           !createMore && navigate(UI_ROUTES.TRANSACTIONS);
         }}
         autoComplete="off"
