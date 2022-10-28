@@ -49,10 +49,9 @@ export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ tran
           typeId: transaction?.category?.type?.id || ETRANSACTION_TYPE.EXPENSE,
         }}
         onFinish={(formValues) => {
-          console.log('formValues', formValues);
           transaction ? transactionsService.update({ ...formValues, id: transaction?.id }) : transactionsService.create(formValues);
           form.setFieldsValue({ amount: undefined, description: '' });
-          !createMore && navigate(UI_ROUTES.TRANSACTIONS);
+          !createMore && navigate(-1);
         }}
         autoComplete="off"
       >
