@@ -8,6 +8,8 @@ import { FilterButton } from '../../_shared/buttons/FilterButton';
 import { Loader } from '../../_shared/Loader';
 import { ETRANSACTION_TYPE } from '../../../server/types/transactions';
 import { useSearchParams } from 'react-router-dom';
+import { formats } from '../../../constants/formats';
+import moment from 'moment';
 
 export const TransactionsPage: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
@@ -23,8 +25,13 @@ export const TransactionsPage: React.FC = () => {
   if (String(searchAsObject.accountId) !== 'undefined') {
     initialFilterParams.accountId = searchAsObject.accountId;
   }
+  if (String(searchAsObject.dateFrom) !== 'undefined') {
+    initialFilterParams.dateFrom = moment(searchAsObject.dateFrom);
+  }
+  if (String(searchAsObject.dateEnd) !== 'undefined') {
+    initialFilterParams.dateEnd = moment(searchAsObject.dateEnd);
+  }
 
-  //todo: добавить даты
   const [filterParams, setFilterParams] = useState<GetTransactionsQueryParams>(initialFilterParams);
 
   const { useGetList: useGetTransactions } = useTransactions();
@@ -49,8 +56,11 @@ export const TransactionsPage: React.FC = () => {
           onFinish={(params) => {
             setShowFilters(false);
             setFilterParams(params);
-            console.log('params', params);
-            setSearch(params as URLSearchParams);
+            setSearch({
+              ...params,
+              dateFrom: params.dateFrom?.format(formats.dateMoment.short),
+              dateEnd: params.dateEnd?.format(formats.dateMoment.short),
+            } as unknown as URLSearchParams);
           }}
         />
       )}

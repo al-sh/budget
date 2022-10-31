@@ -4,15 +4,17 @@ import isValid from 'date-fns/isValid';
 import { parseISO } from 'date-fns';
 
 export const formatDate = (dt?: Date) => {
+  //todo: сделать в сервисе конверсию строк в даты
   if (!dt) {
     return '';
   }
 
-  if (!isValid(dt)) {
+  const newDt = parseISO(dt as unknown as string);
+  if (!isValid(newDt)) {
     console.log('invalid date: ', dt);
     return '';
   }
-  return format(dt, 'HH:mm dd.MM.yyyy');
+  return format(newDt, 'HH:mm dd.MM.yyyy');
 };
 
 export const formatDateTechnical = (dt?: Date) => {

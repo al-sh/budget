@@ -46,7 +46,7 @@ export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ tran
           description: transaction?.description || '',
           dt: moment(transaction?.dt) || new Date(),
           toAccountId: transaction?.toAccount?.id || '',
-          typeId: transaction?.category?.type?.id || ETRANSACTION_TYPE.EXPENSE,
+          typeId: transaction?.type?.id || ETRANSACTION_TYPE.EXPENSE,
         }}
         onFinish={(formValues) => {
           transaction ? transactionsService.update({ ...formValues, id: transaction?.id }) : transactionsService.create(formValues);

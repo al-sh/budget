@@ -4,6 +4,7 @@ import { Category, ICategoryTreeItem, ICategoryStatItem, CategoryWithAmount, Cat
 import { Transaction } from '../entity/Transaction';
 import { CategoriesRepo } from '../repos/categories.repo';
 import { TransactionsRepo } from '../repos/transactions.repo';
+import { StatisticsService } from '../services/statistics.service';
 import { ETRANSACTION_TYPE } from '../types/transactions';
 import { buildPeriodFilterString } from '../utils/dates';
 
@@ -33,6 +34,7 @@ export class StatisticsController {
     this.ds = ds;
     this.categoriesRepo = CategoriesRepo.getInstance(ds);
     this.transactionsRepo = TransactionsRepo.getInstance(ds);
+    this.statService = StatisticsService.getInstance(ds);
 
     this.router.get(`${this.path}tree`, this.getTreeStat);
   }
@@ -45,50 +47,9 @@ export class StatisticsController {
 
   private path = '/';
 
+  private statService: StatisticsService;
+
   private transactionsRepo: TransactionsRepo;
-
-  private calculateAmount = (category: Category, categories: Category[]) => {
-    const selfAmount = this.calculateTransactions(category.transactions || []);
-    let totalAmount = selfAmount;
-    const childrenCategories = categories.filter((cat) => cat.parentCategory?.id === category.id);
-    if (childrenCategories) {
-      const childrenAmount = childrenCategories.reduce((prev, current) => prev + this.calculateTransactions(current.transactions || []), 0);
-      totalAmount = selfAmount + childrenAmount;
-    }
-    return { selfAmount, totalAmount };
-  };
-
-  private calculatePercents = (category: CategoryWithAmount, categories: CategoryWithAmount[]) => {
-    const parentSelfAmount = category.parentCategory?.id
-      ? categories.find((cat) => cat.id === category.parentCategory?.id)?.selfAmount || 0
-      : 0;
-
-    const total = categories.reduce((prev, current) => {
-      if (category?.parentCategory?.id === current?.parentCategory?.id) {
-        return prev + current.totalAmount;
-      }
-
-      return prev;
-    }, parentSelfAmount);
-
-    return total ? (category.totalAmount * 100) / total : 0;
-  };
-
-  private calculateTransactions = (transactions: Transaction[]) => {
-    // только для массива транзакций одной категории
-    const rest = transactions.reduce((prev, current) => {
-      if (
-        current.category?.type?.id === ETRANSACTION_TYPE.RETURN_INCOME ||
-        current.category?.type?.id === ETRANSACTION_TYPE.RETURN_EXPENSE
-      ) {
-        return prev - current.amount;
-      }
-
-      return prev + current.amount;
-    }, 0);
-
-    return rest;
-  };
 
   private getTreeItem = (category: CategoryWithAmountAndShare, categories: CategoryWithAmountAndShare[]) => {
     const item: ICategoryStatItem = {
@@ -155,7 +116,7 @@ export class StatisticsController {
     }));
 
     const categoriesWithAmounts: CategoryWithAmount[] = categoriesWithTransactions.map((category) => {
-      const amounts = this.calculateAmount(category, categoriesWithTransactions);
+      const amounts = this.statService.calculateAmount(category, categoriesWithTransactions);
       return { ...category, ...amounts };
     });
 
@@ -163,14 +124,14 @@ export class StatisticsController {
 
     const categoriesWithAmountsAndShares: CategoryWithAmountAndShare[] = categoriesWithAmounts.map((category) => ({
       ...category,
-      share: this.calculatePercents(category, categoriesWithAmounts),
+      share: this.statService.calculatePercents(category, categoriesWithAmounts),
     }));
 
     const tree = categoriesWithAmountsAndShares
       ?.filter((item) => !item.parentCategory)
       .map((itemWithoutParents) => this.getTreeItem(itemWithoutParents, categoriesWithAmountsAndShares));
 
-    const totalAmount = this.calculateTransactions(transactions);
+    const totalAmount = this.statService.calculateTransactions(transactions);
 
     const totalItem: ICategoryStatItem = {
       id: 'total',

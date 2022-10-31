@@ -5,6 +5,7 @@ import { Account } from '../entity/Account';
 import { Category } from '../entity/Category';
 import { Transaction } from '../entity/Transaction';
 import { User } from '../entity/User';
+import { ETRANSACTION_TYPE } from '../types/transactions';
 import { buildPeriodFilterString } from '../utils/dates';
 import { CategoriesRepo } from './categories.repo';
 
@@ -40,8 +41,9 @@ export class TransactionsRepo {
       categoryId?: Category['id'];
       dateEnd?: string;
       dateFrom?: string;
+      excludeReturns?: boolean;
       pageNumber?: number;
-      typeId: Category['type']['id'];
+      typeId: Transaction['type']['id'];
     }
   ) => {
     const accounts = await this.ds.manager.find(Account, { where: { user: { id: userId } } });
@@ -54,20 +56,22 @@ export class TransactionsRepo {
       if (accounts.find((acc) => acc.id === filterAccountId)) {
         whereClause.account = { id: filterAccountId };
       } else {
-        const errMessage = `Данный счет не принадлежит данному клиенту! request.query.categoryId' ${filterAccountId} userId ${userId}`;
+        const errMessage = `Данный счет не принадлежит данному клиенту! filterAccountId' ${filterAccountId} userId ${userId}`;
         console.error('TransactionsRepo getAll', errMessage);
         throw new Error(errMessage);
       }
     }
 
-    //фильтрация по типу происходит через фильтрацию по категориям
-    const categoriesWhereClause: FindOptionsWhere<Category> = { user: { id: userId } };
-
-    if (Number.isFinite(params.typeId)) {
-      categoriesWhereClause.type = { id: params.typeId };
+    const typeId = params.typeId;
+    if (!params.excludeReturns && typeId === ETRANSACTION_TYPE.EXPENSE) {
+      whereClause.type = { id: In([ETRANSACTION_TYPE.EXPENSE, ETRANSACTION_TYPE.RETURN_EXPENSE]) };
     }
 
-    const categories = await this.categoriesService.getAll(userId, false, params.typeId);
+    if (!params.excludeReturns && typeId === ETRANSACTION_TYPE.INCOME) {
+      whereClause.type = { id: In([ETRANSACTION_TYPE.INCOME, ETRANSACTION_TYPE.RETURN_INCOME]) };
+    }
+
+    const categories = await this.categoriesService.getAll(userId, false);
 
     const categoriesIds = categories.map((cat) => cat.id);
     whereClause.category = { id: In(categoriesIds) };
@@ -90,7 +94,7 @@ export class TransactionsRepo {
     }
 
     const transactions = await this.ds.manager.find(Transaction, {
-      relations: ['account', 'category', 'category.type'],
+      relations: ['account', 'category', 'category.type', 'type'],
       where: whereClause,
       order: {
         dt: 'DESC',
@@ -99,5 +103,14 @@ export class TransactionsRepo {
     });
 
     return transactions;
+  };
+
+  public getById = async (userId: User['id'], tranId: Transaction['id']) => {
+    const tran = await this.ds.manager.findOne(Transaction, {
+      relations: ['account', 'toAccount', 'category', 'category.type', 'type'],
+      where: { id: tranId, user: { id: userId } },
+    });
+
+    return tran;
   };
 }

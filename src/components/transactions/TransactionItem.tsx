@@ -54,11 +54,11 @@ export const TransactionItem: React.VFC<{ tran: Transaction; showOnlyTime?: bool
     >
       <span>
         <div>
-          <span>{tran.category?.type && <TypeIcon type={tran.category?.type} />}</span>
+          <span>{tran.category?.type && <TypeIcon type={tran?.type} />}</span>
 
           <span>{tran.dt && showOnlyTime ? formatOnlyTime(tran.dt) : formatDate(tran.dt)}</span>
 
-          <CategoryName>{tran.category?.type?.id !== ETRANSACTION_TYPE.TRANSFER ? tran?.category?.name : tran.category?.name}</CategoryName>
+          <CategoryName>{tran?.type?.id !== ETRANSACTION_TYPE.TRANSFER ? tran?.category?.name : tran.category?.name}</CategoryName>
         </div>
 
         <span>{tran.description}</span>

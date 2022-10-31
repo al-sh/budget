@@ -111,17 +111,10 @@ export class TransactionsController {
 
   private getById = async (request: express.Request, response: express.Response) => {
     const tranId = request.params.id;
+    const userId = parseInt(String(request.headers.userid));
 
     try {
-      const tran = await this.ds.manager.findOne(Transaction, {
-        relations: ['account', 'toAccount', 'category', 'category.type'],
-        where: { id: tranId },
-      });
-
-      if (tran && tran.account && tran.account.user && !(tran.account?.user.id === Number(request.headers.userid))) {
-        response.status(401);
-        response.send('Not auth E3');
-      }
+      const tran = await this.transactionsRepo.getById(userId, tranId);
 
       response.send(tran);
     } catch (err) {
@@ -149,6 +142,7 @@ export class TransactionsController {
       amount: request.body.amount,
       description: request.body.description,
       dt: request.body.dt,
+      type: { id: request.body.typeId },
     };
 
     if (request.body.typeId !== ETRANSACTION_TYPE.TRANSFER) {
