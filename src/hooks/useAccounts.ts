@@ -33,7 +33,7 @@ export const useAccounts = () => {
     useMutation(
       (formValues: Record<string, unknown>) => {
         return api.send({
-          data: formValues,
+          data: { ...formValues, initialValue: Math.floor(parseFloat(formValues.initialValue as string) * 100) },
           endpoint: API_ROUTES.ACCOUNTS,
           method: 'POST',
         });
@@ -49,7 +49,7 @@ export const useAccounts = () => {
     useMutation(
       (formValues: Record<string, unknown>) => {
         return api.send({
-          data: formValues,
+          data: { ...formValues, initialValue: Math.floor(parseFloat(formValues.initialValue as string) * 100) },
           endpoint: params?.id ? `${API_ROUTES.ACCOUNTS}/${params.id}` : API_ROUTES.ACCOUNTS,
           method: method,
         });

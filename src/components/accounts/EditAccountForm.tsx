@@ -44,7 +44,7 @@ export const EditAccountForm: React.VFC<{ account: AccountWithRest }> = ({ accou
           span: 16,
         }}
         initialValues={{
-          initialValue: account.initialValue,
+          initialValue: account.initialValue / 100,
           isActive: account?.id ? account.isActive : true,
           name: account?.id ? account.name : '',
           icon: account.icon,

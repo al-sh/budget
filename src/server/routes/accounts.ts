@@ -2,6 +2,7 @@ import * as express from 'express';
 import { DataSource, FindOptionsWhere } from 'typeorm';
 import { Account } from '../entity/Account';
 import { Transaction } from '../entity/Transaction';
+import { AccountsRepo } from '../repos/accounts.repo';
 import { AccountWithRest } from '../types/accounts';
 import { ETRANSACTION_TYPE } from '../types/transactions';
 
@@ -14,6 +15,7 @@ export interface GetAccountsRequest extends express.Request {
 export class AccountsController {
   constructor(ds: DataSource) {
     this.ds = ds;
+    this.accsRepo = AccountsRepo.getInstance(ds);
 
     this.router.get(this.path, this.getAll);
     this.router.get(`${this.path}:id`, this.getById);
@@ -24,14 +26,15 @@ export class AccountsController {
 
   public router = express.Router();
 
+  private accsRepo: AccountsRepo;
+
   private ds: DataSource;
 
   private path = '/';
 
   private calculateRest = (transactions: Transaction[], account: Account) => {
     const rest = transactions.reduce((prev, current) => {
-      console.log(current);
-      if (current.category?.type?.id === ETRANSACTION_TYPE.INCOME || current.category?.type?.id === ETRANSACTION_TYPE.RETURN_EXPENSE) {
+      if (current.type?.id === ETRANSACTION_TYPE.INCOME || current.type?.id === ETRANSACTION_TYPE.RETURN_EXPENSE) {
         return prev + current.amount;
       }
 
@@ -42,7 +45,6 @@ export class AccountsController {
       return prev - current.amount;
     }, account.initialValue);
 
-    // console.log('calculateRest', rest, 'trans:', transactions);
     return rest;
   };
 
@@ -74,7 +76,6 @@ export class AccountsController {
   };
 
   private getAll = async (request: GetAccountsRequest, response: express.Response<AccountWithRest[]>) => {
-    console.log('Loading accounts from the database...');
     const showHidden = request.query.showHidden === '1';
 
     const whereClause: FindOptionsWhere<Account> = { user: { id: Number(request.headers.userid) } };
@@ -83,7 +84,7 @@ export class AccountsController {
     }
 
     const accounts = await this.ds.manager.find(Account, {
-      relations: { incomingTransactions: { toAccount: true, category: true }, transactions: { category: true } },
+      relations: { incomingTransactions: { toAccount: true, category: true, type: true }, transactions: { category: true, type: true } },
       where: whereClause,
     });
 
@@ -140,11 +141,11 @@ export class AccountsController {
   };
 
   private update = async (request: express.Request, response: express.Response) => {
-    console.log('acc update', request.body);
+    const userId = parseInt(String(request.headers.userid));
 
     try {
-      const account = await this.ds.manager.update(Account, parseInt(request.params.id), request.body);
-      response.send({ account: account });
+      this.accsRepo.update(userId, request.params.id, request.body);
+      response.send('ok');
     } catch (err) {
       response.send(err);
     }
