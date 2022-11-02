@@ -43,7 +43,7 @@ export class TransactionsRepo {
       dateFrom?: string;
       excludeReturns?: boolean;
       pageNumber?: number;
-      typeId: Transaction['type']['id'];
+      typeId?: Transaction['type']['id'];
     }
   ) => {
     const accounts = await this.ds.manager.find(Account, { where: { user: { id: userId } } });
@@ -71,18 +71,16 @@ export class TransactionsRepo {
       whereClause.type = { id: In([ETRANSACTION_TYPE.INCOME, ETRANSACTION_TYPE.RETURN_INCOME]) };
     }
 
-    const categories = await this.categoriesService.getAll(userId, false);
-
-    const categoriesIds = categories.map((cat) => cat.id);
-    whereClause.category = { id: In(categoriesIds) };
     const filterCategoryId = params?.categoryId;
     if (filterCategoryId) {
-      if (categories.findIndex((cat) => cat.id === filterCategoryId) === -1) {
+      const allCategories = await this.categoriesService.getAll(userId, false);
+
+      if (allCategories.findIndex((cat) => cat.id === filterCategoryId) === -1) {
         const errMessage = `Данная категория не принадлежит данному клиенту! request.query.categoryId' ${filterCategoryId} userId ${userId}`;
         console.error('TransactionsRepo getAll', errMessage);
         throw new Error(errMessage);
       }
-      const childrenCategories = categories.filter((cat) => cat.parentCategory?.id === filterCategoryId);
+      const childrenCategories = allCategories.filter((cat) => cat.parentCategory?.id === filterCategoryId);
       const categoriesIds: Category['id'][] = [...childrenCategories.map((cat) => cat.id), filterCategoryId];
       whereClause.category = { id: In(categoriesIds) };
     }

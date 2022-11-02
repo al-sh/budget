@@ -15,7 +15,7 @@ export const TransactionsFilters: React.VFC<{
 }> = ({ params, onClear, onFinish }) => {
   const [form] = Form.useForm();
 
-  const [typeId, setTypeId] = useState(params.typeId ? params.typeId : ETRANSACTION_TYPE.EXPENSE);
+  const [typeId, setTypeId] = useState<ETRANSACTION_TYPE | undefined>(params.typeId ? params.typeId : undefined);
 
   const [isSubmitDisabled, setisSubmitDisabled] = useState(false);
 
@@ -56,6 +56,7 @@ export const TransactionsFilters: React.VFC<{
 
         <Form.Item label="Тип" name="typeId">
           <TransactionTypeSelect
+            allowClear
             onChange={() => {
               form.setFieldsValue({ categoryId: undefined });
             }}

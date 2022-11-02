@@ -4,7 +4,7 @@ import { ETRANSACTION_TYPE } from '../../../server/types/transactions';
 
 interface Props {
   onChange?: (newValue: number) => void;
-  typeId: ETRANSACTION_TYPE;
+  typeId?: ETRANSACTION_TYPE;
   value?: number;
   allowClear?: boolean;
   disabled?: boolean;

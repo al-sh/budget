@@ -3,13 +3,12 @@ import { TransactionsFilters } from '../TransactionsFilters';
 import { TransactionsListByDates } from '../TransactionsListByDates';
 
 import { Button } from 'antd';
+import moment from 'moment';
+import { useSearchParams } from 'react-router-dom';
+import { formats } from '../../../constants/formats';
 import { GetTransactionsQueryParams, useTransactions } from '../../../hooks/useTransactions';
 import { FilterButton } from '../../_shared/buttons/FilterButton';
 import { Loader } from '../../_shared/Loader';
-import { ETRANSACTION_TYPE } from '../../../server/types/transactions';
-import { useSearchParams } from 'react-router-dom';
-import { formats } from '../../../constants/formats';
-import moment from 'moment';
 
 export const TransactionsPage: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
@@ -17,7 +16,7 @@ export const TransactionsPage: React.FC = () => {
   const [search, setSearch] = useSearchParams();
   const searchAsObject = Object.fromEntries(new URLSearchParams(search));
   const initialFilterParams: GetTransactionsQueryParams = {
-    typeId: searchAsObject.typeId ? parseInt(searchAsObject.typeId) : ETRANSACTION_TYPE.EXPENSE,
+    typeId: searchAsObject.typeId ? parseInt(searchAsObject.typeId) : undefined,
   };
   if (String(searchAsObject.categoryId) !== 'undefined') {
     initialFilterParams.categoryId = searchAsObject.categoryId;
