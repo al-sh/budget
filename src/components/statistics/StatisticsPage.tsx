@@ -15,7 +15,6 @@ export const StatisticsPage: React.VFC = () => {
 
   const { isLoading, isError, data: categoriesTree } = useGetTree(filterParams);
 
-  if (isLoading) return <Loader />;
   if (isError) return <>Error</>;
 
   return (
@@ -49,7 +48,8 @@ export const StatisticsPage: React.VFC = () => {
         <Tabs.TabPane tab="Расходы" key={String(ETRANSACTION_TYPE.EXPENSE)} />
         <Tabs.TabPane tab="Доходы" key={String(ETRANSACTION_TYPE.INCOME)} />
       </Tabs>
-      {categoriesTree && <StatCategoriesList categoriesTree={categoriesTree} />}
+      {isLoading && <Loader />}
+      {categoriesTree && !isLoading && <StatCategoriesList categoriesTree={categoriesTree} />}
     </>
   );
 };

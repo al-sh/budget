@@ -31,7 +31,7 @@ class TransactionsService {
     this.api.send({
       endpoint: API_ROUTES.TRANSACTIONS + '/' + item.id,
       method: 'PUT',
-      data: { ...item, amount: Math.floor(item.amount * 100) },
+      data: { ...item, amount: Math.round(item.amount * 100) },
     });
   }
 }

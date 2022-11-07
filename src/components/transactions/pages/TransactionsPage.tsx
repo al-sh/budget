@@ -55,10 +55,18 @@ export const TransactionsPage: React.FC = () => {
           onFinish={(params) => {
             setShowFilters(false);
             setFilterParams(params);
+            const paramsForSearch: GetTransactionsQueryParams = {};
+            for (const key in params) {
+              if (params[key as keyof GetTransactionsQueryParams] !== undefined) {
+                const key1 = key as keyof GetTransactionsQueryParams;
+                paramsForSearch[key1] = params[key1];
+              }
+            }
+
             setSearch({
-              ...params,
-              dateFrom: params.dateFrom?.format(formats.dateMoment.short),
-              dateEnd: params.dateEnd?.format(formats.dateMoment.short),
+              ...paramsForSearch,
+              ...(paramsForSearch.dateFrom && { dateFrom: paramsForSearch.dateFrom.format(formats.dateMoment.short) }),
+              ...(paramsForSearch.dateEnd && { dateEnd: paramsForSearch.dateEnd.format(formats.dateMoment.short) }),
             } as unknown as URLSearchParams);
           }}
         />

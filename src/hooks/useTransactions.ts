@@ -7,6 +7,7 @@ import { GetTransactionsRequest } from '../server/routes/transactions';
 import { getApi } from '../services/Api';
 
 export type GetTransactionsQueryParams = {
+  [i: string]: string | undefined | Moment | number;
   accountId?: string;
   categoryId?: string;
   dateEnd?: Moment;

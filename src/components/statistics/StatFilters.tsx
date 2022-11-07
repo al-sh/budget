@@ -32,7 +32,6 @@ export const StatFilters: React.VFC<{
         }}
         initialValues={params}
         onFinish={(formValues) => {
-          console.log('filter transactions values:', formValues);
           onFinish(formValues);
         }}
         autoComplete="off"
