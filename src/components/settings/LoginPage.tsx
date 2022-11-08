@@ -18,7 +18,7 @@ export const LoginPage: React.FC = () => {
       try {
         const response = await api.send<AuthResponse, AuthPasswordRequest['body']>({
           data: formValues,
-          endpoint: API_ROUTES + '/password',
+          endpoint: API_ROUTES.AUTH + '/password',
           method: 'POST',
         });
         console.log('response: ', response);

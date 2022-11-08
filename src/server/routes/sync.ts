@@ -101,11 +101,18 @@ export class SyncController {
       errorText = 'id is null';
     }
 
-    const amount = parseFloat(String(object.amount));
+    const amount = parseInt(String(object.amount));
     if (Number.isFinite(amount)) {
       newTran.amount = amount;
     } else {
       errorText = 'incorrect amount';
+    }
+
+    const typeId = parseInt(String(object.typeId));
+    if (Number.isFinite(typeId)) {
+      newTran.type = { id: typeId };
+    } else {
+      errorText = 'incorrect typeId';
     }
 
     newTran.description = String(object.description);
@@ -134,10 +141,12 @@ export class SyncController {
       }
     }
 
-    if (categoriesIds.includes(String(object.categoryId))) {
-      newTran.category = { id: object.categoryId } as Category;
-    } else {
-      errorText = 'category not found';
+    if (!object.toAccountId) {
+      if (categoriesIds.includes(String(object.categoryId))) {
+        newTran.category = { id: object.categoryId } as Category;
+      } else {
+        errorText = 'category not found';
+      }
     }
 
     newTran.user = { id: userId };
@@ -148,7 +157,7 @@ export class SyncController {
   private exportAll = async (request: express.Request<BaseItemRequest>, response: express.Response) => {
     const getAccountsQuery = `SELECT id, name, "isActive", "initialValue", icon FROM account where "userId" = $1`;
     const getCategoriesQuery = `SELECT id, name, "isActive", mpath, "typeId", "parentCategoryId", "order" FROM category where "userId" = $1`;
-    const getTransactionsQuery = `SELECT description, amount, dt, "categoryId", id, "accountId", "toAccountId" FROM "transaction" where "userId"=$1`;
+    const getTransactionsQuery = `SELECT description, amount, dt, "categoryId", id, "accountId", "toAccountId", "typeId" FROM "transaction" where "userId"=$1`;
 
     try {
       const queryRunner = await this.ds.createQueryRunner();
@@ -227,6 +236,7 @@ export class SyncController {
       if (!Array.isArray(accountsFromFile) || !Array.isArray(categoriesFromFile) || !Array.isArray(transactionsFromFile)) {
         response.status(500);
         response.send({ message: 'Некорректный формат файла' });
+        return;
       }
 
       const importErrors: { item: unknown; message: string }[] = [];
@@ -273,6 +283,7 @@ export class SyncController {
       if (importErrors.length > 0) {
         response.status(500);
         response.send({ errors: importErrors });
+        return;
       }
 
       await this.ds.transaction(async (transactionalEntityManager) => {
@@ -280,11 +291,14 @@ export class SyncController {
         await transactionalEntityManager.delete(Account, { user: { id: userId } });
         await transactionalEntityManager.delete(Category, { user: { id: userId } });
         await transactionalEntityManager.insert(Account, accsToCreate);
-        transactionalEntityManager.insert(Category, categoriesToCreate);
-        transactionalEntityManager.insert(Transaction, transactionsToCreate);
+        await transactionalEntityManager.insert(Category, categoriesToCreate);
+        await transactionalEntityManager.insert(Transaction, transactionsToCreate);
       });
 
-      response.send({ imported: accsToCreate.length, errors: importErrors });
+      response.send({
+        imported: { accounts: accsToCreate.length, categories: categoriesToCreate.length, transactions: transactionsToCreate.length },
+        errors: importErrors,
+      });
     } catch (err) {
       console.error('importAll error: ', err);
       response.status(500);

@@ -19,11 +19,11 @@ class TransactionsService {
 
   private api: ApiService;
 
-  public create(item: any) {
+  public create(item: Transaction) {
     this.api.send({
       endpoint: API_ROUTES.TRANSACTIONS,
       method: 'POST',
-      data: { ...item, amount: Math.floor(parseFloat(item.amount as string) * 100) },
+      data: { ...item, amount: Math.round(item.amount * 100) },
     });
   }
 
