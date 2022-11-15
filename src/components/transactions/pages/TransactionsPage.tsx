@@ -10,6 +10,27 @@ import { GetTransactionsQueryParams, useTransactions } from '../../../hooks/useT
 import { FilterButton } from '../../_shared/buttons/FilterButton';
 import { Loader } from '../../_shared/Loader';
 
+import styled from 'styled-components';
+
+const HeaderBlock = styled.div`
+  height: 64px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(180deg, #008f8c 0%, #0fc2c0 100%);
+  border-radius: 0px 0px 5px 5px;
+  padding: 12px;
+`;
+
+const HeaderTitle = styled.div`
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 19px;
+  color: #ffffff;
+`;
+
 export const TransactionsPage: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
@@ -38,12 +59,15 @@ export const TransactionsPage: React.FC = () => {
 
   return (
     <>
-      <FilterButton
-        onClick={() => {
-          setShowFilters(!showFilters);
-        }}
-        showFilters={showFilters}
-      />
+      <HeaderBlock>
+        <HeaderTitle>История</HeaderTitle>
+        <FilterButton
+          onClick={() => {
+            setShowFilters(!showFilters);
+          }}
+          showFilters={showFilters}
+        />
+      </HeaderBlock>
 
       {showFilters && (
         <TransactionsFilters

@@ -1,8 +1,12 @@
-import { Button } from 'antd';
 import styled from 'styled-components';
+import { ReactComponent as FilterButtonSVG } from './FilterButton.svg';
 
-const FilterButtonWrapper = styled(Button)``;
+const FilterButtonWrapper = styled.div`
+  cursor: pointer;
+`;
 
 export const FilterButton: React.VFC<{ onClick: () => void; showFilters: boolean }> = ({ showFilters, onClick }) => (
-  <FilterButtonWrapper onClick={onClick}>{showFilters ? 'Скрыть фильтры' : 'Показать фильтры'}</FilterButtonWrapper>
+  <FilterButtonWrapper>
+    <FilterButtonSVG onClick={onClick}>{showFilters ? 'Скрыть фильтры' : 'Показать фильтры'}</FilterButtonSVG>
+  </FilterButtonWrapper>
 );
