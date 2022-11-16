@@ -7,15 +7,16 @@ import { formats } from '../../../constants/formats';
 export interface DatePickerProps {
   withTime?: boolean;
   value?: Moment;
+  placeholder?: string;
   onChange?: AntdDatePickerProps['onChange'];
 }
 
-export const DatePicker: React.VFC<DatePickerProps> = ({ withTime, onChange, value }) => (
+export const DatePicker: React.VFC<DatePickerProps> = ({ withTime, onChange, value, placeholder }) => (
   <AntdDatePicker
     format={withTime ? formats.dateMoment.withTime : formats.dateMoment.short}
     locale={locale}
     showTime={withTime}
-    placeholder="Выберите дату"
+    placeholder={placeholder || 'Выберите дату'}
     value={value}
     onChange={onChange}
   />

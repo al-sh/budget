@@ -26,10 +26,10 @@ export const Navbar = {
   `,
 
   Item: styled.li<{ active: boolean }>`
-    padding: 0 1rem;
+    padding: 0 0.5rem;
     cursor: pointer;
 
-    color: ${({ theme, active }) => (active ? theme.text.active : theme.text.primary)};
+    color: ${({ theme, active }) => (active ? theme.text.active : theme.text.inactive)};
 
     :hover {
       color: ${({ theme }) => theme.text.hover};

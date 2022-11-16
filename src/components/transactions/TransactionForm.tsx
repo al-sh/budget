@@ -54,20 +54,16 @@ export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ tran
         }}
         autoComplete="off"
       >
+        <Form.Item label="Дата" name="dt" rules={[{ message: 'Укажите дату', required: true }]}>
+          <DatePicker withTime />
+        </Form.Item>
+
         <Form.Item label="Сумма" name="amount" rules={[{ message: 'Укажите сумму', required: true }]}>
           <InputNumber
             style={{
               width: '100%',
             }}
           />
-        </Form.Item>
-
-        <Form.Item label="Дата" name="dt" rules={[{ message: 'Укажите дату', required: true }]}>
-          <DatePicker withTime />
-        </Form.Item>
-
-        <Form.Item label="Описание" name="description">
-          <Input />
         </Form.Item>
 
         <Form.Item label="Счет" name="accountId" rules={[{ message: 'Выберите счет', required: true }]}>
@@ -89,6 +85,10 @@ export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ tran
             <CategoriesSelect typeId={typeId} />
           </Form.Item>
         )}
+
+        <Form.Item label="Описание" name="description">
+          <Input />
+        </Form.Item>
 
         {!transaction && (
           <Checkbox

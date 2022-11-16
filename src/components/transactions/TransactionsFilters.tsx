@@ -1,4 +1,4 @@
-import { Button, Form } from 'antd';
+import { Form } from 'antd';
 
 import { useState } from 'react';
 import { GetTransactionsQueryParams } from '../../hooks/useTransactions';
@@ -6,6 +6,7 @@ import { ETRANSACTION_TYPE } from '../../server/types/transactions';
 import { AccountsSelect } from '../_shared/selects/AccountsSelect';
 import { CategoriesSelect } from '../_shared/selects/CategoriesSelect';
 import { TransactionTypeSelect } from '../_shared/selects/TransactionTypeSelect';
+import { Button } from '../_shared/_base/Button';
 import { DatePicker } from '../_shared/_base/DatePicker';
 
 export const TransactionsFilters: React.VFC<{
@@ -24,31 +25,27 @@ export const TransactionsFilters: React.VFC<{
       <Form
         name="TransactionsFilters"
         form={form}
-        labelCol={{
-          span: 8,
-        }}
         onValuesChange={() => {
           setTypeId(form.getFieldValue('typeId'));
           setisSubmitDisabled(form.getFieldsError().filter(({ errors }) => errors.length).length > 0);
         }}
         layout="horizontal"
         labelAlign="left"
-        wrapperCol={{
-          span: 16,
-        }}
         initialValues={params}
         onFinish={(formValues) => {
           onFinish(formValues);
         }}
         autoComplete="off"
       >
-        <Form.Item label="Начало периода" name="dateFrom">
-          <DatePicker />
-        </Form.Item>
-
-        <Form.Item label="Окончание периода" name="dateEnd">
-          <DatePicker />
-        </Form.Item>
+        <div style={{ marginTop: 20, display: 'flex', alignItems: 'baseline' }}>
+          <Form.Item name="dateFrom" style={{ display: 'inline-block' }}>
+            <DatePicker placeholder="Начало периода" />
+          </Form.Item>
+          <span style={{ margin: '0 12px 0 12px' }}>-</span>
+          <Form.Item name="dateEnd" style={{ display: 'inline-block' }}>
+            <DatePicker placeholder="Конец периода" />
+          </Form.Item>
+        </div>
 
         <Form.Item label="Счет" name="accountId">
           <AccountsSelect allowClear />
@@ -75,17 +72,19 @@ export const TransactionsFilters: React.VFC<{
             span: 16,
           }}
         >
-          <Button
-            type="link"
-            onClick={() => {
-              onClear();
-            }}
-          >
-            Очистить
-          </Button>
-          <Button type="primary" htmlType="submit" disabled={isSubmitDisabled}>
-            Применить
-          </Button>
+          <div>
+            <Button
+              type="link"
+              onClick={() => {
+                onClear();
+              }}
+            >
+              Очистить
+            </Button>
+            <Button type="primary" htmlType="submit" disabled={isSubmitDisabled}>
+              Применить
+            </Button>
+          </div>
         </Form.Item>
       </Form>
     </div>

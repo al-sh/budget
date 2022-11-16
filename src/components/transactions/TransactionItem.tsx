@@ -1,4 +1,4 @@
-import { MinusOutlined, PlusOutlined, RollbackOutlined, RetweetOutlined } from '@ant-design/icons';
+import { MinusOutlined, PlusOutlined, RetweetOutlined, RollbackOutlined } from '@ant-design/icons';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -8,6 +8,7 @@ import { ETRANSACTION_TYPE } from '../../server/types/transactions';
 
 import { UI_ROUTES } from '../../constants/urls';
 import { formatDate, formatMoney, formatOnlyTime } from '../../utils/format';
+import { T2, T6 } from '../_shared/_base/Text';
 
 const TypeIcon: React.VFC<{ type: TransactionType }> = ({ type }) => {
   return (
@@ -21,6 +22,18 @@ const TypeIcon: React.VFC<{ type: TransactionType }> = ({ type }) => {
   );
 };
 
+const TypeSymbol: React.VFC<{ type: TransactionType }> = ({ type }) => {
+  return (
+    <>
+      {type.id === ETRANSACTION_TYPE.INCOME && '+'}
+      {type.id === ETRANSACTION_TYPE.EXPENSE && '-'}
+      {type.id === ETRANSACTION_TYPE.RETURN_EXPENSE && '+'}
+      {type.id === ETRANSACTION_TYPE.RETURN_INCOME && '-'}
+      {type.id === ETRANSACTION_TYPE.TRANSFER && '-'}
+    </>
+  );
+};
+
 const TransactionWrapper = styled.div`
   display: flex;
   flex-direction: row;
@@ -30,7 +43,6 @@ const TransactionWrapper = styled.div`
 
 const CategoryName = styled.span`
   margin-left: 0.5em;
-  color: gray;
 `;
 
 const CurrencyName = styled.div`
@@ -40,7 +52,6 @@ const CurrencyName = styled.div`
 
 const AccountName = styled.div`
   text-align: right;
-  color: gray;
 `;
 
 export const TransactionItem: React.VFC<{ tran: Transaction; showOnlyTime?: boolean }> = ({ tran, showOnlyTime }) => {
@@ -54,19 +65,28 @@ export const TransactionItem: React.VFC<{ tran: Transaction; showOnlyTime?: bool
     >
       <span>
         <div>
-          <span>{tran?.type && <TypeIcon type={tran?.type} />}</span>
+          <span></span>
 
-          <span>{tran.dt && showOnlyTime ? formatOnlyTime(tran.dt) : formatDate(tran.dt)}</span>
+          <T6>{tran.dt && showOnlyTime ? formatOnlyTime(tran.dt) : formatDate(tran.dt)}</T6>
 
-          <CategoryName>{tran?.type?.id !== ETRANSACTION_TYPE.TRANSFER ? tran?.category?.name : 'Перевод на свой счет'}</CategoryName>
+          <CategoryName>
+            <T2>{tran?.type?.id !== ETRANSACTION_TYPE.TRANSFER ? tran?.category?.name : 'Перевод на свой счет'}</T2>
+          </CategoryName>
         </div>
 
-        <span>{tran.description}</span>
+        <T6>{tran.description}</T6>
       </span>
 
       <span>
-        <CurrencyName>{formatMoney(tran.amount)}</CurrencyName>
-        <AccountName>{tran.account?.name}</AccountName>
+        <CurrencyName>
+          <T2>
+            {tran?.type && <TypeSymbol type={tran?.type} />}
+            {formatMoney(tran.amount)}
+          </T2>
+        </CurrencyName>
+        <AccountName>
+          <T6>{tran.account?.name}</T6>
+        </AccountName>
       </span>
     </TransactionWrapper>
   );
