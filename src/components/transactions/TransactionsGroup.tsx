@@ -10,7 +10,7 @@ const TransactionsGroupWrapper = styled.div`
 `;
 
 const DateWrapper = styled.div`
-  font-weight: 800;
+  font-weight: bolder;
 `;
 
 export const TransactionsGroup: React.VFC<{ date: string; transactions: Transaction[] }> = observer(({ date, transactions }) => (

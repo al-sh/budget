@@ -1,6 +1,6 @@
 {
   "name": "budget-react",
-  "version": "0.2.20",
+  "version": "0.2.22",
   "homepage": "budget",
   "proxy": "http://localhost:3001",
   "private": true,
