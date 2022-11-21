@@ -33,6 +33,10 @@ export const Navbar = {
 
     :hover {
       color: ${({ theme }) => theme.text.hover};
+
+      path {
+        fill: ${({ theme }) => theme.text.hover};
+      }
     }
   `,
   Icon: styled.div`

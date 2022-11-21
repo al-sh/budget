@@ -38,7 +38,7 @@ const TransactionWrapper = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid #f5f5f5;
 `;
 
 const CategoryName = styled.span`

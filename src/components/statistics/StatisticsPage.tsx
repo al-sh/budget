@@ -4,6 +4,7 @@ import { GetStatTreeFormParams, useStatistics } from '../../hooks/useStatistics'
 import { ETRANSACTION_TYPE } from '../../server/types/transactions';
 import { FilterButton } from '../_shared/buttons/FilterButton';
 import { Loader } from '../_shared/Loader';
+import { PageTitle } from '../_shared/_base/PageTitle';
 import { StatCategoriesList } from './StatCategoriesList';
 import { StatFilters } from './StatFilters';
 
@@ -19,7 +20,7 @@ export const StatisticsPage: React.VFC = () => {
 
   return (
     <>
-      <h2>Статистика по категориям</h2>
+      <PageTitle>Статистика по категориям</PageTitle>
       <FilterButton
         onClick={() => {
           setShowFilters(!showFilters);

@@ -9,9 +9,19 @@ const CategoriesListWrapper = styled.div`
   .ant-tree .ant-tree-node-content-wrapper {
     cursor: default;
   }
+
+  .ant-tree-list {
+    background-color: ${({ theme }) => theme.background.main};
+
+    .ant-tree-switcher {
+      color: ${({ theme }) => theme.text.primary};
+    }
+  }
 `;
 
-const StatTreeItem = styled.div``;
+const StatTreeItem = styled.div`
+  background-color: ${({ theme }) => theme.background.main};
+`;
 
 const CategoryName = styled.span<{ active: boolean }>`
   display: inline-block;
