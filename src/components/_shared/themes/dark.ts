@@ -6,6 +6,7 @@ export const dark: DefaultTheme = {
   },
   text: {
     active: '#0b962f',
+    header: '#000',
     hover: '#0ec03d',
     inactive: '#a1a49e',
     primary: '#FFF',

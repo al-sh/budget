@@ -1,3 +1,5 @@
+console.time('total serverInit');
+
 import dotenvFlow from 'dotenv-flow';
 dotenvFlow.config();
 console.log('env loaded');
@@ -13,8 +15,6 @@ import { CategoriesController } from './routes/categories';
 import { StatisticsController } from './routes/statistics';
 import { SyncController } from './routes/sync';
 import { TransactionsController } from './routes/transactions';
-
-console.time('serverInit');
 
 const app = express();
 const port = 3001;
@@ -37,8 +37,11 @@ app.get('/', (req, res) => {
 
 AppDataSource.initialize()
   .then(async () => {
+    console.time('initDB');
     dbInitializer(AppDataSource);
+    console.timeEnd('initDB');
 
+    console.time('routesAdd');
     const MAIN_ROUTE = '/api/';
 
     const authController = new AuthController(AppDataSource);
@@ -58,10 +61,11 @@ AppDataSource.initialize()
 
     const syncController = new SyncController(AppDataSource);
     app.use(MAIN_ROUTE + API_ROUTES.SYNC, syncController.router);
+    console.timeEnd('routesAdd');
 
     app.listen(port, '0.0.0.0', () => {
       console.log(`Example app listening on port ${port}`);
     });
-    console.timeEnd('serverInit');
+    console.timeEnd('total serverInit');
   })
   .catch((error) => console.log(error));

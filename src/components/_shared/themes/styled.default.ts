@@ -13,6 +13,7 @@ declare module 'styled-components' {
     };
     text: {
       active: Color;
+      header: Color;
       hover: Color;
       inactive: Color;
       primary: Color;

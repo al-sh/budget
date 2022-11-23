@@ -4,7 +4,8 @@ import { GetStatTreeFormParams, useStatistics } from '../../hooks/useStatistics'
 import { ETRANSACTION_TYPE } from '../../server/types/transactions';
 import { FilterButton } from '../_shared/buttons/FilterButton';
 import { Loader } from '../_shared/Loader';
-import { PageTitle } from '../_shared/_base/PageTitle';
+import { HeaderBlock } from '../_shared/_base/HeaderBlock';
+import { HeaderTitle } from '../_shared/_base/HeaderTitle';
 import { StatCategoriesList } from './StatCategoriesList';
 import { StatFilters } from './StatFilters';
 
@@ -20,13 +21,15 @@ export const StatisticsPage: React.VFC = () => {
 
   return (
     <>
-      <PageTitle>Статистика по категориям</PageTitle>
-      <FilterButton
-        onClick={() => {
-          setShowFilters(!showFilters);
-        }}
-        showFilters={showFilters}
-      />
+      <HeaderBlock>
+        <HeaderTitle>Статистика по категориям</HeaderTitle>
+        <FilterButton
+          onClick={() => {
+            setShowFilters(!showFilters);
+          }}
+          showFilters={showFilters}
+        />
+      </HeaderBlock>
       {showFilters && (
         <StatFilters
           params={filterParams}

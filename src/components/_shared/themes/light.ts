@@ -6,6 +6,7 @@ export const light: DefaultTheme = {
   },
   text: {
     active: '#008F8C',
+    header: '#FFF',
     hover: '#0ec03d',
     inactive: '#BABABA',
     primary: '#000',
