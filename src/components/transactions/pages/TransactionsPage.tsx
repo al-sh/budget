@@ -42,7 +42,6 @@ export const TransactionsPage: React.FC = () => {
   let filtersCount = 0;
   for (const key in filterParams) {
     if (filterParams[key as keyof GetTransactionsQueryParams]) {
-      console.log(key, filterParams[key as keyof GetTransactionsQueryParams]);
       filtersCount++;
     }
   }

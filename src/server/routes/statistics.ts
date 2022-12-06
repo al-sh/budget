@@ -1,12 +1,11 @@
 import * as express from 'express';
 import { DataSource, FindOptionsWhere } from 'typeorm';
-import { Category, ICategoryTreeItem, ICategoryStatItem, CategoryWithAmount, CategoryWithAmountAndShare } from '../entity/Category';
-import { Transaction } from '../entity/Transaction';
+import { Category, CategoryWithAmount, CategoryWithAmountAndShare, ICategoryStatItem, ICategoryTreeItem } from '../entity/Category';
 import { CategoriesRepo } from '../repos/categories.repo';
 import { TransactionsRepo } from '../repos/transactions.repo';
 import { StatisticsService } from '../services/statistics.service';
 import { ETRANSACTION_TYPE } from '../types/transactions';
-import { buildPeriodFilterString } from '../utils/dates';
+import { getMonthPeriods } from '../utils/dates';
 
 export interface GetAllCategoriesRequest extends express.Request {
   query: {
@@ -24,9 +23,24 @@ export interface GetStatTree extends express.Request {
   };
 }
 
+export interface GetMonthStat extends express.Request {
+  query: {
+    categoryId?: string;
+    dateEnd?: string;
+    dateFrom?: string;
+    showHidden?: string;
+    typeId?: string;
+  };
+}
+
 export interface GetAllCategoriesQuery {
   showHidden?: string;
   typeId?: string;
+}
+
+export interface MonthlyStatCategory {
+  category: { id: Category['id']; name: Category['name'] };
+  data: { amount: number; period: string }[];
 }
 
 export class StatisticsController {
@@ -37,6 +51,7 @@ export class StatisticsController {
     this.statService = StatisticsService.getInstance(ds);
 
     this.router.get(`${this.path}tree`, this.getTreeStat);
+    this.router.get(`${this.path}graph`, this.getGraphStat);
   }
 
   public router = express.Router();
@@ -50,6 +65,55 @@ export class StatisticsController {
   private statService: StatisticsService;
 
   private transactionsRepo: TransactionsRepo;
+
+  private getGraphStat = async (request: GetMonthStat, response: express.Response<MonthlyStatCategory[] | string>) => {
+    const userId = Number(request.headers.userid);
+    let typeId: ETRANSACTION_TYPE = parseInt(
+      Array.isArray(request.query.typeId) ? request.query.typeId.join('') : (request.query.typeId as string)
+    );
+
+    if (typeId === ETRANSACTION_TYPE.RETURN_EXPENSE) typeId = ETRANSACTION_TYPE.EXPENSE;
+    if (typeId === ETRANSACTION_TYPE.RETURN_INCOME) typeId = ETRANSACTION_TYPE.INCOME;
+
+    const showHidden = request.query.showHidden === '1';
+    const categoryId = request.query?.categoryId;
+
+    const categoriesList = await this.categoriesRepo.getAll(userId, { id: categoryId, showHidden: showHidden, typeId: typeId });
+
+    const dtFrom = request.query.dateFrom;
+    const dtEnd = request.query.dateEnd;
+
+    const transactions = await this.transactionsRepo.getAll(userId, { dateEnd: dtEnd, dateFrom: dtFrom, typeId: typeId });
+
+    const categoriesWithTransactions = categoriesList.map((category) => ({
+      category: category,
+      transactions: transactions.filter((tran) => tran.category?.id === category.id),
+    }));
+
+    if (dtFrom && dtEnd) {
+      try {
+        const periods = getMonthPeriods(dtFrom, dtEnd);
+
+        const result: MonthlyStatCategory[] = categoriesWithTransactions.map((item) => ({
+          category: { id: item.category.id, name: item.category.name },
+          data: periods.map((period) => ({
+            period: period,
+            amount: this.statService.calculateTransactions(this.statService.filterTransactionsByPeriod(period, item.transactions)),
+          })),
+        }));
+
+        setTimeout(() => {
+          response.send(result);
+        }, 500);
+      } catch (e) {
+        response.status(500).send('getGraphStat error' + String(e));
+      }
+    } else {
+      setTimeout(() => {
+        response.send([]);
+      }, 500);
+    }
+  };
 
   private getTreeItem = (category: CategoryWithAmountAndShare, categories: CategoryWithAmountAndShare[]) => {
     const item: ICategoryStatItem = {
@@ -103,7 +167,7 @@ export class StatisticsController {
       whereClause.isActive = true;
     }
 
-    const categoriesList = await this.categoriesRepo.getAll(userId, showHidden, typeId);
+    const categoriesList = await this.categoriesRepo.getAll(userId, { showHidden: showHidden, typeId: typeId });
 
     const dtFrom = request.query.dateFrom;
     const dtEnd = request.query.dateEnd;
@@ -119,8 +183,6 @@ export class StatisticsController {
       const amounts = this.statService.calculateAmount(category, categoriesWithTransactions);
       return { ...category, ...amounts };
     });
-
-    console.log('categoriesWithAmounts', categoriesWithAmounts);
 
     const categoriesWithAmountsAndShares: CategoryWithAmountAndShare[] = categoriesWithAmounts.map((category) => ({
       ...category,
@@ -146,6 +208,6 @@ export class StatisticsController {
 
     setTimeout(() => {
       response.send(tree);
-    }, 1500);
+    }, 500);
   };
 }

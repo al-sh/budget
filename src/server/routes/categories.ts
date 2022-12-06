@@ -91,7 +91,7 @@ export class CategoriesController {
 
     const showHidden = request.query.showHidden === '1';
 
-    const categories = await this.categoriesService.getAll(Number(request.headers.userid), showHidden, typeId);
+    const categories = await this.categoriesService.getAll(Number(request.headers.userid), { showHidden: showHidden, typeId: typeId });
 
     setTimeout(() => {
       response.send(categories);

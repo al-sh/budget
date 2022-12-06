@@ -34,13 +34,18 @@ const Amount = styled.span`
   color: green;
 `;
 
-export const StatCategoriesList: React.VFC<{ categoriesTree: ICategoryStatItem[] }> = ({ categoriesTree }) => {
+export const StatCategoriesList: React.VFC<{ categoriesTree: ICategoryStatItem[]; onSelect?: (selectedIds: string[]) => void }> = ({
+  categoriesTree,
+  onSelect,
+}) => {
   return (
     <>
       <CategoriesListWrapper>
         <Tree
           treeData={categoriesTree}
-          selectable={false}
+          selectable={true}
+          // multiple
+          onSelect={(selectedIds) => onSelect && onSelect(selectedIds.map((item) => String(item)))}
           titleRender={(item) => (
             <StatTreeItem>
               <CategoryName active={!!item.isActive}>{item.title}</CategoryName>

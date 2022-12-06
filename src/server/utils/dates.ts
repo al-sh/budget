@@ -10,7 +10,9 @@ export const buildPeriodFilterString = (dtFrom?: string, dtEnd?: string) => {
     if (isValid(parse(dtFrom, formats.date.short, new Date()))) {
       result = Raw((alias) => `${alias} >= :dtFrom`, { dtFrom: dtFrom });
     } else {
-      console.error('transactions getAll invalid dtFrom', dtFrom);
+      const errMessage = 'buildPeriodFilterString invalid dtFrom ' + dtFrom;
+      console.error(errMessage);
+      throw new Error(errMessage);
     }
   }
 
@@ -22,7 +24,9 @@ export const buildPeriodFilterString = (dtFrom?: string, dtEnd?: string) => {
 
       result = Raw((alias) => `${alias} <= :dtEnd`, { dtEnd: dtEndToFilter });
     } else {
-      console.error('transactions getAll invalid dtEnd', dtEnd);
+      const errMessage = 'buildPeriodFilterString invalid dtEnd ' + dtEnd;
+      console.error(errMessage);
+      throw new Error(errMessage);
     }
   }
 
@@ -34,9 +38,32 @@ export const buildPeriodFilterString = (dtFrom?: string, dtEnd?: string) => {
 
       result = Raw((alias) => `${alias} >= :dtFrom AND ${alias} <= :dtEnd`, { dtFrom: dtFrom, dtEnd: dtEndToFilter });
     } else {
-      console.error('transactions getAll invalid dtFrom or dtEnd', dtFrom, dtEnd);
+      const errMessage = 'buildPeriodFilterString invalid dtFrom or dtEnd ' + dtFrom + ' ' + dtEnd;
+      console.error(errMessage);
+      throw new Error(errMessage);
     }
   }
 
   return result;
+};
+
+export const getMonthPeriods = (dtFrom: string, dtEnd: string) => {
+  const res: string[] = [];
+  if (isValid(parse(dtFrom, formats.date.short, new Date())) && isValid(parse(dtEnd, formats.date.short, new Date()))) {
+    const dateFrom = parse(dtFrom, formats.date.short, new Date());
+    const dateEnd = parse(dtEnd, formats.date.short, new Date());
+    for (let year = dateFrom.getFullYear(); year <= dateEnd.getFullYear(); year++) {
+      const initMonth = year === dateFrom.getFullYear() ? dateFrom.getMonth() : 0;
+      const lastMonth = year === dateEnd.getFullYear() ? dateEnd.getMonth() : 11;
+      for (let month = initMonth; month <= lastMonth; month++) {
+        const formattedMonth = String(month + 1).padStart(2, '0');
+        res.push(`${year}_${formattedMonth}`);
+      }
+    }
+    return res;
+  } else {
+    const errMessage = 'getMonthPeriods invalid dtFrom or dtEnd ' + dtFrom + ' ' + dtEnd;
+    console.error(errMessage);
+    throw new Error(errMessage);
+  }
 };

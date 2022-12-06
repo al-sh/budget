@@ -49,14 +49,11 @@ export class AccountsController {
   };
 
   private create = async (request: express.Request, response: express.Response) => {
-    console.log('acc create1', request.body);
-
     const account = this.ds.manager.create(Account, { ...request.body, user: { id: request.headers.userid } });
 
     this.ds.manager
       .save(account)
       .then((acc) => {
-        console.log('create - ok: ', account, acc);
         setTimeout(() => {
           response.send({ account: acc });
         }, 1500); //load emulation
@@ -65,7 +62,6 @@ export class AccountsController {
   };
 
   private delete = async (request: express.Request, response: express.Response) => {
-    console.log('acc delete', request.body);
     if (!parseInt(request.params.id)) {
       response.status(500);
       response.send(`acc delete error. request.params.id: ${request.params.id}`);

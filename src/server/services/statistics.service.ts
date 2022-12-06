@@ -62,4 +62,11 @@ export class StatisticsService {
 
     return rest;
   };
+
+  public filterTransactionsByPeriod(period: string, transactions: Transaction[]) {
+    const year = parseInt(period.substring(0, 4));
+    const month = parseInt(period.substring(5, 7)) - 1;
+
+    return transactions.filter((item) => item.dt?.getFullYear() === year && item.dt.getMonth() === month);
+  }
 }

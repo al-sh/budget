@@ -73,7 +73,7 @@ export class TransactionsRepo {
 
     const filterCategoryId = params?.categoryId;
     if (filterCategoryId) {
-      const allCategories = await this.categoriesService.getAll(userId, false);
+      const allCategories = await this.categoriesService.getAll(userId, { showHidden: false });
 
       if (allCategories.findIndex((cat) => cat.id === filterCategoryId) === -1) {
         const errMessage = `Данная категория не принадлежит данному клиенту! request.query.categoryId' ${filterCategoryId} userId ${userId}`;

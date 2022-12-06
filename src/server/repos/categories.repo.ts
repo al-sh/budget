@@ -44,7 +44,6 @@ export class CategoriesRepo {
           order: defaultCategoriesOrder,
         })
       ).filter((cat) => !cat.parentCategory?.id);
-      console.log('siblings', siblings);
     }
     const lastSiblingOrder = siblings.length ? siblings[siblings.length - 1].order || 1 : 0;
     category.order = lastSiblingOrder + 1;
@@ -58,23 +57,34 @@ export class CategoriesRepo {
     }
   }
 
-  public async getAll(userId: User['id'], showHidden?: boolean, typeId?: Category['type']['id']): Promise<Category[]> {
+  public async getAll(
+    userId: User['id'],
+    params: { id?: Category['id']; showHidden?: boolean; typeId?: Category['type']['id'] }
+  ): Promise<Category[]> {
     const whereClause: FindOptionsWhere<Category> = {
-      type: typeId ? { id: typeId } : undefined,
+      id: params.id,
+      type: params.typeId ? { id: params.typeId } : undefined,
       user: { id: userId },
     };
 
-    if (!showHidden) {
+    if (!params.showHidden) {
       whereClause.isActive = true;
     }
 
-    const categories = await this.ds.manager.find(Category, {
-      relations: ['type', 'childrenCategories', 'parentCategory'],
-      where: whereClause,
-      order: defaultCategoriesOrder,
-    });
+    try {
+      const categories = await this.ds.manager.find(Category, {
+        relations: ['type', 'childrenCategories', 'parentCategory'],
+        where: whereClause,
+        order: defaultCategoriesOrder,
+      });
 
-    return categories;
+      return categories;
+    } catch (e) {
+      const errMessage = 'categoriesRepo getAll error' + e;
+      throw new Error(errMessage);
+      console.error(errMessage);
+    }
+    return [];
   }
 
   public async getTree(userId: User['id'], showHidden?: boolean, typeId?: Category['type']['id']): Promise<ICategoryTreeItem[]> {

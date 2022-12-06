@@ -1,6 +1,7 @@
 import { Tabs } from 'antd';
 import React, { useState } from 'react';
 import { GetStatTreeFormParams, useStatistics } from '../../hooks/useStatistics';
+import { Category } from '../../server/entity/Category';
 import { ETRANSACTION_TYPE } from '../../server/types/transactions';
 import { FilterButton } from '../_shared/buttons/FilterButton';
 import { Loader } from '../_shared/Loader';
@@ -8,10 +9,12 @@ import { HeaderBlock } from '../_shared/_base/HeaderBlock';
 import { HeaderTitle } from '../_shared/_base/HeaderTitle';
 import { StatCategoriesList } from './StatCategoriesList';
 import { StatFilters } from './StatFilters';
+import { StatGraph } from './StatGraph';
 
 export const StatisticsPage: React.VFC = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [filterParams, setFilterParams] = useState<GetStatTreeFormParams>({ typeId: ETRANSACTION_TYPE.EXPENSE, showHidden: false });
+  const [selectedCategory, setSelectedCategory] = useState<Category['id'] | undefined>(undefined);
 
   const { useGetTree } = useStatistics();
 
@@ -20,7 +23,6 @@ export const StatisticsPage: React.VFC = () => {
   let filtersCount = 0;
   for (const key in filterParams) {
     if (key !== 'typeId' && filterParams[key as keyof GetStatTreeFormParams]) {
-      console.log(key, filterParams[key as keyof GetStatTreeFormParams]);
       filtersCount++;
     }
   }
@@ -62,7 +64,10 @@ export const StatisticsPage: React.VFC = () => {
         <Tabs.TabPane tab="Доходы" key={String(ETRANSACTION_TYPE.INCOME)} />
       </Tabs>
       {isLoading && <Loader />}
-      {categoriesTree && !isLoading && <StatCategoriesList categoriesTree={categoriesTree} />}
+      {categoriesTree && !isLoading && (
+        <StatCategoriesList categoriesTree={categoriesTree} onSelect={(selectedIds) => setSelectedCategory(selectedIds[0])} />
+      )}
+      <StatGraph filterParams={filterParams} selectedCategory={selectedCategory} />
     </>
   );
 };
