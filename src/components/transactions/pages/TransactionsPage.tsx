@@ -39,6 +39,14 @@ export const TransactionsPage: React.FC = () => {
   const { useGetList: useGetTransactions } = useTransactions();
   const { isLoading, isError, data: transactions } = useGetTransactions(filterParams);
 
+  let filtersCount = 0;
+  for (const key in filterParams) {
+    if (filterParams[key as keyof GetTransactionsQueryParams]) {
+      console.log(key, filterParams[key as keyof GetTransactionsQueryParams]);
+      filtersCount++;
+    }
+  }
+
   return (
     <>
       <HeaderBlock>
@@ -48,6 +56,7 @@ export const TransactionsPage: React.FC = () => {
             setShowFilters(!showFilters);
           }}
           showFilters={showFilters}
+          filtersCount={filtersCount}
         />
       </HeaderBlock>
 

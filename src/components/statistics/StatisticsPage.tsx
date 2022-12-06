@@ -17,6 +17,14 @@ export const StatisticsPage: React.VFC = () => {
 
   const { isLoading, isError, data: categoriesTree } = useGetTree(filterParams);
 
+  let filtersCount = 0;
+  for (const key in filterParams) {
+    if (key !== 'typeId' && filterParams[key as keyof GetStatTreeFormParams]) {
+      console.log(key, filterParams[key as keyof GetStatTreeFormParams]);
+      filtersCount++;
+    }
+  }
+
   if (isError) return <>Error</>;
 
   return (
@@ -28,6 +36,7 @@ export const StatisticsPage: React.VFC = () => {
             setShowFilters(!showFilters);
           }}
           showFilters={showFilters}
+          filtersCount={filtersCount}
         />
       </HeaderBlock>
       {showFilters && (
