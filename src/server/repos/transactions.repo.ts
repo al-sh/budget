@@ -97,7 +97,7 @@ export class TransactionsRepo {
       order: {
         dt: 'DESC',
       },
-      ...(params.pageNumber && { skip: 0 + params.pageNumber * PAGE_SIZE, take: PAGE_SIZE }),
+      ...(params.pageNumber && { skip: (params.pageNumber - 1) * PAGE_SIZE, take: PAGE_SIZE }),
     });
 
     return transactions;

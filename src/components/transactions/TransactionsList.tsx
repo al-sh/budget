@@ -5,7 +5,7 @@ import { Loader } from '../_shared/Loader';
 import { TransactionItem } from './TransactionItem';
 
 export const TransactionsList: React.VFC = () => {
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const { useGetList: useGetTransactions } = useTransactions();
   const { isLoading, isError, data: transactions } = useGetTransactions({ pageNum: currentPage });
 
@@ -23,7 +23,7 @@ export const TransactionsList: React.VFC = () => {
         <TransactionItem key={tran.id} tran={tran} />
       ))}
       <div style={{ marginTop: '1rem' }}>
-        <span style={{ marginRight: '0.5rem' }}>Страница: {currentPage + 1}</span>
+        <span style={{ marginRight: '0.5rem' }}>Страница: {currentPage}</span>
         {currentPage > 0 && (
           <Button
             onClick={() => {
