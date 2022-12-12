@@ -113,6 +113,7 @@ export class AccountsController {
 
     const account = await this.ds.manager.findOne(Account, {
       where: { id: accId, user: { id: Number(request.headers.userid) } },
+      relations: { incomingTransactions: { toAccount: true, category: true, type: true }, transactions: { category: true, type: true } },
     });
 
     if (!account) {
@@ -122,14 +123,9 @@ export class AccountsController {
       return;
     }
 
-    const transactions = await this.ds.manager.find(Transaction, { relations: ['account', 'category'], where: { account: { id: accId } } });
-    const incomingTransactions = await this.ds.manager.find(Transaction, {
-      relations: ['account', 'category', 'toAccount'],
-      where: { toAccount: { id: accId } },
-    });
-    const rest = this.calculateRest([...transactions, ...incomingTransactions], account);
+    const transactions = [...(account.transactions ?? []), ...(account.incomingTransactions ?? [])];
 
-    console.log('tran cnt:', transactions.length, 'SUM1:', rest);
+    const rest = this.calculateRest(transactions, account);
 
     setTimeout(() => {
       response.send({ ...account, rest: rest });

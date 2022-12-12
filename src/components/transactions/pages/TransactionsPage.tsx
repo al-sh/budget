@@ -29,6 +29,10 @@ export const TransactionsPage: React.FC = () => {
   }
   if (String(searchAsObject.dateFrom) !== 'undefined') {
     initialFilterParams.dateFrom = moment(searchAsObject.dateFrom);
+  } else {
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    initialFilterParams.dateFrom = moment(startOfMonth);
   }
   if (String(searchAsObject.dateEnd) !== 'undefined') {
     initialFilterParams.dateEnd = moment(searchAsObject.dateEnd);

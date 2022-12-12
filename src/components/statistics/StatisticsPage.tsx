@@ -1,4 +1,5 @@
 import { Tabs } from 'antd';
+import moment from 'moment';
 import React, { useState } from 'react';
 import { GetStatTreeFormParams, useStatistics } from '../../hooks/useStatistics';
 import { Category } from '../../server/entity/Category';
@@ -13,7 +14,20 @@ import { StatGraph } from './StatGraph/StatGraph';
 
 export const StatisticsPage: React.VFC = () => {
   const [showFilters, setShowFilters] = useState(false);
-  const [filterParams, setFilterParams] = useState<GetStatTreeFormParams>({ typeId: ETRANSACTION_TYPE.EXPENSE, showHidden: false });
+
+  const dateFrom = new Date();
+  dateFrom.setMonth(dateFrom.getMonth() - 6);
+  dateFrom.setDate(1);
+
+  const dateEnd = new Date();
+  dateEnd.setDate(0);
+
+  const [filterParams, setFilterParams] = useState<GetStatTreeFormParams>({
+    typeId: ETRANSACTION_TYPE.EXPENSE,
+    showHidden: false,
+    dateFrom: moment(dateFrom),
+    dateEnd: moment(dateEnd),
+  });
   const [selectedCategories, setSelectedCategories] = useState<Category['id'][] | undefined>(undefined);
 
   const { useGetTree } = useStatistics();

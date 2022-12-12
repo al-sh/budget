@@ -103,7 +103,7 @@ export class StatisticsController {
           category: { id: item.category.id, name: item.category.name },
           data: periods.map((period) => ({
             period: period,
-            amount: this.statService.calculateTransactions(this.statService.filterTransactionsByPeriod(period, item.transactions)), //TODO: получаем список дочерних catId и считаем по ним
+            amount: this.statService.calculateTransactions(this.statService.filterTransactionsByPeriod(period, item.transactions)),
           })),
         }));
       }
@@ -130,7 +130,7 @@ export class StatisticsController {
     const children = categories.filter((item) => item.parentCategory?.id === category?.id);
     if (children?.length) {
       item.children = children.map((child) => this.getTreeItem(child, categories));
-      if (category.selfAmount > 0) {
+      if (category.selfAmount !== 0) {
         (item.children as ICategoryStatItem[]).unshift({
           title: category.name + ' (общ)',
           id: category.id + '_general',
