@@ -92,7 +92,7 @@ export class TransactionsRepo {
     }
 
     const transactions = await this.ds.manager.find(Transaction, {
-      relations: ['account', 'category', 'category.type', 'type'],
+      relations: ['account', 'category', 'category.type', 'category.parentCategory', 'type'],
       where: whereClause,
       order: {
         dt: 'DESC',

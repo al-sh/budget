@@ -63,6 +63,11 @@ export class StatisticsService {
     return rest;
   };
 
+  public calculateTransactionsByCategories = (transactions: Transaction[], categoryIds: string[]) => {
+    const filteredTransactions = transactions.filter((item) => item.category?.id && categoryIds.includes(item.category?.id));
+    return this.calculateTransactions(filteredTransactions);
+  };
+
   public filterTransactionsByPeriod(period: string, transactions: Transaction[]) {
     const year = parseInt(period.substring(0, 4));
     const month = parseInt(period.substring(5, 7)) - 1;

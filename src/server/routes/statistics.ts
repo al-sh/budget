@@ -78,44 +78,40 @@ export class StatisticsController {
     const showHidden = request.query.showHidden === '1';
     const categoryIds = request.query?.categoryIds?.split(',');
 
-    const categoriesList = await this.categoriesRepo.getAll(userId, {
-      ...(categoryIds && { ids: categoryIds }),
-      showHidden: showHidden,
-      typeId: typeId,
-    });
+    try {
+      const categoriesList = await this.categoriesRepo.getAll(userId, {
+        ...(categoryIds && { ids: categoryIds }),
+        showHidden: showHidden,
+        typeId: typeId,
+      });
 
-    const dtFrom = request.query.dateFrom;
-    const dtEnd = request.query.dateEnd;
+      const dtFrom = request.query.dateFrom;
+      const dtEnd = request.query.dateEnd;
 
-    const transactions = await this.transactionsRepo.getAll(userId, { dateEnd: dtEnd, dateFrom: dtFrom, typeId: typeId });
+      const transactions = await this.transactionsRepo.getAll(userId, { dateEnd: dtEnd, dateFrom: dtFrom, typeId: typeId });
 
-    const categoriesWithTransactions = categoriesList.map((category) => ({
-      category: category,
-      transactions: transactions.filter((tran) => tran.category?.id === category.id),
-    }));
+      const categoriesWithTransactions = categoriesList.map((category) => ({
+        category: category,
+        transactions: transactions.filter((tran) => tran.category?.id === category.id || tran.category?.parentCategory?.id === category.id),
+      }));
 
-    if (dtFrom && dtEnd) {
-      try {
+      let result: MonthlyStatCategory[] = [];
+      if (dtFrom && dtEnd) {
         const periods = getMonthPeriods(dtFrom, dtEnd);
 
-        const result: MonthlyStatCategory[] = categoriesWithTransactions.map((item) => ({
+        result = categoriesWithTransactions.map((item) => ({
           category: { id: item.category.id, name: item.category.name },
           data: periods.map((period) => ({
             period: period,
-            amount: this.statService.calculateTransactions(this.statService.filterTransactionsByPeriod(period, item.transactions)),
+            amount: this.statService.calculateTransactions(this.statService.filterTransactionsByPeriod(period, item.transactions)), //TODO: получаем список дочерних catId и считаем по ним
           })),
         }));
-
-        setTimeout(() => {
-          response.send(result);
-        }, 500);
-      } catch (e) {
-        response.status(500).send('getGraphStat error' + String(e));
       }
-    } else {
       setTimeout(() => {
-        response.send([]);
+        response.send(result);
       }, 500);
+    } catch (e) {
+      response.status(500).send('getGraphStat error' + String(e));
     }
   };
 
