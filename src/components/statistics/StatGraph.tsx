@@ -1,14 +1,16 @@
 import { GetStatTreeFormParams, useStatistics } from '../../hooks/useStatistics';
 import { Category } from '../../server/entity/Category';
-import { formatMoney } from '../../utils/format';
 import { Loader } from '../_shared/Loader';
 
-export const StatGraph: React.VFC<{ filterParams: GetStatTreeFormParams; selectedCategory?: Category['id'] }> = ({
+import { StatGraphChart } from './StatGraph/StatGrapChart';
+import { StatGraphRawData } from './StatGraph/StatGraphRawData';
+
+export const StatGraph: React.VFC<{ filterParams: GetStatTreeFormParams; selectedCategories: Category['id'][] }> = ({
   filterParams,
-  selectedCategory,
+  selectedCategories,
 }) => {
   const { useGraph } = useStatistics();
-  const { isLoading, isError, data: statCategories } = useGraph({ ...filterParams, categoryId: selectedCategory });
+  const { isLoading, isError, data: statCategories } = useGraph({ ...filterParams, categoryIds: selectedCategories });
 
   if (isLoading) {
     return <Loader />;
@@ -24,20 +26,8 @@ export const StatGraph: React.VFC<{ filterParams: GetStatTreeFormParams; selecte
 
   return (
     <div>
-      {statCategories?.length > 0 &&
-        statCategories?.map((item) => (
-          <div key={item.category.id}>
-            <div>{item.category.name}</div>
-            <div>
-              {item.data.map((item) => (
-                <div key={item.period}>
-                  <span>{item.period}</span>
-                  <span style={{ marginLeft: 20 }}>{formatMoney(item.amount)}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
+      <StatGraphChart statCategories={statCategories} />
+      <StatGraphRawData statCategories={statCategories} />
     </div>
   );
 };

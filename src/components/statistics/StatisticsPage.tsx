@@ -14,7 +14,7 @@ import { StatGraph } from './StatGraph';
 export const StatisticsPage: React.VFC = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [filterParams, setFilterParams] = useState<GetStatTreeFormParams>({ typeId: ETRANSACTION_TYPE.EXPENSE, showHidden: false });
-  const [selectedCategory, setSelectedCategory] = useState<Category['id'] | undefined>(undefined);
+  const [selectedCategories, setSelectedCategories] = useState<Category['id'][] | undefined>(undefined);
 
   const { useGetTree } = useStatistics();
 
@@ -65,9 +65,9 @@ export const StatisticsPage: React.VFC = () => {
       </Tabs>
       {isLoading && <Loader />}
       {categoriesTree && !isLoading && (
-        <StatCategoriesList categoriesTree={categoriesTree} onSelect={(selectedIds) => setSelectedCategory(selectedIds[0])} />
+        <StatCategoriesList categoriesTree={categoriesTree} onSelect={(selectedIds) => setSelectedCategories(selectedIds)} />
       )}
-      <StatGraph filterParams={filterParams} selectedCategory={selectedCategory} />
+      {selectedCategories && <StatGraph filterParams={filterParams} selectedCategories={selectedCategories} />}
     </>
   );
 };

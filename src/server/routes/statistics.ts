@@ -25,7 +25,7 @@ export interface GetStatTree extends express.Request {
 
 export interface GetMonthStat extends express.Request {
   query: {
-    categoryId?: string;
+    categoryIds?: string;
     dateEnd?: string;
     dateFrom?: string;
     showHidden?: string;
@@ -76,9 +76,13 @@ export class StatisticsController {
     if (typeId === ETRANSACTION_TYPE.RETURN_INCOME) typeId = ETRANSACTION_TYPE.INCOME;
 
     const showHidden = request.query.showHidden === '1';
-    const categoryId = request.query?.categoryId;
+    const categoryIds = request.query?.categoryIds?.split(',');
 
-    const categoriesList = await this.categoriesRepo.getAll(userId, { id: categoryId, showHidden: showHidden, typeId: typeId });
+    const categoriesList = await this.categoriesRepo.getAll(userId, {
+      ...(categoryIds && { ids: categoryIds }),
+      showHidden: showHidden,
+      typeId: typeId,
+    });
 
     const dtFrom = request.query.dateFrom;
     const dtEnd = request.query.dateEnd;

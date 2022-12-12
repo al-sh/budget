@@ -1,6 +1,6 @@
 {
   "name": "budget-react",
-  "version": "0.2.27",
+  "version": "0.2.29",
   "homepage": "budget",
   "proxy": "http://localhost:3001",
   "private": true,
@@ -42,6 +42,7 @@
     "react-query": "3.34.16",
     "react-router-dom": "6.2.1",
     "react-scripts": "5.0.0",
+    "recharts": "2.2.0",
     "reflect-metadata": "0.1.13",
     "styled-components": "5.3.3",
     "typeorm": "0.3.0",

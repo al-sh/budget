@@ -44,7 +44,7 @@ export const StatCategoriesList: React.VFC<{ categoriesTree: ICategoryStatItem[]
         <Tree
           treeData={categoriesTree}
           selectable={true}
-          // multiple
+          multiple
           onSelect={(selectedIds) => onSelect && onSelect(selectedIds.map((item) => String(item)))}
           titleRender={(item) => (
             <StatTreeItem>

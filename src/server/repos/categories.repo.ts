@@ -1,4 +1,4 @@
-import { DataSource, FindOptionsOrder, FindOptionsWhere } from 'typeorm';
+import { DataSource, FindOptionsOrder, FindOptionsWhere, In } from 'typeorm';
 import { Category, ICategoryTreeItem } from '../entity/Category';
 import { User } from '../entity/User';
 
@@ -59,10 +59,10 @@ export class CategoriesRepo {
 
   public async getAll(
     userId: User['id'],
-    params: { id?: Category['id']; showHidden?: boolean; typeId?: Category['type']['id'] }
+    params: { ids?: Category['id'][]; showHidden?: boolean; typeId?: Category['type']['id'] }
   ): Promise<Category[]> {
     const whereClause: FindOptionsWhere<Category> = {
-      id: params.id,
+      ...(params.ids && { id: In(params.ids) }),
       type: params.typeId ? { id: params.typeId } : undefined,
       user: { id: userId },
     };

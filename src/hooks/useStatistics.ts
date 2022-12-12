@@ -19,7 +19,7 @@ export interface GetMonthStatParams {
   dateEnd?: Moment;
   showHidden?: boolean;
   typeId?: ETRANSACTION_TYPE;
-  categoryId?: string;
+  categoryIds?: string[];
 }
 
 export const statQueryKey = 'statistics';
@@ -66,9 +66,9 @@ export const useStatistics = () => {
     query.showHidden = showHidden ? '1' : '0';
     query.typeId = String(typeId);
 
-    const categoryId = params.categoryId;
-    if (categoryId) {
-      query.categoryId = String(categoryId);
+    const categoryIds = params.categoryIds;
+    if (categoryIds) {
+      query.categoryIds = categoryIds.join(',');
     }
 
     return useQuery([statQueryKey, 'graph', JSON.stringify(query)], () =>
