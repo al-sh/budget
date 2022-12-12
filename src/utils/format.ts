@@ -74,6 +74,8 @@ const formatter = new Intl.NumberFormat('ru-RU', {
 
 export const formatMoney = (value: number) => formatter.format(value / 100);
 
+export const formatMoneyShort = (value: number) => String(value / 1000);
+
 const percentFormatter = new Intl.NumberFormat('ru-RU', {
   minimumFractionDigits: 0,
   maximumFractionDigits: 0,

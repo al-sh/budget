@@ -1,5 +1,6 @@
-import { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Legend, Line, Tooltip } from 'recharts';
+import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { MonthlyStatCategory } from '../../../server/routes/statistics';
+import { formatMoneyShort } from '../../../utils/format';
 
 function getRandomColor() {
   const letters = '0123456789ABCDEF';
@@ -27,15 +28,12 @@ export const StatGraphChart: React.VFC<{ statCategories: MonthlyStatCategory[] }
     }
   }
   const chartDataValues = [...chartDataMap.values()];
-
-  console.log(chartDataFlatted, chartDataMap);
   const chartDataKeys = statCategories.map((statItem) => statItem.category.name);
 
   return (
-    <div style={{ height: 600 }}>
+    <div style={{ height: 600, marginLeft: -30 }}>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
-          width={500}
           height={600}
           data={chartDataValues}
           margin={{
@@ -47,7 +45,7 @@ export const StatGraphChart: React.VFC<{ statCategories: MonthlyStatCategory[] }
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
-          <YAxis />
+          <YAxis tickFormatter={(value) => formatMoneyShort(value)} />
           <Tooltip />
           <Legend />
           {chartDataKeys.map((item) => (

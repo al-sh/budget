@@ -9,7 +9,7 @@ import { HeaderBlock } from '../_shared/_base/HeaderBlock';
 import { HeaderTitle } from '../_shared/_base/HeaderTitle';
 import { StatCategoriesList } from './StatCategoriesList';
 import { StatFilters } from './StatFilters';
-import { StatGraph } from './StatGraph';
+import { StatGraph } from './StatGraph/StatGraph';
 
 export const StatisticsPage: React.VFC = () => {
   const [showFilters, setShowFilters] = useState(false);

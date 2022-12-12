@@ -1,9 +1,9 @@
-import { GetStatTreeFormParams, useStatistics } from '../../hooks/useStatistics';
-import { Category } from '../../server/entity/Category';
-import { Loader } from '../_shared/Loader';
+import { GetStatTreeFormParams, useStatistics } from '../../../hooks/useStatistics';
+import { Category } from '../../../server/entity/Category';
+import { Loader } from '../../_shared/Loader';
 
-import { StatGraphChart } from './StatGraph/StatGrapChart';
-import { StatGraphRawData } from './StatGraph/StatGraphRawData';
+import { StatGraphChart } from './StatGrapChart';
+import { StatGraphRawData } from './StatGraphRawData';
 
 export const StatGraph: React.VFC<{ filterParams: GetStatTreeFormParams; selectedCategories: Category['id'][] }> = ({
   filterParams,

@@ -1,7 +1,9 @@
-import { Button, Form } from 'antd';
+import { Form } from 'antd';
+import moment from 'moment';
 import { useState } from 'react';
 import { GetStatTreeFormParams } from '../../hooks/useStatistics';
 import { AccountsSelect } from '../_shared/selects/AccountsSelect';
+import { Button } from '../_shared/_base/Button';
 import { Checkbox } from '../_shared/_base/Checkbox';
 import { DatePicker } from '../_shared/_base/DatePicker';
 
@@ -19,30 +21,40 @@ export const StatFilters: React.VFC<{
       <Form
         name="StatFilters"
         form={form}
-        labelCol={{
-          span: 8,
-        }}
         onValuesChange={() => {
           setisSubmitDisabled(form.getFieldsError().filter(({ errors }) => errors.length).length > 0);
         }}
         layout="horizontal"
         labelAlign="left"
-        wrapperCol={{
-          span: 16,
-        }}
         initialValues={params}
         onFinish={(formValues) => {
           onFinish(formValues);
         }}
         autoComplete="off"
       >
-        <Form.Item label="Начало периода" name="dateFrom">
-          <DatePicker />
-        </Form.Item>
-
-        <Form.Item label="Окончание периода" name="dateEnd">
-          <DatePicker />
-        </Form.Item>
+        <div style={{ marginTop: 20, display: 'flex', alignItems: 'baseline' }}>
+          <Form.Item name="dateFrom" style={{ display: 'inline-block' }}>
+            <DatePicker placeholder="Начало периода" />
+          </Form.Item>
+          <span style={{ margin: '0 12px 0 12px' }}>-</span>
+          <Form.Item name="dateEnd" style={{ display: 'inline-block' }}>
+            <DatePicker placeholder="Конец периода" />
+          </Form.Item>
+          <Button
+            onClick={() => {
+              form.setFieldsValue({ dateFrom: moment('20220101'), dateEnd: moment('20221130') });
+            }}
+          >
+            Год
+          </Button>
+          <Button
+            onClick={() => {
+              form.setFieldsValue({ dateFrom: moment('20220701'), dateEnd: moment('20221130') });
+            }}
+          >
+            Полугодие
+          </Button>
+        </div>
 
         <Form.Item label="Счет" name="accountId">
           <AccountsSelect allowClear />
