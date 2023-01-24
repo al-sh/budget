@@ -1,67 +1,31 @@
-import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { Category, ICategoryTreeItem } from '../server/entity/Category';
-import { getApi } from '../services/Api';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { Category } from '../server/entity/Category';
+import { LocalCategory } from '../server/types/categories';
 import { ETRANSACTION_TYPE } from '../server/types/transactions';
-import { GetAllCategoriesQuery, GetCategoriesTree } from '../server/routes/categories';
-import { API_ROUTES } from '../constants/api-routes';
+import { getCategoriesStore } from '../stores/CategoriesStore';
 
 export const categoriesQueryKey = 'categories';
 
 export const useCategories = () => {
-  const api = getApi();
-
   const queryClient = useQueryClient();
 
-  const useGetList = (typeId?: ETRANSACTION_TYPE) =>
-    useQuery(
-      [categoriesQueryKey, typeId],
-      () =>
-        api.send<Category[], null, GetAllCategoriesQuery>({
-          endpoint: API_ROUTES.CATEGORIES,
-          method: 'GET',
-          query: { typeId: String(typeId) },
-        })
-      /*{
-        enabled: !!typeId,
-      }*/
-    );
+  const categoriesStore = getCategoriesStore();
 
   const useGetTree = (params: { showHidden?: boolean; typeId?: ETRANSACTION_TYPE }) => {
     const { typeId, showHidden } = params;
 
-    return useQuery(
-      [categoriesQueryKey, 'tree', typeId, showHidden],
-      () =>
-        api.send<ICategoryTreeItem[], null, GetCategoriesTree['params']>({
-          endpoint: API_ROUTES.CATEGORIES + '/tree',
-          method: 'GET',
-          query: {
-            showHidden: showHidden ? '1' : '0',
-            typeId: String(typeId),
-          },
-        })
-      /*{
-        enabled: !!typeId,
-      }*/
-    );
+    return useQuery([categoriesQueryKey, 'tree', typeId, showHidden], () => categoriesStore.getTree(typeId, showHidden));
   };
-  const useGetOne = (id: string) =>
-    useQuery(
-      [categoriesQueryKey, id],
-      () => api.send<Category, null, null>({ endpoint: `${API_ROUTES.CATEGORIES}/${id}`, method: 'GET' }),
-      {
-        enabled: !!id,
-      }
-    );
 
-  const useItem = (method: 'POST' | 'PUT' | 'DELETE', id?: string, onSuccess?: () => void) =>
+  const useGetOne = (id: string) =>
+    useQuery([categoriesQueryKey, id], () => categoriesStore.getOne(id), {
+      enabled: !!id,
+    });
+
+  const useItem = (method: 'PUT' | 'DELETE', id: string, onSuccess?: () => void) =>
     useMutation(
-      (formValues: Partial<Category>) => {
-        return api.send<null, Partial<Category>, null>({
-          data: formValues,
-          endpoint: id ? `${API_ROUTES.CATEGORIES}/${id}` : API_ROUTES.CATEGORIES,
-          method: method,
-        });
+      (formValues: Record<string, unknown>) => {
+        return method === 'PUT' ? categoriesStore.update(id, formValues as unknown as LocalCategory) : categoriesStore.delete(id);
       },
       {
         onSuccess: async () => {
@@ -77,11 +41,7 @@ export const useCategories = () => {
   const useCreate = () =>
     useMutation(
       (formValues: Category) => {
-        return api.send<null, Category, null>({
-          data: formValues,
-          endpoint: 'categories',
-          method: 'POST',
-        });
+        return categoriesStore.create(formValues);
       },
       {
         onSuccess: () => {
@@ -90,5 +50,5 @@ export const useCategories = () => {
       }
     );
 
-  return { useCreate, useGetList, useGetTree, useGetOne, useItem };
+  return { useCreate, useGetTree, useGetOne, useItem };
 };

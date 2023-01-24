@@ -28,7 +28,7 @@ export const EditAccountForm: React.VFC<{ account: AccountWithRest }> = ({ accou
       <FormHeader
         text="Редактирование счета"
         onDeleteButtonClick={() => {
-          if (confirm('Удалить счет?')) {
+          if (confirm('Удалить счет? При наличии транзакций он будет помечен как неактивный')) {
             deleteAccountMutation.mutate({ id: account.id });
           }
         }}

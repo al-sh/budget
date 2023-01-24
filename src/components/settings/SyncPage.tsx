@@ -1,6 +1,9 @@
 import { Button } from 'antd';
 import React, { useState } from 'react';
 import { API_ROUTES } from '../../constants/api-routes';
+import { LocalAccount } from '../../server/types/accounts';
+import { LocalCategory } from '../../server/types/categories';
+import { LocalTransaction } from '../../server/types/transactions';
 import { getApi } from '../../services/Api';
 import { formatDateTechnical } from '../../utils/format';
 
@@ -41,8 +44,32 @@ const SyncPage: React.FC = () => {
     fileToLoad && (await sendFile(API_ROUTES.SYNC + '/upload/transactions', fileToLoad));
   };
 
+  const handleSaveFromStorage = async () => {
+    const storageData = {
+      accounts: JSON.parse(localStorage.accounts),
+      categories: JSON.parse(localStorage.categories),
+      transactions: JSON.parse(localStorage.transactions),
+    };
+    await api.send({
+      endpoint: API_ROUTES.SYNC + '/upload/all/raw',
+      method: 'POST',
+      data: storageData,
+    });
+  };
   const handleAllFile = async () => {
-    fileToLoad && (await sendFile(API_ROUTES.SYNC + '/upload/all', fileToLoad));
+    fileToLoad && (await sendFile(API_ROUTES.SYNC + '/upload/all/file', fileToLoad));
+  };
+
+  const handleGetFromBack = async () => {
+    const res = await api.send<{ accounts: LocalAccount[]; categories: LocalCategory[]; transactions: LocalTransaction[] }>({
+      endpoint: API_ROUTES.SYNC + '/download/all',
+      method: 'GET',
+    });
+
+    console.log(res);
+    localStorage.accounts = JSON.stringify(res.accounts);
+    localStorage.categories = JSON.stringify(res.categories);
+    localStorage.transactions = JSON.stringify(res.transactions);
   };
 
   return (
@@ -73,7 +100,7 @@ const SyncPage: React.FC = () => {
         <Button onClick={handleSendTransactionsFile}>Загрузить</Button>
       </div>
 
-      <h3 style={{ marginTop: 30 }}>Всё сразу</h3>
+      <h3 style={{ marginTop: 30 }}>Всё сразу - файлы</h3>
       <div>
         <Button
           onClick={async () => {
@@ -87,6 +114,12 @@ const SyncPage: React.FC = () => {
           Выгрузить
         </Button>
         <Button onClick={handleAllFile}>Загрузить</Button>
+      </div>
+
+      <h3 style={{ marginTop: 30 }}>Всё сразу - storage</h3>
+      <div>
+        <Button onClick={handleSaveFromStorage}>Сохранить</Button>
+        <Button onClick={handleGetFromBack}>Получить</Button>
       </div>
     </>
   );

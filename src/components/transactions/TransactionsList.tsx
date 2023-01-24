@@ -24,7 +24,7 @@ export const TransactionsList: React.VFC = () => {
       ))}
       <div style={{ marginTop: '1rem' }}>
         <span style={{ marginRight: '0.5rem' }}>Страница: {currentPage}</span>
-        {currentPage > 0 && (
+        {currentPage > 1 && (
           <Button
             onClick={() => {
               setCurrentPage(currentPage - 1);

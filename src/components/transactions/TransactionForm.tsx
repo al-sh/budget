@@ -2,23 +2,25 @@ import { Button, Checkbox, Form, Input, InputNumber } from 'antd';
 import moment from 'moment';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Transaction } from '../../server/entity/Transaction';
-import { ETRANSACTION_TYPE } from '../../server/types/transactions';
-import { getTrasactionsService } from '../../services/Transactions';
+import { useTransactions } from '../../hooks/useTransactions';
+import { ETRANSACTION_TYPE, LocalTransaction } from '../../server/types/transactions';
 import { AccountsSelect } from '../_shared/selects/AccountsSelect';
 import { CategoriesSelect } from '../_shared/selects/CategoriesSelect';
 import { TransactionTypeSelect } from '../_shared/selects/TransactionTypeSelect';
 import { DatePicker } from '../_shared/_base/DatePicker';
 
-export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ transaction }) => {
+export const TransactionForm: React.VFC<{ transaction?: LocalTransaction }> = ({ transaction }) => {
   const [form] = Form.useForm();
-  const [typeId, setTypeId] = useState(transaction?.category?.type?.id ? transaction.category?.type?.id : ETRANSACTION_TYPE.EXPENSE);
+  const [typeId, setTypeId] = useState(transaction?.typeId ? transaction.typeId : ETRANSACTION_TYPE.EXPENSE);
+
+  const { useItem } = useTransactions();
+  const updateQuery = useItem('PUT', { id: transaction?.id ?? '' });
+  const addQuery = useItem('POST', { id: transaction?.id ?? '' });
 
   const navigate = useNavigate();
 
   const [isSubmitDisabled, setisSubmitDisabled] = useState(true);
   const [createMore, setCreateMore] = useState(false);
-  const transactionsService = getTrasactionsService();
 
   return (
     <div>
@@ -39,16 +41,16 @@ export const TransactionForm: React.VFC<{ transaction?: Transaction }> = ({ tran
           span: 16,
         }}
         initialValues={{
-          accountId: transaction?.account?.id || '',
+          accountId: transaction?.accountId || '',
           amount: (!!transaction?.amount && transaction?.amount / 100) || undefined,
-          categoryId: transaction?.category?.id || '',
+          categoryId: transaction?.categoryId || '',
           description: transaction?.description || '',
           dt: moment(transaction?.dt) || new Date(),
-          toAccountId: transaction?.toAccount?.id || '',
-          typeId: transaction?.type?.id || ETRANSACTION_TYPE.EXPENSE,
+          toAccountId: transaction?.toAccountId || '',
+          typeId: transaction?.typeId || ETRANSACTION_TYPE.EXPENSE,
         }}
         onFinish={(formValues) => {
-          transaction ? transactionsService.update({ ...formValues, id: transaction?.id }) : transactionsService.create(formValues);
+          transaction?.id ? updateQuery.mutate(formValues) : addQuery.mutate(formValues);
           form.setFieldsValue({ amount: undefined, description: '' });
           !createMore && navigate(-1);
         }}

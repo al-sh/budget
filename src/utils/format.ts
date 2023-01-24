@@ -41,6 +41,30 @@ export const formatDateISOstr = (dt?: string) => {
   return format(newDt, 'HH:mm dd.MM.yyyy');
 };
 
+export const formatOnlyDateISOstr = (dt?: string) => {
+  if (!dt) {
+    return '';
+  }
+  const newDt = parseISO(dt);
+  if (!isValid(newDt)) {
+    console.log('invalid date: ', newDt);
+    return '';
+  }
+  return format(newDt, 'dd.MM.yyyy');
+};
+
+export const formatOnlyTimeISOstr = (dt?: string) => {
+  if (!dt) {
+    return '';
+  }
+  const newDt = parseISO(dt);
+  if (!isValid(newDt)) {
+    console.log('invalid date: ', newDt);
+    return '';
+  }
+  return format(newDt, 'HH:mm');
+};
+
 export const formatDateShort = (dt?: Date) => {
   if (!dt) {
     return '';

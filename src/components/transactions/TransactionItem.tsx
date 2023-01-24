@@ -2,34 +2,32 @@ import { MinusOutlined, PlusOutlined, RetweetOutlined, RollbackOutlined } from '
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { Transaction } from '../../server/entity/Transaction';
-import { TransactionType } from '../../server/entity/TransactionType';
-import { ETRANSACTION_TYPE } from '../../server/types/transactions';
+import { ETRANSACTION_TYPE, LocalTransactionWithNames } from '../../server/types/transactions';
 
 import { UI_ROUTES } from '../../constants/urls';
-import { formatDate, formatMoney, formatOnlyTime } from '../../utils/format';
+import { formatDateISOstr, formatMoney, formatOnlyTimeISOstr } from '../../utils/format';
 import { T2, T6 } from '../_shared/_base/Text';
 
-const TypeIcon: React.VFC<{ type: TransactionType }> = ({ type }) => {
+const TypeIcon: React.VFC<{ typeId: ETRANSACTION_TYPE }> = ({ typeId }) => {
   return (
     <>
-      {type.id === ETRANSACTION_TYPE.INCOME && <PlusOutlined />}
-      {type.id === ETRANSACTION_TYPE.EXPENSE && <MinusOutlined />}
-      {type.id === ETRANSACTION_TYPE.RETURN_EXPENSE && <RollbackOutlined />}
-      {type.id === ETRANSACTION_TYPE.RETURN_INCOME && <RollbackOutlined />}
-      {type.id === ETRANSACTION_TYPE.TRANSFER && <RetweetOutlined />}
+      {typeId === ETRANSACTION_TYPE.INCOME && <PlusOutlined />}
+      {typeId === ETRANSACTION_TYPE.EXPENSE && <MinusOutlined />}
+      {typeId === ETRANSACTION_TYPE.RETURN_EXPENSE && <RollbackOutlined />}
+      {typeId === ETRANSACTION_TYPE.RETURN_INCOME && <RollbackOutlined />}
+      {typeId === ETRANSACTION_TYPE.TRANSFER && <RetweetOutlined />}
     </>
   );
 };
 
-const TypeSymbol: React.VFC<{ type: TransactionType }> = ({ type }) => {
+const TypeSymbol: React.VFC<{ typeId: ETRANSACTION_TYPE }> = ({ typeId }) => {
   return (
     <>
-      {type.id === ETRANSACTION_TYPE.INCOME && '+'}
-      {type.id === ETRANSACTION_TYPE.EXPENSE && '-'}
-      {type.id === ETRANSACTION_TYPE.RETURN_EXPENSE && '+'}
-      {type.id === ETRANSACTION_TYPE.RETURN_INCOME && '-'}
-      {type.id === ETRANSACTION_TYPE.TRANSFER && '-'}
+      {typeId === ETRANSACTION_TYPE.INCOME && '+'}
+      {typeId === ETRANSACTION_TYPE.EXPENSE && '-'}
+      {typeId === ETRANSACTION_TYPE.RETURN_EXPENSE && '+'}
+      {typeId === ETRANSACTION_TYPE.RETURN_INCOME && '-'}
+      {typeId === ETRANSACTION_TYPE.TRANSFER && '-'}
     </>
   );
 };
@@ -54,7 +52,7 @@ const AccountName = styled.div`
   text-align: right;
 `;
 
-export const TransactionItem: React.VFC<{ tran: Transaction; showOnlyTime?: boolean }> = ({ tran, showOnlyTime }) => {
+export const TransactionItem: React.VFC<{ tran: LocalTransactionWithNames; showOnlyTime?: boolean }> = ({ tran, showOnlyTime }) => {
   const navigate = useNavigate();
 
   return (
@@ -67,10 +65,10 @@ export const TransactionItem: React.VFC<{ tran: Transaction; showOnlyTime?: bool
         <div>
           <span></span>
 
-          <T6>{tran.dt && showOnlyTime ? formatOnlyTime(tran.dt) : formatDate(tran.dt)}</T6>
+          <T6>{tran.dt && showOnlyTime ? formatOnlyTimeISOstr(tran.dt) : formatDateISOstr(tran.dt)}</T6>
 
           <CategoryName>
-            <T2>{tran?.type?.id !== ETRANSACTION_TYPE.TRANSFER ? tran?.category?.name : 'Перевод на свой счет'}</T2>
+            <T2>{tran?.typeId !== ETRANSACTION_TYPE.TRANSFER ? tran.categoryName : 'Перевод на свой счет'}</T2>
           </CategoryName>
         </div>
 
@@ -80,12 +78,12 @@ export const TransactionItem: React.VFC<{ tran: Transaction; showOnlyTime?: bool
       <span>
         <CurrencyName>
           <T2>
-            {tran?.type && <TypeSymbol type={tran?.type} />}
+            {tran?.typeId && <TypeSymbol typeId={tran?.typeId} />}
             {formatMoney(tran.amount)}
           </T2>
         </CurrencyName>
         <AccountName>
-          <T6>{tran.account?.name}</T6>
+          <T6>{tran.accountName}</T6>
         </AccountName>
       </span>
     </TransactionWrapper>

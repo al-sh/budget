@@ -8,20 +8,20 @@ import { UI_ROUTES } from '../../../constants/urls';
 
 export const TransactionsPage: React.FC = () => {
   const { transactionId } = useParams();
-  const { useGetOne, useDelete } = useTransactions();
-  const useDeleleQuery = useDelete();
+  const { useGetOne, useItem } = useTransactions();
+  const useDeleleQuery = useItem('DELETE', { id: transactionId });
   const { isFetching, data: transaction } = useGetOne(transactionId ? transactionId : ''); // TODO: переделать структуру, transactionId должен идти как обязательный props
   const navigate = useNavigate();
 
   return (
     <>
       {isFetching && <Loader />}
-      {transactionId !== 'new' && (
+      {transactionId && transactionId !== 'new' && (
         <FormHeader
           text="Редактирование транзакции"
           onDeleteButtonClick={() => {
             if (confirm('Удалить транзакцию?')) {
-              useDeleleQuery.mutate(transactionId ? transactionId : '');
+              useDeleleQuery.mutate({});
               navigate(UI_ROUTES.TRANSACTIONS);
             }
           }}

@@ -9,7 +9,7 @@ class StorageService {
     return StorageService.instance;
   }
 
-  public getItem: (key: string) => string = (key: string) => {
+  public getItem = (key: string) => {
     if (typeof localStorage === 'undefined') return undefined;
     if (localStorage.getItem(key) === '') return undefined;
     return JSON.parse(localStorage.getItem(key) as string);
@@ -19,7 +19,8 @@ class StorageService {
     localStorage?.removeItem(key);
   };
 
-  public setItem = (key: string, value: string) => {
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  public setItem = (key: string, value: string | Object) => {
     localStorage?.setItem(key, JSON.stringify(value));
   };
 }

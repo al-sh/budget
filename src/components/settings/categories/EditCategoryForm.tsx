@@ -1,22 +1,21 @@
-import { Form, Input, Checkbox, Button } from 'antd';
+import { Button, Checkbox, Form, Input } from 'antd';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UI_ROUTES } from '../../../constants/urls';
 import { useCategories } from '../../../hooks/useCategories';
-import { Category } from '../../../server/entity/Category';
-import { ETRANSACTION_TYPE } from '../../../server/types/transactions';
+import { LocalCategory } from '../../../server/types/categories';
 import { FormHeader } from '../../_shared/forms/FormHeader';
 import { CategoriesSelect } from '../../_shared/selects/CategoriesSelect';
 import { TransactionTypeSelect } from '../../_shared/selects/TransactionTypeSelect';
 
-export const EditCategoryForm: React.VFC<{ category: Category }> = ({ category }) => {
+export const EditCategoryForm: React.VFC<{ category: LocalCategory }> = ({ category }) => {
   const { useItem } = useCategories();
-  const query = useItem('PUT', category.id);
+  const updateQuery = useItem('PUT', category.id);
   const deleteCategoryMutation = useItem('DELETE', category.id);
   const navigate = useNavigate();
 
   const [form] = Form.useForm();
-  const initialTypeId = category.type.id ? category.type.id : ETRANSACTION_TYPE.EXPENSE;
+  const initialTypeId = category.typeId;
   const [typeId, setTypeId] = useState(initialTypeId);
 
   return (
@@ -44,13 +43,13 @@ export const EditCategoryForm: React.VFC<{ category: Category }> = ({ category }
         initialValues={{
           ...category,
           isActive: category?.id ? category.isActive : true,
-          type: { id: initialTypeId },
+          typeId: initialTypeId,
         }}
         onValuesChange={() => {
-          setTypeId(form.getFieldValue(['type', 'id']));
+          setTypeId(form.getFieldValue('typeId'));
         }}
         onFinish={(formValues) => {
-          query.mutate(formValues);
+          updateQuery.mutate(formValues);
           navigate(UI_ROUTES.SETTINGS.CATEGORIES);
         }}
         autoComplete="off"
@@ -70,7 +69,7 @@ export const EditCategoryForm: React.VFC<{ category: Category }> = ({ category }
 
         <Form.Item
           label="Тип"
-          name={['type', 'id']}
+          name={'typeId'}
           rules={[
             {
               message: 'Укажите тип категории',
@@ -81,7 +80,7 @@ export const EditCategoryForm: React.VFC<{ category: Category }> = ({ category }
           <TransactionTypeSelect hideReturns disabled />
         </Form.Item>
 
-        <Form.Item label="Родительская категория" name={['parentCategory', 'id']}>
+        <Form.Item label="Родительская категория" name={'parentCategoryId'}>
           <CategoriesSelect typeId={typeId} allowClear />
         </Form.Item>
 
@@ -99,12 +98,12 @@ export const EditCategoryForm: React.VFC<{ category: Category }> = ({ category }
             span: 16,
           }}
         >
-          <Button type="primary" htmlType="submit" disabled={query.isLoading}>
+          <Button type="primary" htmlType="submit" disabled={updateQuery.isLoading}>
             Сохранить
           </Button>
         </Form.Item>
       </Form>
-      {query.isLoading && <div>Сохранение данных...</div>}
+      {updateQuery.isLoading && <div>Сохранение данных...</div>}
     </div>
   );
 };

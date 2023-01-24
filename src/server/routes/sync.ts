@@ -8,8 +8,10 @@ import { Account } from '../entity/Account';
 import { Category } from '../entity/Category';
 import { Transaction } from '../entity/Transaction';
 import { User } from '../entity/User';
+import { LocalAccount } from '../types/accounts';
 import { BaseItemRequest } from '../types/api';
-import { ETRANSACTION_TYPE } from '../types/transactions';
+import { LocalCategory } from '../types/categories';
+import { ETRANSACTION_TYPE, LocalTransaction } from '../types/transactions';
 
 export class SyncController {
   constructor(ds: DataSource) {
@@ -18,7 +20,8 @@ export class SyncController {
     //TODO: проверять что в системе нет таких счетов/транзакций у других пользователей
     // вариант - сделать через просто удаление всех предыдущих счетов/категорий и insert новых (не использовать save)
     this.router.get(`${this.path}download/all`, this.exportAll);
-    this.router.post(`${this.path}upload/all`, multer().single('fileData'), this.importAll);
+    this.router.post(`${this.path}upload/all/file`, multer().single('fileData'), this.importAllFromFile);
+    this.router.post(`${this.path}upload/all/raw`, multer().single('fileData'), this.importAllRaw);
     this.router.post(`${this.path}upload/accounts`, multer().single('fileData'), this.importAccounts);
     this.router.post(`${this.path}upload/categories`, multer().single('fileData'), this.importCategories);
     this.router.post(`${this.path}upload/transactions`, multer().single('fileData'), this.importTransactions);
@@ -30,7 +33,7 @@ export class SyncController {
 
   private path = '/';
 
-  private buildAccountFromObject: (object: Record<string, unknown>, userId: User['id']) => { errorText: string; item?: Account } = (
+  private buildAccountFromObject: (object: Partial<LocalAccount>, userId: User['id']) => { errorText: string; item?: Account } = (
     object,
     userId
   ) => {
@@ -58,7 +61,7 @@ export class SyncController {
     return { errorText: errorText, item: !errorText ? newAcc : undefined };
   };
 
-  private buildCategoryFromObject: (object: Record<string, unknown>, userId: User['id']) => { errorText: string; item?: Category } = (
+  private buildCategoryFromObject: (object: Partial<LocalCategory>, userId: User['id']) => { errorText: string; item?: Category } = (
     object,
     userId
   ) => {
@@ -76,7 +79,7 @@ export class SyncController {
     newCat.type = { id: object.typeId as ETRANSACTION_TYPE };
     newCat.parentCategory = { id: object.parentCategoryId } as Category;
 
-    const order = parseInt(object.order as string);
+    const order = parseInt(object.order as unknown as string);
     if (Number.isFinite(order)) {
       newCat.order = order;
     }
@@ -87,7 +90,7 @@ export class SyncController {
   };
 
   private buildTransactionFromObject: (
-    object: Record<string, unknown>,
+    object: Partial<LocalTransaction>,
     userId: number,
     accountIds: Account['id'][],
     categoriesIds: Category['id'][]
@@ -224,16 +227,15 @@ export class SyncController {
     }
   };
 
-  private importAll = async (request: express.Request<BaseItemRequest>, response: express.Response) => {
+  private importAll = async (
+    userId: number,
+    accounts: LocalAccount[],
+    categories: LocalCategory[],
+    transactions: LocalTransaction[],
+    response: express.Response
+  ) => {
     try {
-      const fileContent = JSON.parse(request.file?.buffer + '');
-      const accountsFromFile = fileContent.accounts;
-      const categoriesFromFile = fileContent.categories;
-      const transactionsFromFile = fileContent.transactions;
-
-      const userId = parseInt(String(request.headers.userid));
-
-      if (!Array.isArray(accountsFromFile) || !Array.isArray(categoriesFromFile) || !Array.isArray(transactionsFromFile)) {
+      if (!Array.isArray(accounts) || !Array.isArray(categories) || !Array.isArray(transactions)) {
         response.status(500);
         response.send({ message: 'Некорректный формат файла' });
         return;
@@ -242,8 +244,8 @@ export class SyncController {
       const importErrors: { item: unknown; message: string }[] = [];
 
       const accsToCreate: Account[] = [];
-      for (let i = 0; i < accountsFromFile.length; i++) {
-        const accFromFile = accountsFromFile[i];
+      for (let i = 0; i < accounts.length; i++) {
+        const accFromFile = accounts[i];
 
         const newAcc = this.buildAccountFromObject(accFromFile, userId);
         if (newAcc.item) {
@@ -254,8 +256,8 @@ export class SyncController {
       }
 
       const categoriesToCreate: Category[] = [];
-      for (let i = 0; i < categoriesFromFile.length; i++) {
-        const catFromFile = categoriesFromFile[i];
+      for (let i = 0; i < categories.length; i++) {
+        const catFromFile = categories[i];
 
         const newCat = this.buildCategoryFromObject(catFromFile, userId);
         if (newCat.item) {
@@ -269,8 +271,8 @@ export class SyncController {
       const categoriesIds: Category['id'][] = categoriesToCreate.map((category) => category.id);
 
       const transactionsToCreate: Transaction[] = [];
-      for (let i = 0; i < transactionsFromFile.length; i++) {
-        const tranFromFile = transactionsFromFile[i];
+      for (let i = 0; i < transactions.length; i++) {
+        const tranFromFile = transactions[i];
 
         const newTran = this.buildTransactionFromObject(tranFromFile, userId, accountIds, categoriesIds);
         if (newTran.item) {
@@ -304,6 +306,24 @@ export class SyncController {
       response.status(500);
       response.send({ message: `importAll error`, additional: err });
     }
+  };
+
+  private importAllFromFile = async (request: express.Request<BaseItemRequest>, response: express.Response) => {
+    const fileContent = JSON.parse(request.file?.buffer + '');
+    const accounts = fileContent.accounts;
+    const categories = fileContent.categories;
+    const transactions = fileContent.transactions;
+    const userId = parseInt(String(request.headers.userid));
+    this.importAll(userId, accounts, categories, transactions, response);
+  };
+
+  private importAllRaw = async (request: express.Request, response: express.Response) => {
+    const accounts = request.body.accounts;
+    const categories = request.body.categories;
+    const transactions = request.body.transactions;
+    const userId = parseInt(String(request.headers.userid));
+
+    this.importAll(userId, accounts, categories, transactions, response);
   };
 
   private importCategories = async (request: express.Request<BaseItemRequest>, response: express.Response) => {

@@ -1,13 +1,15 @@
 import React, { useMemo } from 'react';
-import { Transaction } from '../../server/entity/Transaction';
-import { formatDateShort } from '../../utils/format';
+import { LocalTransactionWithNames } from '../../server/types/transactions';
+import { formatOnlyDateISOstr } from '../../utils/format';
 import { TransactionsGroup } from './TransactionsGroup';
 
-const splitTransactionsByDate: (transactions: Transaction[]) => Map<string, Transaction[]> = (transactions: Transaction[]) => {
-  const res: Map<string, Transaction[]> = new Map();
+const splitTransactionsByDate: (transactions: LocalTransactionWithNames[]) => Map<string, LocalTransactionWithNames[]> = (
+  transactions: LocalTransactionWithNames[]
+) => {
+  const res: Map<string, LocalTransactionWithNames[]> = new Map();
 
   for (let i = 0; i < transactions.length; i++) {
-    const shortDt = formatDateShort(transactions[i].dt);
+    const shortDt = formatOnlyDateISOstr(transactions[i].dt);
     if (!res.get(shortDt)) {
       res.set(shortDt, []);
     }
@@ -16,7 +18,7 @@ const splitTransactionsByDate: (transactions: Transaction[]) => Map<string, Tran
   return res;
 };
 
-export const TransactionsListByDates: React.VFC<{ transactions: Transaction[] }> = ({ transactions }) => {
+export const TransactionsListByDates: React.VFC<{ transactions: LocalTransactionWithNames[] }> = ({ transactions }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const splitedTrans = useMemo(() => splitTransactionsByDate(transactions ? transactions : []), [JSON.stringify(transactions)]);
   const dates = [...splitedTrans.keys()];
