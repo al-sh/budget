@@ -3,6 +3,7 @@ import { Category } from '../server/entity/Category';
 import { LocalCategory, LocalCategoryTreeItem } from '../server/types/categories';
 import { ETRANSACTION_TYPE } from '../server/types/transactions';
 import { getLocalDataService } from '../services/LocalDataService';
+import { formatDateISOstr } from '../utils/format';
 
 class CategoriesStore {
   private static instance: CategoriesStore;
@@ -34,14 +35,30 @@ class CategoriesStore {
     });
 
   public delete = (id: string) =>
-    new Promise<void>((resolve) => {
+    new Promise<void>((resolve, reject) => {
       const categories = this._localDataService.categories;
-      const categoryToUpdate = categories.find((item) => item.id === id);
-      if (categoryToUpdate) {
-        categoryToUpdate.isActive = false;
-        console.log(categoryToUpdate);
-        this._localDataService.categories = categories;
+      const catToUpdateIdx = categories.findIndex((item) => item.id === id);
+
+      if (catToUpdateIdx === -1) {
+        reject('category delete, id not found:' + id);
+        return;
       }
+
+      const transactions = this._localDataService.transactions;
+      const catTransactions = transactions.filter((tran) => tran.categoryId === id);
+
+      if (catTransactions.length) {
+        alert(
+          'Счет сделан неактивным, а не удалён, т.к. по счету были найдены транзакции. \nДаты:\n' +
+            catTransactions.map((tran) => formatDateISOstr(tran.dt)).join('\n')
+        );
+        categories[catToUpdateIdx].isActive = false;
+      } else {
+        console.log('category delete', catToUpdateIdx);
+        categories.splice(catToUpdateIdx, 1);
+      }
+
+      this._localDataService.categories = categories;
 
       resolve();
     });

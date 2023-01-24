@@ -50,7 +50,7 @@ export const StatCategoriesList: React.VFC<{ categoriesTree: ICategoryStatItem[]
             <StatTreeItem>
               <CategoryName active={!!item.isActive}>{item.title}</CategoryName>
               <Amount>
-                {formatMoney(item.totalAmount)} RUB ({formatPercent(item.share)}%)
+                {formatMoney(item.totalAmount)} ({formatPercent(item.share)}%)
               </Amount>
             </StatTreeItem>
           )}

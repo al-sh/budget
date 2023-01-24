@@ -1,7 +1,5 @@
 import { Moment } from 'moment';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { formats } from '../constants/formats';
-import { GetTransactionsRequest } from '../server/routes/transactions';
 import { LocalTransaction } from '../server/types/transactions';
 import { getTrasactionsStore } from '../stores/TransactionsStore';
 

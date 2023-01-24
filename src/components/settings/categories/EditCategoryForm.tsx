@@ -23,7 +23,7 @@ export const EditCategoryForm: React.VFC<{ category: LocalCategory }> = ({ categ
       <FormHeader
         text="Редактирование категории"
         onDeleteButtonClick={() => {
-          if (confirm('Удалить категорию? Категория перейдёт в неактивные и её можно будет восстановить.')) {
+          if (confirm('Удалить категорию? При наличии транзакций категория будет скрыта.')) {
             deleteCategoryMutation.mutate({ id: category.id });
             navigate(UI_ROUTES.SETTINGS.CATEGORIES);
           }
