@@ -1,4 +1,3 @@
-import { MinusOutlined, PlusOutlined, RetweetOutlined, RollbackOutlined } from '@ant-design/icons';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -8,18 +7,6 @@ import { UI_ROUTES } from '../../constants/urls';
 import { formatDateISOstr, formatMoney, formatOnlyTimeISOstr } from '../../utils/format';
 import { T2, T6 } from '../_shared/_base/Text';
 
-const TypeIcon: React.VFC<{ typeId: ETRANSACTION_TYPE }> = ({ typeId }) => {
-  return (
-    <>
-      {typeId === ETRANSACTION_TYPE.INCOME && <PlusOutlined />}
-      {typeId === ETRANSACTION_TYPE.EXPENSE && <MinusOutlined />}
-      {typeId === ETRANSACTION_TYPE.RETURN_EXPENSE && <RollbackOutlined />}
-      {typeId === ETRANSACTION_TYPE.RETURN_INCOME && <RollbackOutlined />}
-      {typeId === ETRANSACTION_TYPE.TRANSFER && <RetweetOutlined />}
-    </>
-  );
-};
-
 const TypeSymbol: React.VFC<{ typeId: ETRANSACTION_TYPE }> = ({ typeId }) => {
   return (
     <>
@@ -27,7 +14,7 @@ const TypeSymbol: React.VFC<{ typeId: ETRANSACTION_TYPE }> = ({ typeId }) => {
       {typeId === ETRANSACTION_TYPE.EXPENSE && '-'}
       {typeId === ETRANSACTION_TYPE.RETURN_EXPENSE && '+'}
       {typeId === ETRANSACTION_TYPE.RETURN_INCOME && '-'}
-      {typeId === ETRANSACTION_TYPE.TRANSFER && '-'}
+      {typeId === ETRANSACTION_TYPE.TRANSFER && ' '}
     </>
   );
 };

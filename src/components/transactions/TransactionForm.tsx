@@ -65,6 +65,8 @@ export const TransactionForm: React.VFC<{ transaction?: LocalTransaction }> = ({
             style={{
               width: '100%',
             }}
+            formatter={(value) => `${value}`}
+            parser={(value) => (value ? value.replace(',', '.') : '')}
           />
         </Form.Item>
 
