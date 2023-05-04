@@ -1,4 +1,4 @@
-import { Button } from 'antd';
+import { Button, notification } from 'antd';
 import React, { useState } from 'react';
 import { API_ROUTES } from '../../constants/api-routes';
 import { LocalAccount } from '../../server/types/accounts';
@@ -6,6 +6,8 @@ import { LocalCategory } from '../../server/types/categories';
 import { LocalTransaction } from '../../server/types/transactions';
 import { getApi } from '../../services/Api';
 import { formatDateTechnical } from '../../utils/format';
+import { BaseResponse } from '../../server/types/api';
+import { SyncSaveResult } from '../../server/types/sync';
 
 const downloadToFile = (content: string, filename: string, contentType: string) => {
   const a = document.createElement('a');
@@ -50,10 +52,18 @@ const SyncPage: React.FC = () => {
       categories: JSON.parse(localStorage.categories),
       transactions: JSON.parse(localStorage.transactions),
     };
-    await api.send({
+    const res = await api.send<SyncSaveResult, any>({
       endpoint: API_ROUTES.SYNC + '/upload/all/raw',
       method: 'POST',
       data: storageData,
+    });
+
+    notification.info({
+      message:
+        `Количество ошибок: ${res.errors.length} \n ` +
+        `Импортировано счетов: ${res.imported?.accounts} \n` +
+        `Импортировано категорий: ${res.imported?.categories} \n` +
+        `Импортировано транзакций: ${res.imported?.transactions}`,
     });
   };
   const handleAllFile = async () => {

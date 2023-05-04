@@ -9,9 +9,10 @@ import { Category } from '../entity/Category';
 import { Transaction } from '../entity/Transaction';
 import { User } from '../entity/User';
 import { LocalAccount } from '../types/accounts';
-import { BaseItemRequest } from '../types/api';
+import { BaseItemRequest, BaseResponse } from '../types/api';
 import { LocalCategory } from '../types/categories';
 import { ETRANSACTION_TYPE, LocalTransaction } from '../types/transactions';
+import { SyncSaveResult } from '../types/sync';
 
 export class SyncController {
   constructor(ds: DataSource) {
@@ -232,7 +233,7 @@ export class SyncController {
     accounts: LocalAccount[],
     categories: LocalCategory[],
     transactions: LocalTransaction[],
-    response: express.Response
+    response: express.Response<BaseResponse<SyncSaveResult>>
   ) => {
     try {
       if (!Array.isArray(accounts) || !Array.isArray(categories) || !Array.isArray(transactions)) {
@@ -297,10 +298,12 @@ export class SyncController {
         await transactionalEntityManager.insert(Transaction, transactionsToCreate);
       });
 
-      response.send({
+      const res: SyncSaveResult = {
         imported: { accounts: accsToCreate.length, categories: categoriesToCreate.length, transactions: transactionsToCreate.length },
         errors: importErrors,
-      });
+      };
+
+      response.send(res);
     } catch (err) {
       console.error('importAll error: ', err);
       response.status(500);
