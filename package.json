@@ -1,7 +1,7 @@
 {
   "name": "budget-react",
-  "version": "0.2.37",
-  "homepage": "budget",
+  "version": "0.2.38",
+  "homepage": "https://al-sh.github.io/budget",
   "proxy": "http://localhost:3001",
   "private": true,
   "devDependencies": {
@@ -15,6 +15,7 @@
     "eslint": "8.8.0",
     "eslint-plugin-react": "7.28.0",
     "eslint-plugin-sort-exports": "0.6.0",
+    "gh-pages": "5.0.0",
     "nodemon": "2.0.15",
     "serve": "13.0.2",
     "ts-node": "10.4.0"
@@ -53,7 +54,9 @@
   },
   "scripts": {
     "start": "npm run dev",
-    "build": "npm run client:build && npm run server:build",
+    "build": "npm run client:build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "dev": "concurrently --kill-others \"npm run client:dev\" \"npm run server:dev\"",
     "prod:nobuild": "concurrently --kill-others \"npm run client:container:run\" \"npm run server:container:run\"",
     "client:dev": "react-scripts start",
