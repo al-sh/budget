@@ -7,7 +7,7 @@ const Wrapper = styled.div`
   overflow-x: hidden;
   overflow-y: auto;
   display: flex;
-  height: 100%;
+  height: 100vh;
   min-width: 350px;
   max-width: 600px;
   flex-direction: column;

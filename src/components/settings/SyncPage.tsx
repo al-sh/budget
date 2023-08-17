@@ -3,11 +3,11 @@ import React, { useState } from 'react';
 import { API_ROUTES } from '../../constants/api-routes';
 import { LocalAccount } from '../../server/types/accounts';
 import { LocalCategory } from '../../server/types/categories';
+import { SyncSaveResult } from '../../server/types/sync';
 import { LocalTransaction } from '../../server/types/transactions';
 import { getApi } from '../../services/Api';
 import { formatDateTechnical } from '../../utils/format';
-import { BaseResponse } from '../../server/types/api';
-import { SyncSaveResult } from '../../server/types/sync';
+import { T2 } from '../_shared/_base/Text';
 
 const downloadToFile = (content: string, filename: string, contentType: string) => {
   const a = document.createElement('a');
@@ -59,11 +59,21 @@ const SyncPage: React.FC = () => {
     });
 
     notification.info({
-      message:
-        `Количество ошибок: ${res.errors.length} \n ` +
-        `Импортировано счетов: ${res.imported?.accounts} \n` +
-        `Импортировано категорий: ${res.imported?.categories} \n` +
-        `Импортировано транзакций: ${res.imported?.transactions}`,
+      message: (
+        <div>
+          <div>Количество ошибок: {res.errors.length}</div>
+          <div>
+            <div>
+              <T2>Сохранено на бэке:</T2>
+            </div>
+            <div>
+              <div>Счетов: {res.imported?.accounts}</div>
+              <div>Категорий: {res.imported?.categories}</div>
+              <div>Транзакций: {res.imported?.transactions}</div>
+            </div>
+          </div>
+        </div>
+      ),
     });
   };
   const handleAllFile = async () => {
