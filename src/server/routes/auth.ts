@@ -99,5 +99,12 @@ export interface AuthPasswordRequest extends express.Request {
   body: { login: string; password: string };
 }
 
-export const getPasswordHash = (password: string) =>
-  crypto.pbkdf2Sync(password, 'testSalt', Number(process.env.CRYPTO_ITERATIONS), 32, 'sha256').toString('hex');
+export const getPasswordHash = (password: string) => {
+  const salt = process.env.CRYPTO_SALT;
+
+  if (!salt) {
+    throw new Error('Salt not set. Check env CRYPTO_SALT');
+  }
+
+  return crypto.pbkdf2Sync(password, salt, Number(process.env.CRYPTO_ITERATIONS), 32, 'sha256').toString('hex');
+};

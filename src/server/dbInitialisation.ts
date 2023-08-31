@@ -10,6 +10,7 @@ import { ETRANSACTION_TYPE } from './types/transactions';
 import { isNeedDbReInit } from './utils/envSettngs';
 
 export const dbInitializer = async (ds: DataSource) => {
+  console.log('isNeedDbReInit: ', isNeedDbReInit());
   if (!isNeedDbReInit()) {
     return;
   }
