@@ -62,7 +62,7 @@ export const TransactionsFilters: React.VFC<{
 
         {typeId !== ETRANSACTION_TYPE.TRANSFER && (
           <Form.Item label="Категория" name="categoryId">
-            <CategoriesSelect typeId={typeId} />
+            <CategoriesSelect allowClear typeId={typeId} />
           </Form.Item>
         )}
 

@@ -1,6 +1,6 @@
 {
   "name": "budget-react",
-  "version": "0.2.40",
+  "version": "0.2.41",
   "homepage": "budget",
   "proxy": "http://localhost:3001",
   "private": true,
@@ -63,7 +63,8 @@
     "dev": "concurrently --kill-others \"npm run client:dev\" \"npm run server:dev\"",
     "prod:nobuild": "concurrently --kill-others \"npm run client:container:run\" \"npm run server:container:run\"",
     "client:dev": "vite",
-    "client:build": "vite build --base=https://al-sh.github.io/budget",
+    "client:build": "vite build --base=/budget",
+    "client:build:git": "vite build --base=https://al-sh.github.io/budget",
     "rs:client:dev": "react-scripts start",
     "rs:client:build": "react-scripts build",
     "client:build:image": "sh ./nginx-image-build.sh",
