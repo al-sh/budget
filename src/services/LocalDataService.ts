@@ -23,7 +23,9 @@ class LocalDataService {
   private _storage = getStorage();
 
   public get accounts() {
-    return this._storage.getItem(EStorageLabels.ACCOUNTS);
+    const storagedAccounts = this._storage.getItem(EStorageLabels.ACCOUNTS);
+
+    return Array.isArray(storagedAccounts) ? storagedAccounts : [];
   }
 
   public set accounts(items: LocalAccount[]) {
@@ -39,7 +41,9 @@ class LocalDataService {
   }
 
   public get transactions() {
-    return this._storage.getItem(EStorageLabels.TRANSACTIONS);
+    const storagedTransactions = this._storage.getItem(EStorageLabels.TRANSACTIONS);
+
+    return Array.isArray(storagedTransactions) ? storagedTransactions : [];
   }
 
   public set transactions(items: LocalTransaction[]) {

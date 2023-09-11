@@ -37,6 +37,7 @@ export const AccountsList: React.VFC<{ fromMainPage?: boolean }> = ({ fromMainPa
 
   return (
     <AccountListWrapper>
+      {accounts?.length === 0 && 'Список счетов пуст'}
       {accounts?.map((acc) => (
         <AccountWrapper
           key={acc.id}

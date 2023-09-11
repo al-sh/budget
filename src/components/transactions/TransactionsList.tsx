@@ -19,6 +19,7 @@ export const TransactionsList: React.VFC = () => {
 
   return (
     <>
+      {transactions?.length === 0 && 'Список пуст'}
       {transactions?.map((tran) => (
         <TransactionItem key={tran.id} tran={tran} />
       ))}
