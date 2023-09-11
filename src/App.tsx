@@ -14,6 +14,10 @@ import { getStorage } from './services/Storage';
 import { light } from './components/_shared/themes/light';
 import { UI_ROUTES } from './constants/urls';
 
+/*if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}*/
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -41,6 +45,8 @@ const TransactionsPage = React.lazy(() => import('./components/transactions/page
 export const App = () => {
   const storage = getStorage();
   const isDarkTheme = storage.getItem('settings.theme') === 'dark';
+
+  console.log('APP START, version:', __APP_VERSION__, 'homepage:', __HOMEPAGE__);
 
   return (
     <QueryClientProvider client={queryClient}>
