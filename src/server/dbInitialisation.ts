@@ -116,6 +116,7 @@ export const dbInitializer = async (ds: DataSource) => {
     utilitiesTran.category = apartmentCategory;
     utilitiesTran.dt = new Date();
     utilitiesTran.description = 'Коммуналка';
+    utilitiesTran.user = newDemoUser;
 
     const capitalRepairTran = new Transaction();
     capitalRepairTran.account = account2;
@@ -123,6 +124,7 @@ export const dbInitializer = async (ds: DataSource) => {
     capitalRepairTran.category = apartmentCategory;
     capitalRepairTran.dt = new Date();
     capitalRepairTran.description = 'Капремонт';
+    capitalRepairTran.user = newDemoUser;
 
     const avanceTran = new Transaction();
     avanceTran.account = account;
@@ -130,6 +132,7 @@ export const dbInitializer = async (ds: DataSource) => {
     avanceTran.category = salaryCategory;
     avanceTran.dt = new Date();
     avanceTran.description = 'Аванс';
+    avanceTran.user = newDemoUser;
 
     await transactionalEntityManager.save([utilitiesTran, capitalRepairTran, avanceTran]);
     console.log('Transactions initialized');
